@@ -1,0 +1,2994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHA 294 - Chapter 1: Introducing Ansible</title>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Web-safe, ADA compliant color palette */
+            --rh-red: #CC0000;
+            --rh-red-dark: #A30000;
+            --rh-red-light: #FF6666;
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --bg-tertiary: #3D3D3D;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --text-muted: #B0B0B0;
+            --accent-blue: #0066CC;
+            --accent-green: #009933;
+            --accent-yellow: #FFCC00;
+            --accent-orange: #FF6600;
+            --border-color: #4D4D4D;
+            --success: #00CC66;
+            --error: #FF3333;
+            --code-bg: #0D0D0D;
+            --tooltip-bg: #FFFFCC;
+            --tooltip-text: #1A1A1A;
+            --focus-outline: #FFCC00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+
+        /* Skip to main content link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--rh-red);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 10000;
+            font-weight: 600;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        /* Focus styles for accessibility */
+        :focus {
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        :focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 3px solid var(--rh-red);
+            padding: 16px 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--rh-red);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .course-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chapter-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--rh-red) 0%, var(--accent-orange) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+            min-width: 45px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            left: 0;
+            top: 76px;
+            bottom: 0;
+            width: 300px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 999;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-section-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 12px 24px 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(204, 0, 0, 0.15);
+            border-left-color: var(--rh-red);
+            color: var(--text-primary);
+        }
+
+        .nav-item.completed::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: -32px;
+            margin-left: -8px;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: auto;
+            font-family: 'Red Hat Mono', monospace;
+        }
+
+        /* Main Content */
+        main {
+            margin-left: 300px;
+            margin-top: 76px;
+            min-height: calc(100vh - 76px);
+        }
+
+        .section {
+            display: none;
+            padding: 48px 64px;
+            max-width: 1000px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--rh-red);
+            padding-bottom: 12px;
+        }
+
+        h3 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .lead {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Tooltips */
+        .term {
+            color: var(--accent-blue);
+            border-bottom: 2px dotted var(--accent-blue);
+            cursor: help;
+            position: relative;
+            display: inline;
+            font-weight: 500;
+        }
+
+        .term .tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            font-weight: 400;
+            text-align: left;
+            pointer-events: none;
+        }
+
+        .term .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--tooltip-bg);
+        }
+
+        /* Tooltip positioning to prevent bleeding off screen */
+        .term.tooltip-left .tooltip {
+            left: 0;
+            transform: translateX(0);
+        }
+
+        .term.tooltip-left .tooltip::after {
+            left: 20px;
+            transform: translateX(0);
+        }
+
+        .term.tooltip-right .tooltip {
+            left: auto;
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .term.tooltip-right .tooltip::after {
+            left: auto;
+            right: 20px;
+            transform: translateX(0);
+        }
+
+        .term:hover .tooltip,
+        .term:focus .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* Code blocks */
+        code {
+            font-family: 'Red Hat Mono', monospace;
+            background: var(--code-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 15px;
+            color: var(--accent-orange);
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 24px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-secondary);
+        }
+
+        .code-comment {
+            color: var(--text-muted);
+        }
+
+        .code-keyword {
+            color: var(--rh-red-light);
+        }
+
+        .code-string {
+            color: var(--accent-green);
+        }
+
+        .code-prompt {
+            color: var(--accent-blue);
+        }
+
+        /* Info boxes */
+        .info-box {
+            padding: 24px;
+            border-radius: 8px;
+            margin: 28px 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.note {
+            background: rgba(0, 102, 204, 0.15);
+            border-color: var(--accent-blue);
+        }
+
+        .info-box.important {
+            background: rgba(255, 102, 0, 0.15);
+            border-color: var(--accent-orange);
+        }
+
+        .info-box.warning {
+            background: rgba(204, 0, 0, 0.15);
+            border-color: var(--rh-red);
+        }
+
+        .info-box.tip {
+            background: rgba(0, 153, 51, 0.15);
+            border-color: var(--accent-green);
+        }
+
+        .info-box-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box.note .info-box-title { color: var(--accent-blue); }
+        .info-box.important .info-box-title { color: var(--accent-orange); }
+        .info-box.warning .info-box-title { color: var(--rh-red); }
+        .info-box.tip .info-box-title { color: var(--accent-green); }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--rh-red);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(204, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--rh-red) 0%, var(--rh-red-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Interactive Diagrams */
+        .diagram-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+            overflow-x: auto;
+        }
+
+        .diagram-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .architecture-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        .diagram-node {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 28px;
+            text-align: center;
+            min-width: 160px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .diagram-node:hover,
+        .diagram-node:focus {
+            border-color: var(--rh-red);
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(204, 0, 0, 0.3);
+        }
+
+        .diagram-node.control-node {
+            border-color: var(--rh-red);
+            background: rgba(204, 0, 0, 0.1);
+        }
+
+        .diagram-node.managed-host {
+            border-color: var(--accent-blue);
+            background: rgba(0, 102, 204, 0.1);
+        }
+
+        .diagram-node-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .diagram-node-label {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .diagram-node-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .diagram-arrow {
+            font-size: 32px;
+            color: var(--text-muted);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .managed-hosts-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            text-align: left;
+            padding: 16px 20px;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--rh-red);
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: var(--bg-secondary);
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quiz-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .quiz-progress {
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .quiz-question {
+            margin-bottom: 24px;
+        }
+
+        .quiz-question-text {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--text-muted);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--accent-blue);
+            background: rgba(0, 102, 204, 0.1);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: rgba(0, 204, 102, 0.15);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--error);
+            background: rgba(255, 51, 51, 0.15);
+        }
+
+        .quiz-option-marker {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .quiz-option.selected .quiz-option-marker {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .quiz-option.correct .quiz-option-marker {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .quiz-option.incorrect .quiz-option-marker {
+            background: var(--error);
+            border-color: var(--error);
+            color: white;
+        }
+
+        .quiz-explanation {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .quiz-explanation.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quiz-explanation-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quiz-explanation-title.correct {
+            color: var(--success);
+        }
+
+        .quiz-explanation-title.incorrect {
+            color: var(--error);
+        }
+
+        .quiz-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: var(--rh-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .quiz-btn:hover {
+            background: var(--rh-red-dark);
+            transform: translateY(-2px);
+        }
+
+        .quiz-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-score {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .quiz-score-value {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 72px;
+            font-weight: 900;
+            color: var(--rh-red);
+            margin-bottom: 16px;
+        }
+
+        .quiz-score-label {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
+        /* Tabs for use cases */
+        .tabs-container {
+            margin: 32px 0;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 14px 24px;
+            background: none;
+            border: none;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--rh-red);
+            border-bottom-color: var(--rh-red);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 24px 0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Navigation buttons */
+        .section-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 28px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--rh-red);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-btn.primary {
+            background: var(--rh-red);
+            border-color: var(--rh-red);
+            color: white;
+        }
+
+        .nav-btn.primary:hover {
+            background: var(--rh-red-dark);
+            border-color: var(--rh-red-dark);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Interactive terminal */
+        .terminal {
+            background: #0D0D0D;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 24px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #FF5F57; }
+        .terminal-dot.yellow { background: #FFBD2E; }
+        .terminal-dot.green { background: #28CA41; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+        }
+
+        .terminal-prompt {
+            color: var(--accent-green);
+        }
+
+        .terminal-command {
+            color: var(--text-primary);
+        }
+
+        .terminal-output {
+            color: var(--text-muted);
+        }
+
+        /* Learning objectives */
+        .objectives-list {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin: 24px 0;
+        }
+
+        .objectives-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .objective-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .objective-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .objective-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .objective-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .objective-text {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Timeline component */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 32px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 32px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -40px;
+            width: 32px;
+            height: 32px;
+            background: var(--bg-secondary);
+            border: 3px solid var(--rh-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .timeline-content {
+            background: var(--bg-secondary);
+            padding: 20px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .timeline-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .timeline-desc {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Comparison table */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .comparison-col {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-header {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--rh-red);
+        }
+
+        .comparison-header h4 {
+            margin: 0;
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .comparison-body {
+            padding: 20px;
+        }
+
+        .comparison-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-icon {
+            color: var(--success);
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            nav {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            nav.open {
+                transform: translateX(0);
+            }
+
+            main {
+                margin-left: 0;
+            }
+
+            .section {
+                padding: 32px 24px;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 1024px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            h1 { font-size: 32px; }
+            h2 { font-size: 26px; }
+            h3 { font-size: 20px; }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .architecture-diagram {
+                flex-direction: column;
+            }
+
+            .diagram-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            header, nav, .section-nav, .quiz-container {
+                display: none;
+            }
+
+            main {
+                margin: 0;
+            }
+
+            .section {
+                display: block !important;
+                page-break-after: always;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Staggered animation for cards */
+        .card-grid .card {
+            opacity: 0;
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        .card-grid .card:nth-child(1) { animation-delay: 0.1s; }
+        .card-grid .card:nth-child(2) { animation-delay: 0.2s; }
+        .card-grid .card:nth-child(3) { animation-delay: 0.3s; }
+        .card-grid .card:nth-child(4) { animation-delay: 0.4s; }
+        .card-grid .card:nth-child(5) { animation-delay: 0.5s; }
+        .card-grid .card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(204, 0, 0, 0.15) 0%, rgba(255, 102, 0, 0.1) 100%);
+            border: 2px solid var(--rh-red);
+            border-radius: 12px;
+            padding: 28px;
+            margin: 32px 0;
+        }
+
+        .highlight-box h3 {
+            margin-top: 0;
+            color: var(--rh-red);
+        }
+
+        /* Interactive checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .checklist li:hover {
+            border-color: var(--rh-red);
+        }
+
+        .checklist-check {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: white;
+            font-size: 14px;
+        }
+
+        .checklist-check.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        /* Flow diagram */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .flow-number {
+            width: 48px;
+            height: 48px;
+            background: var(--rh-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .flow-content {
+            flex: 1;
+            background: var(--bg-secondary);
+            padding: 20px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .flow-content h4 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }
+
+        .flow-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: var(--text-muted);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .badge.red {
+            background: rgba(204, 0, 0, 0.2);
+            color: var(--rh-red-light);
+        }
+
+        .badge.blue {
+            background: rgba(0, 102, 204, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .badge.green {
+            background: rgba(0, 153, 51, 0.2);
+            color: var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="header-brand">
+            <button class="menu-toggle" aria-label="Toggle navigation menu" onclick="toggleNav()">☰</button>
+            <div class="logo" aria-hidden="true">A</div>
+            <div>
+                <div class="course-title">RHA 294</div>
+                <div class="chapter-title">Chapter 1: Introducing Ansible</div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav role="navigation" aria-label="Chapter sections" id="nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="#" class="nav-item active" data-section="welcome" role="button" tabindex="0">
+                <span class="nav-icon">🎯</span>
+                Welcome & Objectives
+                <span class="nav-time">5 min</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Core Concepts</div>
+            <a href="#" class="nav-item" data-section="automation" role="button" tabindex="0">
+                <span class="nav-icon">⚡</span>
+                Why Automation?
+                <span class="nav-time">15 min</span>
+            </a>
+            <a href="#" class="nav-item" data-section="what-is-ansible" role="button" tabindex="0">
+                <span class="nav-icon">🔧</span>
+                What is Ansible?
+                <span class="nav-time">20 min</span>
+            </a>
+            <a href="#" class="nav-item" data-section="architecture" role="button" tabindex="0">
+                <span class="nav-icon">🏗️</span>
+                Architecture
+                <span class="nav-time">25 min</span>
+            </a>
+            <a href="#" class="nav-item" data-section="use-cases" role="button" tabindex="0">
+                <span class="nav-icon">💼</span>
+                Use Cases
+                <span class="nav-time">20 min</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Installation</div>
+            <a href="#" class="nav-item" data-section="ansible-versions" role="button" tabindex="0">
+                <span class="nav-icon">📦</span>
+                Ansible Versions
+                <span class="nav-time">15 min</span>
+            </a>
+            <a href="#" class="nav-item" data-section="aap-overview" role="button" tabindex="0">
+                <span class="nav-icon">🚀</span>
+                Platform Overview
+                <span class="nav-time">20 min</span>
+            </a>
+            <a href="#" class="nav-item" data-section="installation" role="button" tabindex="0">
+                <span class="nav-icon">💻</span>
+                Installing Ansible
+                <span class="nav-time">25 min</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Assessment</div>
+            <a href="#" class="nav-item" data-section="quiz" role="button" tabindex="0">
+                <span class="nav-icon">📝</span>
+                Knowledge Check
+                <span class="nav-time">15 min</span>
+            </a>
+            <a href="#" class="nav-item" data-section="summary" role="button" tabindex="0">
+                <span class="nav-icon">📋</span>
+                Summary
+                <span class="nav-time">10 min</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <!-- Section 1: Welcome -->
+        <section class="section active" id="section-welcome" aria-labelledby="welcome-title">
+            <h1 id="welcome-title">Welcome to Chapter 1: Introducing Ansible</h1>
+            <p class="lead">In this chapter, you'll learn the fundamental concepts of Ansible and how it can transform the way you manage your IT infrastructure. By the end, you'll understand why Ansible has become the go-to automation platform for system administrators and DevOps engineers worldwide.</p>
+
+            <div class="objectives-list">
+                <div class="objectives-title">
+                    <span aria-hidden="true">🎯</span>
+                    Learning Objectives
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)"></div>
+                    <div class="objective-text">Describe the motivation for automating Linux administration tasks with Ansible</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)"></div>
+                    <div class="objective-text">Explain fundamental Ansible concepts and the basic architecture of Ansible</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)"></div>
+                    <div class="objective-text">Install Ansible on a control node and describe the distinction between community Ansible and Red Hat Ansible Automation Platform</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)"></div>
+                    <div class="objective-text">Understand the key components of Red Hat Ansible Automation Platform 2</div>
+                </div>
+            </div>
+
+            <h2>What You'll Learn</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⚡</div>
+                    <div class="card-title">Automation Fundamentals</div>
+                    <p>Understand why automation is essential for modern system administration and infrastructure management.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔧</div>
+                    <div class="card-title">Ansible Basics</div>
+                    <p>Learn what Ansible is, how it works, and why it's become the industry-standard automation tool.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🏗️</div>
+                    <div class="card-title">Architecture</div>
+                    <p>Explore Ansible's architecture including control nodes, managed hosts, inventories, and playbooks.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">💻</div>
+                    <div class="card-title">Installation</div>
+                    <p>Set up Ansible on your control node and prepare your environment for automation.</p>
+                </div>
+            </div>
+
+            <div class="info-box note">
+                <div class="info-box-title">
+                    <span aria-hidden="true">ℹ️</span>
+                    Prerequisites
+                </div>
+                <p>This course assumes you have Red Hat Certified System Administrator (RHCSA) certification or equivalent Red Hat Enterprise Linux knowledge and experience. Familiarity with the Linux command line is essential.</p>
+            </div>
+
+            <div class="section-nav">
+                <div></div>
+                <button class="nav-btn primary" onclick="navigateTo('automation')">
+                    Get Started
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 2: Why Automation? -->
+        <section class="section" id="section-automation" aria-labelledby="automation-title">
+            <h1 id="automation-title">Why Automation?</h1>
+            <p class="lead">For many years, most system administration and infrastructure management has relied on manual tasks performed through graphical or command-line user interfaces. This approach is error-prone and difficult to scale.</p>
+
+            <h2>The Problem with Manual Administration</h2>
+            <p>System administrators often work from checklists, other documentation, or a memorized routine to perform standard tasks. This traditional approach has several significant drawbacks:</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">❌</div>
+                    <div class="card-title">Error-Prone Process</div>
+                    <p>It's easy for a system administrator to skip a step or make a mistake on a step. Verification that steps were performed properly is often limited.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔀</div>
+                    <div class="card-title">Configuration Drift</div>
+                    <p>Managing each server manually and independently makes it very easy for many servers to be different in minor (or major) ways, leading to inconsistent environments.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⏰</div>
+                    <div class="card-title">Time-Consuming</div>
+                    <p>Manual tasks take valuable time away from more critical work and don't scale well as your infrastructure grows.</p>
+                </div>
+            </div>
+
+            <h2>How Automation Helps</h2>
+            <p><span class="term" tabindex="0">Automation<span class="tooltip">The use of technology to perform tasks with reduced human intervention. In IT, this typically means using scripts or tools to automate repetitive system administration tasks.</span></span> can help avoid the problems caused by manual system administration and infrastructure management. As a system administrator, you can use automation to ensure that all your systems are quickly and correctly deployed and configured.</p>
+
+            <div class="highlight-box">
+                <h3>Key Benefits of Automation</h3>
+                <ul>
+                    <li><strong>Consistency:</strong> Ensure all systems are configured identically every time</li>
+                    <li><strong>Speed:</strong> Deploy and configure systems in minutes instead of hours</li>
+                    <li><strong>Scale:</strong> Manage hundreds or thousands of systems with the same effort as one</li>
+                    <li><strong>Documentation:</strong> Your automation code serves as documentation for your infrastructure</li>
+                    <li><strong>Version Control:</strong> Track changes to your infrastructure over time</li>
+                </ul>
+            </div>
+
+            <h2>Infrastructure as Code</h2>
+            <p>A good automation system allows you to implement <span class="term" tabindex="0">Infrastructure as Code<span class="tooltip">A practice where infrastructure configuration is written as machine-readable definition files rather than through interactive configuration tools. This allows infrastructure to be versioned, tested, and deployed automatically.</span></span> practices. This means that you can use a machine-readable automation language to define and describe the required state of your IT infrastructure.</p>
+
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="flow-content">
+                        <h4>Define Desired State</h4>
+                        <p>Write code that describes how your systems should be configured</p>
+                    </div>
+                </div>
+                <div class="flow-arrow" aria-hidden="true">↓</div>
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="flow-content">
+                        <h4>Version Control</h4>
+                        <p>Store your infrastructure code in a version control system like Git</p>
+                    </div>
+                </div>
+                <div class="flow-arrow" aria-hidden="true">↓</div>
+                <div class="flow-step">
+                    <div class="flow-number">3</div>
+                    <div class="flow-content">
+                        <h4>Apply Changes</h4>
+                        <p>Run your automation to apply the desired state to your infrastructure</p>
+                    </div>
+                </div>
+                <div class="flow-arrow" aria-hidden="true">↓</div>
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="flow-content">
+                        <h4>Verify & Iterate</h4>
+                        <p>Validate the changes and iterate as needed</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Mitigating Human Error</h2>
+            <p>Reducing the number of tasks performed manually on servers by using task automation and Infrastructure as Code practices can help ensure that your servers are consistently configured more often.</p>
+
+            <div class="info-box important">
+                <div class="info-box-title">
+                    <span aria-hidden="true">⚠️</span>
+                    Important Consideration
+                </div>
+                <p>You need to become accustomed to making changes by updating your automation code, rather than manually applying them to your servers. Otherwise, you run the risk of losing manually applied changes the next time you apply changes using automation.</p>
+            </div>
+
+            <p>You can use code review, peer review by multiple subject matter experts, and document the procedure within the automation content to reduce your operational risks. Ultimately, you can enforce that changes to your IT infrastructure be made through automation to mitigate human error.</p>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('welcome')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('what-is-ansible')">
+                    Next: What is Ansible?
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 3: What is Ansible? -->
+        <section class="section" id="section-what-is-ansible" aria-labelledby="what-is-ansible-title">
+            <h1 id="what-is-ansible-title">What is Ansible?</h1>
+            <p class="lead">Ansible is an open source automation platform. It is a simple automation language that can accurately describe an IT application infrastructure in Ansible Playbooks. It is also an automation engine that runs Ansible Playbooks.</p>
+
+            <h2>Ansible at a Glance</h2>
+            <p>Ansible can manage powerful automation tasks and can adapt to many workflows and environments. At the same time, new users of Ansible can very quickly use it to become productive.</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📝</div>
+                    <div class="card-title">Ansible Is Simple</div>
+                    <p><span class="term" tabindex="0">Ansible Playbooks<span class="tooltip">YAML files that contain a series of plays. Each play targets specific hosts and defines tasks to be executed. Playbooks are the heart of Ansible's configuration, deployment, and orchestration language.</span></span> provide human-readable automation. This means that playbooks are automation tools that are also easy for humans to read, comprehend, and change. No special coding skills are required to write them.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">💪</div>
+                    <div class="card-title">Ansible Is Powerful</div>
+                    <p>You can use Ansible to deploy applications for configuration management, for workflow automation, and for network automation. You can use Ansible to orchestrate the entire application lifecycle.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🚫</div>
+                    <div class="card-title">Ansible Is Agentless</div>
+                    <p>Ansible is built around an <span class="term" tabindex="0">agentless architecture<span class="tooltip">An architecture where managed hosts don't need any special software installed. Ansible connects via standard protocols (SSH for Linux, WinRM for Windows) and pushes small programs called modules to perform tasks, removing them when done.</span></span>. Typically, Ansible connects to the hosts it manages by using OpenSSH or WinRM and runs tasks.</p>
+                </div>
+            </div>
+
+            <h2>Ansible Strengths</h2>
+            <p>Ansible has a number of important strengths that make it the preferred choice for automation:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Strength</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cross Platform Support</strong></td>
+                            <td>Ansible provides agentless support for Linux, Windows, UNIX, and network devices, in physical, virtual, cloud, and container environments.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Human-Readable Automation</strong></td>
+                            <td>Ansible Playbooks, written as <span class="term tooltip-left" tabindex="0">YAML<span class="tooltip">YAML Ain't Markup Language - a human-readable data serialization format commonly used for configuration files. Ansible uses YAML for playbooks because of its simplicity and readability.</span></span> text files, are easy to read and help ensure that everyone understands what they do.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Precise Application Descriptions</strong></td>
+                            <td>Every change can be made by Ansible Playbooks, and every aspect of your application environment can be described and documented.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Easy to Manage in Version Control</strong></td>
+                            <td>Ansible Playbooks and projects are plain text. They can be treated like source code and placed in your existing version control system.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Support for Dynamic Inventories</strong></td>
+                            <td>The list of machines that Ansible manages can be dynamically updated from external sources to capture the correct, current list of all managed servers.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Orchestration That Integrates Easily</strong></td>
+                            <td>HP SA, Puppet, Jenkins, Red Hat Satellite, and other systems can be leveraged and integrated into your Ansible workflow.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>The Ansible Way</h2>
+            <p>The following goals were used during the design of Ansible:</p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker" aria-hidden="true">1</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Complexity Kills Productivity</div>
+                        <p class="timeline-desc">Simpler is better. Ansible is designed so that its tools are simple to use and automation is simple to write and read. You should take advantage of this to strive for simplification in how you create your automation.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker" aria-hidden="true">2</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Optimize for Readability</div>
+                        <p class="timeline-desc">The Ansible automation language is built around simple, declarative, text-based files that are easy for humans to read. Written properly, Ansible Playbooks can clearly document your workflow automation.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker" aria-hidden="true">3</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Think Declaratively</div>
+                        <p class="timeline-desc">Ansible is a <span class="term tooltip-left" tabindex="0">desired-state engine<span class="tooltip">A system that describes the end state you want your systems to be in, rather than the steps needed to get there. Ansible determines what changes need to be made to reach that state.</span></span>. It approaches the problem of how to automate IT deployments by expressing them in terms of the state that you want your systems to be in.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">
+                    <span aria-hidden="true">💡</span>
+                    Best Practice
+                </div>
+                <p>The goal of Ansible is to put your systems into the desired state, only making changes that are necessary. Trying to treat Ansible like a scripting language is not the right approach—think declaratively about the end state you want to achieve.</p>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('automation')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('architecture')">
+                    Next: Architecture
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 4: Architecture -->
+        <section class="section" id="section-architecture" aria-labelledby="architecture-title">
+            <h1 id="architecture-title">Ansible Concepts and Architecture</h1>
+            <p class="lead">The Ansible architecture consists of two types of machines: control nodes and managed hosts. Understanding how these components work together is essential for effective automation.</p>
+
+            <h2>Architecture Overview</h2>
+            <div class="diagram-container">
+                <div class="diagram-title">Ansible Architecture</div>
+                <div class="architecture-diagram" role="img" aria-label="Ansible architecture diagram showing control node connecting to multiple managed hosts">
+                    <div class="diagram-node control-node" tabindex="0" aria-label="Control Node: Where Ansible is installed and playbooks are run">
+                        <div class="diagram-node-icon" aria-hidden="true">🖥️</div>
+                        <div class="diagram-node-label">Control Node</div>
+                        <div class="diagram-node-desc">Runs Ansible</div>
+                    </div>
+                    <div class="diagram-arrow" aria-hidden="true">→</div>
+                    <div class="managed-hosts-group">
+                        <div class="diagram-node managed-host" tabindex="0" aria-label="Managed Host A: Server managed by Ansible">
+                            <div class="diagram-node-icon" aria-hidden="true">🖧</div>
+                            <div class="diagram-node-label">servera</div>
+                            <div class="diagram-node-desc">Managed Host</div>
+                        </div>
+                        <div class="diagram-node managed-host" tabindex="0" aria-label="Managed Host B: Server managed by Ansible">
+                            <div class="diagram-node-icon" aria-hidden="true">🖧</div>
+                            <div class="diagram-node-label">serverb</div>
+                            <div class="diagram-node-desc">Managed Host</div>
+                        </div>
+                        <div class="diagram-node managed-host" tabindex="0" aria-label="Managed Host C: Server managed by Ansible">
+                            <div class="diagram-node-icon" aria-hidden="true">🖧</div>
+                            <div class="diagram-node-label">serverc</div>
+                            <div class="diagram-node-desc">Managed Host</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Key Components</h2>
+
+            <h3>Control Node</h3>
+            <p>The <span class="term" tabindex="0">control node<span class="tooltip">The machine where Ansible is installed and from which automation is run. This machine has copies of your Ansible project files and is used to execute playbooks against managed hosts.</span></span> is the machine where Ansible is installed and run from. This machine also has copies of your Ansible project files. Python 3.8 or later needs to be installed on the control node before installing the ansible-core package.</p>
+
+            <h3>Managed Hosts</h3>
+            <p><span class="term" tabindex="0">Managed hosts<span class="tooltip">The systems that Ansible manages. These systems don't need to have Ansible installed—they only need to allow the control node to connect to them, typically via SSH (Linux) or WinRM (Windows).</span></span> are listed in an <span class="term" tabindex="0">inventory<span class="tooltip">A file or script that defines the managed hosts and groups them for collective management. Inventories can be static (defined in a text file) or dynamic (generated by scripts from external sources).</span></span>, which also organizes those systems into groups for easier collective management.</p>
+
+            <h3>Plays and Playbooks</h3>
+            <p>Instead of writing complex scripts, Ansible users create high-level <span class="term" tabindex="0">plays<span class="tooltip">A play targets specific hosts and defines a series of tasks to execute on them. Plays map a group of hosts to well-defined roles or tasks.</span></span> to ensure that a host or group of hosts is in a particular state. A play performs a series of <span class="term" tabindex="0">tasks<span class="tooltip">An action that Ansible performs on managed hosts. Tasks call modules with specific arguments to achieve a desired state.</span></span> on the hosts, in the order specified by the play.</p>
+
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">Example Playbook Structure</div>
+                </div>
+                <div class="terminal-body">
+<pre style="margin: 0;"><code><span class="code-comment"># site.yml - Example Ansible Playbook</span>
+<span class="code-keyword">---</span>
+<span class="code-keyword">- name:</span> <span class="code-string">Configure web servers</span>
+  <span class="code-keyword">hosts:</span> <span class="code-string">webservers</span>
+  <span class="code-keyword">become:</span> <span class="code-string">true</span>
+  
+  <span class="code-keyword">tasks:</span>
+    <span class="code-keyword">- name:</span> <span class="code-string">Install Apache web server</span>
+      <span class="code-keyword">ansible.builtin.dnf:</span>
+        <span class="code-keyword">name:</span> <span class="code-string">httpd</span>
+        <span class="code-keyword">state:</span> <span class="code-string">present</span>
+
+    <span class="code-keyword">- name:</span> <span class="code-string">Start and enable Apache</span>
+      <span class="code-keyword">ansible.builtin.service:</span>
+        <span class="code-keyword">name:</span> <span class="code-string">httpd</span>
+        <span class="code-keyword">state:</span> <span class="code-string">started</span>
+        <span class="code-keyword">enabled:</span> <span class="code-string">true</span></code></pre>
+                </div>
+            </div>
+
+            <h3>Modules</h3>
+            <p>Each task runs a <span class="term" tabindex="0">module<span class="tooltip">A small piece of code (typically written in Python) that Ansible pushes to managed hosts to perform a specific task. Modules are the tools in your toolkit—there are hundreds available for different automation tasks.</span></span>, a small piece of code (written in Python, PowerShell, or some other language), with specific arguments. Each module is essentially a tool in your toolkit. Ansible ships with hundreds of useful modules that can perform a wide variety of automation tasks.</p>
+
+            <h3>Idempotence</h3>
+            <p>Tasks, plays, and playbooks are designed to be <span class="term" tabindex="0">idempotent<span class="tooltip">The property where running an operation multiple times produces the same result as running it once. In Ansible, this means you can safely run a playbook multiple times—if systems are already in the correct state, no changes are made.</span></span>. This means that you can safely run a playbook on the same hosts multiple times. When your systems are in the correct state, the playbook makes no changes when you run it.</p>
+
+            <div class="info-box note">
+                <div class="info-box-title">
+                    <span aria-hidden="true">ℹ️</span>
+                    Note on Idempotence
+                </div>
+                <p>Numerous modules are available that you can use to run arbitrary commands. However, you must use those modules with care to ensure that they run in an idempotent way. The goal is that running a playbook multiple times should not cause unintended side effects.</p>
+            </div>
+
+            <h2>Agentless Architecture</h2>
+            <p>The Ansible architecture is agentless. Typically, when an administrator runs an Ansible Playbook, the control node connects to the managed host by using SSH (by default) or WinRM. This means that you do not need to have an Ansible-specific agent installed on managed hosts, and do not need to permit any additional communication between the control node and managed hosts.</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-col">
+                    <div class="comparison-header">
+                        <h4>Agent-Based Tools</h4>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Require agent software on each managed host</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Need to maintain and update agents</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Additional ports/firewall rules needed</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>More complex security considerations</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-col">
+                    <div class="comparison-header">
+                        <h4>Ansible (Agentless)</h4>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">✓</span>
+                            <span>No agent installation required</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">✓</span>
+                            <span>Uses existing SSH/WinRM infrastructure</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">✓</span>
+                            <span>Standard ports already permitted</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">✓</span>
+                            <span>More efficient and secure</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('what-is-ansible')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('use-cases')">
+                    Next: Use Cases
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 5: Use Cases -->
+        <section class="section" id="section-use-cases" aria-labelledby="use-cases-title">
+            <h1 id="use-cases-title">Ansible Use Cases</h1>
+            <p class="lead">Unlike some other tools, Ansible combines orchestration with configuration management, provisioning, and application deployment in one easy-to-use platform.</p>
+
+            <h2>Common Use Cases</h2>
+            <div class="tabs-container">
+                <div class="tabs-header" role="tablist" aria-label="Use case categories">
+                    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-config" id="btn-config" onclick="switchTab('config')">Configuration Management</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-deploy" id="btn-deploy" onclick="switchTab('deploy')">Application Deployment</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-provision" id="btn-provision" onclick="switchTab('provision')">Provisioning</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-cicd" id="btn-cicd" onclick="switchTab('cicd')">CI/CD</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-security" id="btn-security" onclick="switchTab('security')">Security</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-orchestration" id="btn-orchestration" onclick="switchTab('orchestration')">Orchestration</button>
+                </div>
+
+                <div class="tab-content active" id="tab-config" role="tabpanel" aria-labelledby="btn-config">
+                    <h3>Configuration Management</h3>
+                    <p>Centralizing configuration file management and deployment is a common use case for Ansible, and it is how many power users are first introduced to the Ansible automation platform.</p>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">📄</div>
+                            <div class="card-title">File Management</div>
+                            <p>Deploy and manage configuration files across your infrastructure consistently.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">⚙️</div>
+                            <div class="card-title">System Settings</div>
+                            <p>Configure system parameters, services, and user accounts uniformly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-deploy" role="tabpanel" aria-labelledby="btn-deploy">
+                    <h3>Application Deployment</h3>
+                    <p>When you define your application with Ansible, and manage the deployment with automation controller, development teams can effectively manage the entire application lifecycle from development to production.</p>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🚀</div>
+                            <div class="card-title">Deploy Applications</div>
+                            <p>Automate the deployment of applications across development, testing, and production environments.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🔄</div>
+                            <div class="card-title">Rolling Updates</div>
+                            <p>Perform zero-downtime deployments with rolling updates across your server fleet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-provision" role="tabpanel" aria-labelledby="btn-provision">
+                    <h3>Provisioning</h3>
+                    <p>Applications have to be deployed or installed on systems. Ansible and automation controller can help streamline the process of provisioning systems, whether you are PXE booting and kickstarting bare-metal servers or virtual machines, or creating virtual machines or cloud instances from templates.</p>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">☁️</div>
+                            <div class="card-title">Cloud Provisioning</div>
+                            <p>Create and configure cloud instances on AWS, Azure, GCP, and other providers.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🖥️</div>
+                            <div class="card-title">VM Management</div>
+                            <p>Automate virtual machine creation on VMware, Red Hat Virtualization, and other platforms.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-cicd" role="tabpanel" aria-labelledby="btn-cicd">
+                    <h3>Continuous Delivery</h3>
+                    <p>Creating a CI/CD pipeline requires coordination and buy-in from numerous teams. You cannot do it without a simple automation platform that everyone in your organization can use. Ansible Playbooks keep your applications properly deployed and managed throughout their entire lifecycle.</p>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🔗</div>
+                            <div class="card-title">Pipeline Integration</div>
+                            <p>Integrate Ansible with Jenkins, GitLab CI, and other CI/CD tools.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">✅</div>
+                            <div class="card-title">Automated Testing</div>
+                            <p>Run automated tests and validation as part of your deployment pipeline.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-security" role="tabpanel" aria-labelledby="btn-security">
+                    <h3>Security and Compliance</h3>
+                    <p>When your security policy is defined in Ansible Playbooks, scanning for and remediation of potential security issues can be integrated into other automated processes. Instead of being an afterthought, it is an integral part of everything that is deployed.</p>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🔒</div>
+                            <div class="card-title">Security Hardening</div>
+                            <p>Apply security baselines and hardening configurations automatically.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">📋</div>
+                            <div class="card-title">Compliance Auditing</div>
+                            <p>Ensure systems meet compliance requirements with automated checks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-orchestration" role="tabpanel" aria-labelledby="btn-orchestration">
+                    <h3>Orchestration</h3>
+                    <p>Configurations alone do not define your environment. You need to define how multiple configurations interact, and ensure that the disparate pieces can be managed as a whole.</p>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🎭</div>
+                            <div class="card-title">Multi-tier Deployments</div>
+                            <p>Coordinate complex deployments across web servers, application servers, and databases.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon" aria-hidden="true">🔀</div>
+                            <div class="card-title">Workflow Automation</div>
+                            <p>Define and execute complex workflows that span multiple systems and services.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagram-container">
+                <div class="diagram-title">Ansible Across the Application Lifecycle</div>
+                <div class="architecture-diagram" style="gap: 24px;">
+                    <div class="diagram-node" tabindex="0" style="background: rgba(204, 0, 0, 0.1);">
+                        <div class="diagram-node-icon" aria-hidden="true">👨‍💻</div>
+                        <div class="diagram-node-label">Dev/Test</div>
+                    </div>
+                    <div class="diagram-arrow" aria-hidden="true">→</div>
+                    <div class="diagram-node" tabindex="0" style="background: rgba(255, 102, 0, 0.1);">
+                        <div class="diagram-node-icon" aria-hidden="true">🔍</div>
+                        <div class="diagram-node-label">Q/A</div>
+                    </div>
+                    <div class="diagram-arrow" aria-hidden="true">→</div>
+                    <div class="diagram-node" tabindex="0" style="background: rgba(0, 102, 204, 0.1);">
+                        <div class="diagram-node-icon" aria-hidden="true">⚙️</div>
+                        <div class="diagram-node-label">Operations</div>
+                    </div>
+                    <div class="diagram-arrow" aria-hidden="true">→</div>
+                    <div class="diagram-node" tabindex="0" style="background: rgba(0, 153, 51, 0.1);">
+                        <div class="diagram-node-icon" aria-hidden="true">🚀</div>
+                        <div class="diagram-node-label">Production</div>
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); margin-top: 16px;">Communication is the key to DevOps. Ansible is the first automation language that can be read and written across IT.</p>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('architecture')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('ansible-versions')">
+                    Next: Ansible Versions
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 6: Ansible Versions -->
+        <section class="section" id="section-ansible-versions" aria-labelledby="ansible-versions-title">
+            <h1 id="ansible-versions-title">Ansible Versions and Support</h1>
+            <p class="lead">You can obtain Ansible software in different ways, each with their own level of support. Understanding these options helps you choose the right approach for your organization.</p>
+
+            <h2>Ways to Get Ansible</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🌐</div>
+                    <div class="card-title">Community Ansible</div>
+                    <p>From the upstream community as Python pip packages. No Red Hat support.</p>
+                    <span class="badge">Community</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🐧</div>
+                    <div class="card-title">RHEL Included</div>
+                    <p>As part of Red Hat Enterprise Linux with limited support for specific use cases.</p>
+                    <span class="badge blue">Limited Support</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🎯</div>
+                    <div class="card-title">Ansible Automation Platform</div>
+                    <p>Fully supported Red Hat product with additional enterprise components.</p>
+                    <span class="badge red">Full Support</span>
+                </div>
+            </div>
+
+            <h2>Community Ansible</h2>
+            <p>The upstream Ansible community develops Ansible and distributes versions of it in two ways:</p>
+
+            <h3>Ansible Core</h3>
+            <p><span class="term" tabindex="0">Ansible Core<span class="tooltip">The minimalist component that consists of the core runtime that can interpret Ansible content and a set of commonly used Ansible modules (included as the ansible.builtin Ansible Content Collection).</span></span> is a minimalist component that consists of the core runtime that can interpret Ansible content and a set of commonly used Ansible modules (included as the <code>ansible.builtin</code> Ansible Content Collection). This runtime is structured so that the control node acts as the execution environment for Ansible code.</p>
+
+            <h3>Community Ansible Package</h3>
+            <p><span class="term" tabindex="0">Community Ansible<span class="tooltip">A distribution of Ansible Core plus a selection of other Ansible Content Collections selected by the open source community, adding additional Ansible modules and roles.</span></span> is a distribution of Ansible Core plus a selection of other Ansible Content Collections selected by the open source community, adding additional Ansible modules and roles. Both are provided by the upstream developers as Python pip packages; neither community version is supported by Red Hat.</p>
+
+            <h2>Ansible Core in Red Hat Enterprise Linux</h2>
+            <p>Red Hat provides Ansible Core as an RPM package, <code>ansible-core</code>, included with Red Hat Enterprise Linux 9 in the AppStream repository. It is intended to enable support for automation code provided or generated by Red Hat.</p>
+
+            <div class="info-box important">
+                <div class="info-box-title">
+                    <span aria-hidden="true">⚠️</span>
+                    Scope of Support
+                </div>
+                <p>The scope of support is limited to any Ansible Playbooks, roles, or modules that are included with or generated by a Red Hat product, such as the system roles included in the <code>rhel-system-roles</code> package, Red Hat Insights remediation playbooks, and OpenSCAP compliance Ansible Playbooks. Other use cases, including using the other Ansible modules and plug-ins included with Ansible Core 2.13, are outside the scope of support.</p>
+            </div>
+
+            <h2>Red Hat Ansible Automation Platform</h2>
+            <p>Red Hat provides a fully supported version of Ansible through <span class="term" tabindex="0">Red Hat Ansible Automation Platform<span class="tooltip">A fully supported version of Ansible that enables enterprises to manage their automation at scale. It includes official support, certified content, on-premise tools, and cloud services.</span></span>. This platform provides a supported version of the Ansible Core toolset plus additional certified and supported content, tools, components, and cloud services.</p>
+
+            <div class="highlight-box">
+                <h3>Red Hat Ansible Automation Platform Benefits</h3>
+                <ul>
+                    <li><strong>Official support</strong> for the core Ansible toolset</li>
+                    <li><strong>Red Hat Certified Ansible Content Collections</strong> to help you accelerate adoption of Ansible automation with supported code</li>
+                    <li><strong>On-premise tools</strong> to help you centralize delivery of automation content, manage automation tasks, and scale distribution of automation execution</li>
+                    <li><strong>Cloud services</strong> to help you discover certified Ansible content, facilitate team collaboration, and provide operational analytics</li>
+                </ul>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('use-cases')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('aap-overview')">
+                    Next: Platform Overview
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 7: AAP Overview -->
+        <section class="section" id="section-aap-overview" aria-labelledby="aap-overview-title">
+            <h1 id="aap-overview-title">Red Hat Ansible Automation Platform 2 Overview</h1>
+            <p class="lead">Red Hat Ansible Automation Platform 2 includes a number of distinct components that together provide a complete and integrated set of automation tools and resources.</p>
+
+            <h2>Platform Components</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⚙️</div>
+                    <div class="card-title">Ansible Core</div>
+                    <p>Provides the fundamental functionality used to run Ansible Playbooks. It defines the automation language that is used to write Ansible Playbooks in YAML text files.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📚</div>
+                    <div class="card-title">Content Collections</div>
+                    <p><span class="term tooltip-left" tabindex="0">Ansible Content Collections<span class="tooltip">Packages of related modules, roles, and plug-ins that are supported by the same group of developers. They allow modules to be versioned and distributed independently of Ansible Core.</span></span> are made up of related modules, roles, and plug-ins. Red Hat provides access to more than 120 certified content collections.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🧭</div>
+                    <div class="card-title">Automation Content Navigator</div>
+                    <p><span class="term tooltip-left" tabindex="0">Automation content navigator<span class="tooltip">A command-line tool (ansible-navigator) that replaces and extends the functionality of several Ansible utilities. It can run playbooks in containers called automation execution environments.</span></span> (<code>ansible-navigator</code>) is a tool to develop and test Ansible Playbooks that replaces and extends several command-line utilities.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Execution Environments</div>
+                    <p>An <span class="term tooltip-right" tabindex="0">automation execution environment<span class="tooltip">A container image that contains Ansible Core, Ansible Content Collections, and any Python libraries, executables, or other dependencies needed to run your playbook.</span></span> is a container image that contains Ansible Core, Content Collections, and any dependencies needed to run your playbook.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🎛️</div>
+                    <div class="card-title">Automation Controller</div>
+                    <p><span class="term tooltip-left" tabindex="0">Automation controller<span class="tooltip">Formerly called Red Hat Ansible Tower, this component provides a central point of control to run your enterprise automation code. It offers a web UI and a REST API for managing automation jobs.</span></span> (formerly Red Hat Ansible Tower) provides a central point of control to run your enterprise automation code with a web UI and REST API.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🏪</div>
+                    <div class="card-title">Automation Hub</div>
+                    <p>A public service at <code>console.redhat.com</code> provides access to Red Hat Certified Ansible Content Collections that you can download and use.</p>
+                </div>
+            </div>
+
+            <h2>Component Workflow</h2>
+            <div class="diagram-container">
+                <div class="diagram-title">User Experience: Adapting Execution Environments</div>
+                <div style="display: flex; flex-direction: column; gap: 32px; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center;">
+                        <div class="diagram-node" tabindex="0">
+                            <div class="diagram-node-icon" aria-hidden="true">👤</div>
+                            <div class="diagram-node-label">User</div>
+                        </div>
+                        <div class="diagram-arrow" aria-hidden="true">→</div>
+                        <div class="diagram-node" tabindex="0" style="border-color: var(--accent-orange);">
+                            <div class="diagram-node-icon" aria-hidden="true">🏗️</div>
+                            <div class="diagram-node-label">ansible-builder</div>
+                            <div class="diagram-node-desc">Create EE</div>
+                        </div>
+                        <div class="diagram-arrow" aria-hidden="true">→</div>
+                        <div class="diagram-node" tabindex="0" style="border-color: var(--accent-green);">
+                            <div class="diagram-node-icon" aria-hidden="true">📦</div>
+                            <div class="diagram-node-label">Execution Environment</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center;">
+                        <div class="diagram-node" tabindex="0">
+                            <div class="diagram-node-icon" aria-hidden="true">👤</div>
+                            <div class="diagram-node-label">User</div>
+                        </div>
+                        <div class="diagram-arrow" aria-hidden="true">→</div>
+                        <div class="diagram-node" tabindex="0" style="border-color: var(--accent-blue);">
+                            <div class="diagram-node-icon" aria-hidden="true">🧭</div>
+                            <div class="diagram-node-label">ansible-navigator</div>
+                            <div class="diagram-node-desc">Develop & Test</div>
+                        </div>
+                        <div class="diagram-arrow" aria-hidden="true">→</div>
+                        <div class="diagram-node" tabindex="0" style="border-color: var(--rh-red);">
+                            <div class="diagram-node-icon" aria-hidden="true">📋</div>
+                            <div class="diagram-node-label">Playbook + EE</div>
+                            <div class="diagram-node-desc">Execute</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); margin-top: 24px;">
+                    <span class="badge green">✓ Supported tooling</span>
+                    <span class="badge blue">✓ Portable</span>
+                    <span class="badge red">✓ Scalable</span>
+                </p>
+            </div>
+
+            <div class="info-box note">
+                <div class="info-box-title">
+                    <span aria-hidden="true">ℹ️</span>
+                    Course Scope
+                </div>
+                <p>This course uses Red Hat Ansible Automation Platform 2.2, which includes Ansible Core 2.13. This version is roughly similar to the community Ansible 6 distribution, although Ansible Automation Platform includes different Content Collections and additional tools. Installing the server components such as automation controller and automation hub is beyond the scope of this course.</p>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('ansible-versions')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('installation')">
+                    Next: Installing Ansible
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 8: Installation -->
+        <section class="section" id="section-installation" aria-labelledby="installation-title">
+            <h1 id="installation-title">Installing Ansible</h1>
+            <p class="lead">To run Ansible Playbooks, install automation content navigator (ansible-navigator) on your control node and download an execution environment.</p>
+
+            <h2>Preparing a Control Node</h2>
+            <p>Hosts that are managed by Ansible do not need to have <code>ansible-navigator</code> installed; you only need to install that tool on the control node from which you run Ansible Playbooks. Python 3.8 or later needs to be installed on the control node before installing the <code>ansible-core</code> package.</p>
+
+            <div class="info-box important">
+                <div class="info-box-title">
+                    <span aria-hidden="true">⚠️</span>
+                    Subscription Required
+                </div>
+                <p>You need a valid Red Hat Ansible Automation Platform subscription to install automation content navigator on your control node. If you have activated Simple Content Access for your organization in the Red Hat Customer Portal, then you do not need to attach the subscription to your system.</p>
+            </div>
+
+            <h3>Installation Steps</h3>
+
+            <h4>Step 1: Install Automation Content Navigator</h4>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">workstation.lab.example.com</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">[student@workstation ~]$ </span>
+                        <span class="terminal-command">sudo dnf install ansible-navigator</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">[sudo] password for student: student</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Last metadata expiration check: 0:12:47 ago</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Dependencies resolved.</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">...output omitted...</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Is this ok [y/d/N]: y</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">...output omitted...</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Complete!</span>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Step 2: Verify Installation</h4>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">workstation.lab.example.com</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">[student@workstation ~]$ </span>
+                        <span class="terminal-command">ansible-navigator --version</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">ansible-navigator 2.1.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Step 3: Log in to Container Registry</h4>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">workstation.lab.example.com</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">[student@workstation ~]$ </span>
+                        <span class="terminal-command">podman login registry.redhat.io</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Username: your-registry-username</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Password: your-registry-password</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">Login Succeeded!</span>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Step 4: Download Execution Environment</h4>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">workstation.lab.example.com</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">[student@workstation ~]$ </span>
+                        <span class="terminal-command">podman pull \</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-command">&gt; registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest</span>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Step 5: Verify Available Images</h4>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">workstation.lab.example.com</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">[student@workstation ~]$ </span>
+                        <span class="terminal-command">ansible-navigator images</span>
+                    </div>
+                    <div class="terminal-line" style="margin-top: 12px;">
+                        <span class="terminal-output">  Image              Tag     Execution environment  Created      Size</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-output">0│ee-supported-rhel8  latest  True                   5 weeks ago  1.32 GB</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Preparing Managed Hosts</h2>
+            <p>One of the benefits of Ansible is that managed hosts do not need to have a special agent installed. The Ansible control node connects to managed hosts by using a standard network protocol to ensure that the systems are in the specified state.</p>
+
+            <div class="info-box note">
+                <div class="info-box-title">
+                    <span aria-hidden="true">ℹ️</span>
+                    Managed Host Requirements
+                </div>
+                <p>Managed hosts might have some requirements depending on how the control node connects to them and what modules are run on them:</p>
+            </div>
+
+            <ul class="checklist">
+                <li>
+                    <button class="checklist-check" aria-label="Mark as complete" onclick="toggleCheck(this)"></button>
+                    <span><strong>Python installed:</strong> Linux and UNIX managed hosts need to have Python installed for most modules to work. The version of Python to use depends on the version of the ansible-core package.</span>
+                </li>
+                <li>
+                    <button class="checklist-check" aria-label="Mark as complete" onclick="toggleCheck(this)"></button>
+                    <span><strong>SELinux support:</strong> If SELinux is enabled on the managed hosts, ensure that the <code>python3-libselinux</code> package is installed before using modules related to copy, file, or template functions.</span>
+                </li>
+                <li>
+                    <button class="checklist-check" aria-label="Mark as complete" onclick="toggleCheck(this)"></button>
+                    <span><strong>SSH connectivity:</strong> Ansible needs to be able to connect to the machine by using SSH, and if it connects as a regular user it needs to be able to use a mechanism such as <code>sudo</code> to get superuser access.</span>
+                </li>
+            </ul>
+
+            <h2>Microsoft Windows and Network Devices</h2>
+            <p>Ansible also supports managing Microsoft Windows systems and network devices:</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-col">
+                    <div class="comparison-header">
+                        <h4>Microsoft Windows</h4>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Uses the <code>ansible.windows</code> Content Collection</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Requires PowerShell 3.0 or later</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Requires .NET Framework 4.0 or later</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Connects via WinRM</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-col">
+                    <div class="comparison-header">
+                        <h4>Network Devices</h4>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Support for Cisco IOS, IOS XR, NX-OS</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Juniper Junos, Arista EOS, VyOS</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Modules run on control node</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="comparison-icon" aria-hidden="true">•</span>
+                            <span>Uses CLI, XML, or API over SSH/HTTPS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('aap-overview')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('quiz')">
+                    Next: Knowledge Check
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 9: Quiz -->
+        <section class="section" id="section-quiz" aria-labelledby="quiz-title">
+            <h1 id="quiz-title">Knowledge Check</h1>
+            <p class="lead">Test your understanding of the concepts covered in this chapter. Answer the following questions to assess your knowledge.</p>
+
+            <div class="quiz-container" id="quiz-container">
+                <!-- Quiz content will be dynamically generated -->
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('installation')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="navigateTo('summary')">
+                    Continue to Summary
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 10: Summary -->
+        <section class="section" id="section-summary" aria-labelledby="summary-title">
+            <h1 id="summary-title">Chapter Summary</h1>
+            <p class="lead">Congratulations on completing Chapter 1! Here's a recap of the key concepts you've learned.</p>
+
+            <div class="objectives-list">
+                <div class="objectives-title">
+                    <span aria-hidden="true">✅</span>
+                    Key Takeaways
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text"><strong>Automation</strong> helps you mitigate human error and ensure that your IT infrastructure is in a consistent, correct state.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text"><strong>Ansible</strong> is an open source automation platform that can adapt to many workflows and environments.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text"><strong>Red Hat Ansible Automation Platform</strong> is a fully supported version of Ansible that also includes a number of additional components and tools to help you develop, deploy, and manage your automation code.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text">Ansible can be used to manage many types of systems, including servers running <strong>Linux, servers running Microsoft Windows, and network devices</strong>.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text"><strong>Ansible Playbooks</strong> are human-readable text files that describe the desired state of an IT infrastructure.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text">Ansible connects to managed hosts using standard network protocols such as <strong>SSH</strong>, and runs code or commands on the managed hosts to ensure that they are in the state specified.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text">Ansible is built around an <strong>agentless architecture</strong> in which the Ansible software is only installed on a control node and in automation execution environments.</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox checked" aria-hidden="true">✓</div>
+                    <div class="objective-text"><strong>Automation content navigator</strong> (<code>ansible-navigator</code>) is a key tool that helps you develop and run your Ansible automation code.</div>
+                </div>
+            </div>
+
+            <h2>What's Next?</h2>
+            <p>In the next chapter, you will learn how to create and manage Ansible inventories to define the hosts that Ansible will manage. You will also learn how to prepare hosts for connections from Ansible.</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📖</div>
+                    <div class="card-title">Chapter 2</div>
+                    <p>Implementing an Ansible Playbook</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔗</div>
+                    <div class="card-title">Resources</div>
+                    <p>Review the references section in your course materials for additional documentation and guides.</p>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 48px; text-align: center;">
+                <h3 style="margin-top: 0;">🎉 Chapter Complete!</h3>
+                <p style="margin-bottom: 0;">You've successfully completed Chapter 1: Introducing Ansible. Continue to the next chapter to deepen your understanding of Ansible automation.</p>
+            </div>
+
+            <div class="section-nav">
+                <button class="nav-btn" onclick="navigateTo('quiz')">
+                    <span aria-hidden="true">←</span>
+                    Previous
+                </button>
+                <button class="nav-btn primary" onclick="alert('This is the end of Chapter 1. In the full course, this would navigate to Chapter 2.')">
+                    Continue to Chapter 2
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Quiz Questions Data
+        const quizQuestions = [
+            {
+                question: "What type of architecture does Ansible use?",
+                options: [
+                    { text: "Agent-based architecture requiring software on all managed hosts", correct: false },
+                    { text: "Agentless architecture using SSH or WinRM to connect to managed hosts", correct: true },
+                    { text: "Peer-to-peer architecture where all nodes are equal", correct: false },
+                    { text: "Client-server architecture with a dedicated database server", correct: false }
+                ],
+                explanation: "Ansible is built around an agentless architecture. It connects to managed hosts using standard network protocols like SSH (for Linux) or WinRM (for Windows), without requiring any special agent software to be installed on the managed hosts."
+            },
+            {
+                question: "What is the primary format used for writing Ansible Playbooks?",
+                options: [
+                    { text: "JSON (JavaScript Object Notation)", correct: false },
+                    { text: "XML (Extensible Markup Language)", correct: false },
+                    { text: "YAML (YAML Ain't Markup Language)", correct: true },
+                    { text: "INI (Initialization file format)", correct: false }
+                ],
+                explanation: "Ansible Playbooks are written in YAML format. YAML was chosen because it is human-readable and easy to understand, making playbooks accessible to both developers and system administrators."
+            },
+            {
+                question: "What is the term for Ansible's ability to run a playbook multiple times without causing unintended changes?",
+                options: [
+                    { text: "Redundancy", correct: false },
+                    { text: "Idempotence", correct: true },
+                    { text: "Persistence", correct: false },
+                    { text: "Convergence", correct: false }
+                ],
+                explanation: "Idempotence means that running an operation multiple times produces the same result as running it once. In Ansible, if systems are already in the correct state, the playbook makes no changes when you run it again."
+            },
+            {
+                question: "Which component of Red Hat Ansible Automation Platform 2 is used to develop and test Ansible Playbooks?",
+                options: [
+                    { text: "Automation controller", correct: false },
+                    { text: "Ansible Core", correct: false },
+                    { text: "Automation content navigator (ansible-navigator)", correct: true },
+                    { text: "Automation hub", correct: false }
+                ],
+                explanation: "Automation content navigator (ansible-navigator) is a command-line tool that replaces and extends the functionality of several Ansible utilities. It allows you to develop and test playbooks by running them in automation execution environments."
+            },
+            {
+                question: "What is an automation execution environment in Ansible Automation Platform 2?",
+                options: [
+                    { text: "A physical server dedicated to running Ansible", correct: false },
+                    { text: "A container image containing Ansible Core, Content Collections, and dependencies", correct: true },
+                    { text: "A virtual network for isolated playbook testing", correct: false },
+                    { text: "A cloud service for remote execution", correct: false }
+                ],
+                explanation: "An automation execution environment is a container image that contains Ansible Core, Ansible Content Collections, and any Python libraries, executables, or other dependencies needed to run your playbook."
+            },
+            {
+                question: "What is the 'Infrastructure as Code' concept?",
+                options: [
+                    { text: "Writing software applications that manage servers", correct: false },
+                    { text: "Using machine-readable files to define and describe the required state of IT infrastructure", correct: true },
+                    { text: "Converting physical servers to virtual machines", correct: false },
+                    { text: "Documenting infrastructure in spreadsheets", correct: false }
+                ],
+                explanation: "Infrastructure as Code means using a machine-readable automation language to define and describe the required state of your IT infrastructure. This code can be versioned, reviewed, and applied consistently across environments."
+            },
+            {
+                question: "Which of the following is NOT a use case for Ansible?",
+                options: [
+                    { text: "Configuration management", correct: false },
+                    { text: "Application deployment", correct: false },
+                    { text: "Database design and modeling", correct: true },
+                    { text: "Security and compliance automation", correct: false }
+                ],
+                explanation: "While Ansible can manage database servers and configurations, it is not designed for database design and modeling tasks. Common Ansible use cases include configuration management, application deployment, provisioning, continuous delivery, security compliance, and orchestration."
+            },
+            {
+                question: "What is an Ansible Content Collection?",
+                options: [
+                    { text: "A documentation repository for Ansible", correct: false },
+                    { text: "A package of related modules, roles, and plug-ins", correct: true },
+                    { text: "A set of training materials", correct: false },
+                    { text: "A backup of playbook files", correct: false }
+                ],
+                explanation: "Ansible Content Collections are packages of related modules, roles, and plug-ins that are supported by the same group of developers. They allow Ansible content to be versioned and distributed independently of Ansible Core."
+            },
+            {
+                question: "What is the minimum Python version required on a control node for Ansible Core?",
+                options: [
+                    { text: "Python 2.7", correct: false },
+                    { text: "Python 3.6", correct: false },
+                    { text: "Python 3.8 or later", correct: true },
+                    { text: "Python 3.11", correct: false }
+                ],
+                explanation: "Python 3.8 or later needs to be installed on the control node before installing the ansible-core package. This ensures compatibility with current Ansible features and security requirements."
+            },
+            {
+                question: "What was automation controller formerly known as?",
+                options: [
+                    { text: "Ansible Engine", correct: false },
+                    { text: "Red Hat Ansible Tower", correct: true },
+                    { text: "Ansible Hub", correct: false },
+                    { text: "Ansible Galaxy", correct: false }
+                ],
+                explanation: "Automation controller was formerly called Red Hat Ansible Tower. It is the component of Red Hat Ansible Automation Platform that provides a central point of control to run your enterprise automation code, offering a web UI and a REST API."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        // Initialize Quiz
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = quizQuestions[currentQuestion];
+            
+            container.innerHTML = `
+                <div class="quiz-header">
+                    <div class="quiz-title">Question ${currentQuestion + 1} of ${quizQuestions.length}</div>
+                    <div class="quiz-progress">Score: ${score}/${currentQuestion}</div>
+                </div>
+                <div class="quiz-question">
+                    <div class="quiz-question-text">${q.question}</div>
+                    <div class="quiz-options" role="radiogroup" aria-label="Answer options">
+                        ${q.options.map((opt, i) => `
+                            <div class="quiz-option" role="radio" aria-checked="false" tabindex="0" 
+                                 onclick="selectOption(${i})" onkeypress="handleOptionKey(event, ${i})"
+                                 data-index="${i}" data-correct="${opt.correct}">
+                                <div class="quiz-option-marker">${String.fromCharCode(65 + i)}</div>
+                                <div class="quiz-option-text">${opt.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="quiz-explanation" id="explanation">
+                        <div class="quiz-explanation-title" id="explanation-title"></div>
+                        <p>${q.explanation}</p>
+                    </div>
+                </div>
+                <button class="quiz-btn" id="quiz-btn" onclick="nextQuestion()" disabled>
+                    ${currentQuestion < quizQuestions.length - 1 ? 'Next Question' : 'See Results'}
+                    <span aria-hidden="true">→</span>
+                </button>
+            `;
+            answered = false;
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+
+            const options = document.querySelectorAll('.quiz-option');
+            const selected = options[index];
+            const isCorrect = selected.dataset.correct === 'true';
+
+            options.forEach((opt, i) => {
+                opt.setAttribute('aria-checked', i === index ? 'true' : 'false');
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+            } else {
+                selected.classList.add('incorrect');
+            }
+
+            const explanation = document.getElementById('explanation');
+            const explanationTitle = document.getElementById('explanation-title');
+            
+            explanationTitle.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            explanationTitle.className = 'quiz-explanation-title ' + (isCorrect ? 'correct' : 'incorrect');
+            explanation.classList.add('visible');
+
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function handleOptionKey(event, index) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectOption(index);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizQuestions.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const container = document.getElementById('quiz-container');
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            
+            container.innerHTML = `
+                <div class="quiz-score">
+                    <div class="quiz-score-value">${percentage}%</div>
+                    <div class="quiz-score-label">You got ${score} out of ${quizQuestions.length} questions correct</div>
+                    <p style="margin-top: 24px; color: var(--text-muted);">
+                        ${percentage >= 80 ? '🎉 Excellent work! You have a strong understanding of Ansible fundamentals.' :
+                          percentage >= 60 ? '👍 Good job! Review the sections you found challenging.' :
+                          '📚 Consider reviewing the chapter material and trying again.'}
+                    </p>
+                    <button class="quiz-btn" onclick="initQuiz()" style="margin-top: 24px;">
+                        Retake Quiz
+                        <span aria-hidden="true">↺</span>
+                    </button>
+                </div>
+            `;
+
+            // Mark quiz section as completed
+            markSectionComplete('quiz');
+        }
+
+        // Navigation Functions
+        const sections = ['welcome', 'automation', 'what-is-ansible', 'architecture', 'use-cases', 'ansible-versions', 'aap-overview', 'installation', 'quiz', 'summary'];
+        let completedSections = new Set();
+
+        function navigateTo(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Show target section
+            const targetSection = document.getElementById('section-' + sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                
+                // Update nav
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.section === sectionId) {
+                        item.classList.add('active');
+                    }
+                });
+
+                // Mark previous section as complete
+                const currentIndex = sections.indexOf(sectionId);
+                if (currentIndex > 0) {
+                    markSectionComplete(sections[currentIndex - 1]);
+                }
+
+                // Scroll to top
+                window.scrollTo(0, 0);
+
+                // Update progress
+                updateProgress();
+
+                // Initialize quiz if needed
+                if (sectionId === 'quiz') {
+                    initQuiz();
+                }
+            }
+        }
+
+        function markSectionComplete(sectionId) {
+            completedSections.add(sectionId);
+            const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+            if (navItem) {
+                navItem.classList.add('completed');
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (completedSections.size / sections.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = Math.round(progress) + '%';
+            document.querySelector('.progress-bar').setAttribute('aria-valuenow', Math.round(progress));
+        }
+
+        // Tab Functions
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.getElementById('btn-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).setAttribute('aria-selected', 'true');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // Interactive Element Functions
+        function toggleObjective(element) {
+            element.classList.toggle('checked');
+            const isChecked = element.classList.contains('checked');
+            element.setAttribute('aria-checked', isChecked);
+            element.innerHTML = isChecked ? '✓' : '';
+        }
+
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            element.innerHTML = element.classList.contains('checked') ? '✓' : '';
+        }
+
+        function toggleNav() {
+            document.getElementById('nav').classList.toggle('open');
+        }
+
+        // Tooltip positioning
+        function positionTooltips() {
+            document.querySelectorAll('.term').forEach(term => {
+                const rect = term.getBoundingClientRect();
+                const tooltip = term.querySelector('.tooltip');
+                if (!tooltip) return;
+
+                // Reset classes
+                term.classList.remove('tooltip-left', 'tooltip-right');
+
+                // Check if tooltip would go off screen
+                const tooltipWidth = 280;
+                const screenWidth = window.innerWidth;
+
+                if (rect.left < tooltipWidth / 2) {
+                    term.classList.add('tooltip-left');
+                } else if (rect.right + tooltipWidth / 2 > screenWidth) {
+                    term.classList.add('tooltip-right');
+                }
+            });
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateTo(item.dataset.section);
+                
+                // Close mobile nav
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('nav').classList.remove('open');
+                }
+            });
+
+            item.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateTo(item.dataset.section);
+                }
+            });
+        });
+
+        // Handle keyboard navigation for objectives
+        document.querySelectorAll('.objective-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleObjective(checkbox);
+                }
+            });
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            positionTooltips();
+            updateProgress();
+        });
+
+        window.addEventListener('resize', positionTooltips);
+        window.addEventListener('scroll', positionTooltips);
+    </script>
+</body>
+</html>

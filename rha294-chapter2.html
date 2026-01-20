@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHA 294 - Chapter 2: Implementing an Ansible Playbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rh-red: #CC0000;
+            --rh-red-dark: #A30000;
+            --rh-red-light: #FF6666;
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --bg-tertiary: #3D3D3D;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --text-muted: #B0B0B0;
+            --accent-blue: #0066CC;
+            --accent-green: #009933;
+            --accent-yellow: #FFCC00;
+            --accent-orange: #FF6600;
+            --accent-purple: #9966CC;
+            --accent-cyan: #00CCCC;
+            --border-color: #4D4D4D;
+            --success: #00CC66;
+            --error: #FF3333;
+            --warning: #FF9900;
+            --code-bg: #0D0D0D;
+            --tooltip-bg: #FFFFCC;
+            --tooltip-text: #1A1A1A;
+            --focus-outline: #FFCC00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--rh-red);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 10000;
+            font-weight: 600;
+            transition: top 0.3s;
+        }
+        .skip-link:focus { top: 0; outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus:not(:focus-visible) { outline: none; }
+        :focus-visible { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 3px solid var(--rh-red);
+            padding: 16px 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-brand { display: flex; align-items: center; gap: 16px; }
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--rh-red);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+        }
+        .course-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .chapter-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .progress-container { display: flex; align-items: center; gap: 12px; }
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--rh-red) 0%, var(--accent-orange) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        .progress-text {
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+            min-width: 45px;
+        }
+        .menu-toggle {
+            display: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        nav {
+            position: fixed;
+            left: 0;
+            top: 76px;
+            bottom: 0;
+            width: 300px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 999;
+        }
+        .nav-section { margin-bottom: 8px; }
+        .nav-section-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 12px 24px 8px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-item.active {
+            background: rgba(204, 0, 0, 0.15);
+            border-left-color: var(--rh-red);
+            color: var(--text-primary);
+        }
+        .nav-item.completed::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: -32px;
+            margin-left: -8px;
+        }
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
+        .section {
+            display: none;
+            padding: 48px;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        h2 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 48px 0 24px;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--rh-red);
+            padding-bottom: 12px;
+        }
+        h3 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--accent-yellow);
+        }
+        h4 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text-secondary);
+        }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        .lead { font-size: 20px; color: var(--text-muted); margin-bottom: 32px; }
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+        .code-header {
+            background: var(--bg-tertiary);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .code-title { font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
+        .code-copy {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .code-copy:hover { background: var(--rh-red); color: white; border-color: var(--rh-red); }
+        .code-content { padding: 20px; overflow-x: auto; }
+        pre {
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre;
+            margin: 0;
+        }
+        code {
+            font-family: 'Red Hat Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-cyan);
+        }
+        .yaml-key { color: var(--accent-cyan); }
+        .yaml-value { color: var(--accent-green); }
+        .yaml-string { color: var(--accent-yellow); }
+        .yaml-comment { color: var(--text-muted); font-style: italic; }
+        .yaml-dash { color: var(--rh-red-light); }
+        .yaml-module { color: var(--accent-purple); }
+        .yaml-number { color: var(--accent-orange); }
+        .term {
+            position: relative;
+            color: var(--accent-cyan);
+            border-bottom: 1px dotted var(--accent-cyan);
+            cursor: help;
+            display: inline;
+        }
+        .tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 280px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--tooltip-bg);
+        }
+        .term:hover .tooltip, .term:focus .tooltip { opacity: 1; visibility: visible; }
+        .term.tooltip-left .tooltip { left: 0; transform: translateX(0); }
+        .term.tooltip-left .tooltip::after { left: 20px; }
+        .term.tooltip-right .tooltip { left: auto; right: 0; transform: translateX(0); }
+        .term.tooltip-right .tooltip::after { left: auto; right: 20px; }
+        .term.tooltip-bottom .tooltip { bottom: auto; top: calc(100% + 8px); }
+        .term.tooltip-bottom .tooltip::after {
+            top: auto;
+            bottom: 100%;
+            border: 8px solid transparent;
+            border-bottom-color: var(--tooltip-bg);
+        }
+        .info-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-blue);
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .info-box.warning { border-left-color: var(--warning); background: rgba(255, 153, 0, 0.1); }
+        .info-box.tip { border-left-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
+        .info-box.danger { border-left-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .info-box-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-box.warning .info-box-title { color: var(--warning); }
+        .info-box.tip .info-box-title { color: var(--accent-green); }
+        .info-box.danger .info-box-title { color: var(--error); }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: var(--rh-red);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(204, 0, 0, 0.2);
+        }
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--rh-red) 0%, var(--accent-orange) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .card-content { color: var(--text-muted); font-size: 15px; }
+        .objectives-list {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+        .objectives-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .objective-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .objective-item:last-child { border-bottom: none; }
+        .objective-checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: transparent;
+            font-size: 14px;
+        }
+        .objective-checkbox:hover { border-color: var(--rh-red); }
+        .objective-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+        .objective-text { color: var(--text-secondary); line-height: 1.6; }
+        .table-container {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); }
+        th {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            text-align: left;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--rh-red);
+        }
+        td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--bg-tertiary); }
+        .tabs { margin: 32px 0; }
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--rh-red); border-bottom-color: var(--rh-red); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        .demo-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin: 32px 0;
+            overflow: hidden;
+        }
+        .demo-header {
+            background: var(--bg-tertiary);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .demo-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .demo-controls { display: flex; gap: 8px; }
+        .demo-btn {
+            background: var(--rh-red);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .demo-btn:hover { background: var(--rh-red-dark); }
+        .demo-btn:disabled { background: var(--bg-tertiary); cursor: not-allowed; opacity: 0.6; }
+        .demo-btn.secondary { background: var(--bg-secondary); border: 1px solid var(--border-color); }
+        .demo-btn.secondary:hover { background: var(--bg-tertiary); }
+        .demo-body { padding: 20px; }
+        .demo-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .demo-panel { background: var(--code-bg); border-radius: 8px; overflow: hidden; }
+        .demo-panel-header {
+            background: var(--bg-tertiary);
+            padding: 10px 16px;
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .demo-panel-content { padding: 16px; min-height: 200px; max-height: 400px; overflow-y: auto; }
+        .demo-panel textarea {
+            width: 100%;
+            height: 300px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+        }
+        .demo-panel textarea:focus { outline: none; }
+        .demo-output { font-family: 'Red Hat Mono', monospace; font-size: 13px; line-height: 1.6; }
+        .output-line { margin-bottom: 4px; }
+        .output-ok { color: var(--success); }
+        .output-changed { color: var(--accent-yellow); }
+        .output-failed { color: var(--error); }
+        .output-task { color: var(--accent-cyan); font-weight: 600; }
+        .output-play { color: var(--accent-purple); font-weight: 700; }
+        .quiz-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+        .quiz-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .quiz-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .quiz-progress-fill { height: 100%; background: var(--rh-red); transition: width 0.3s; }
+        .quiz-progress-text { font-family: 'Red Hat Mono', monospace; font-size: 14px; color: var(--text-muted); }
+        .quiz-question {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+        .quiz-option {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .quiz-option:hover:not(.selected) { border-color: var(--rh-red); background: rgba(204, 0, 0, 0.1); }
+        .quiz-option.selected { border-color: var(--accent-blue); background: rgba(0, 102, 204, 0.1); }
+        .quiz-option.correct { border-color: var(--success); background: rgba(0, 204, 102, 0.1); }
+        .quiz-option.incorrect { border-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .quiz-option-marker {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .quiz-option.correct .quiz-option-marker { background: var(--success); border-color: var(--success); color: white; }
+        .quiz-option.incorrect .quiz-option-marker { background: var(--error); border-color: var(--error); color: white; }
+        .quiz-explanation {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+            display: none;
+        }
+        .quiz-explanation.visible { display: block; animation: fadeIn 0.3s ease; }
+        .quiz-explanation-title { font-weight: 600; margin-bottom: 8px; }
+        .quiz-explanation-title.correct { color: var(--success); }
+        .quiz-explanation-title.incorrect { color: var(--error); }
+        .quiz-btn {
+            background: var(--rh-red);
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quiz-btn:hover:not(:disabled) { background: var(--rh-red-dark); }
+        .quiz-btn:disabled { background: var(--bg-tertiary); cursor: not-allowed; }
+        .quiz-score { text-align: center; padding: 40px; }
+        .quiz-score-value {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 64px;
+            font-weight: 900;
+            color: var(--rh-red);
+        }
+        .quiz-score-label { font-size: 18px; color: var(--text-muted); margin-top: 8px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-primary { background: var(--rh-red); color: white; }
+        .btn-primary:hover { background: var(--rh-red-dark); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-tertiary); }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+        }
+        .accordion { margin: 24px 0; }
+        .accordion-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .accordion-header {
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .accordion-header:hover { background: var(--bg-tertiary); }
+        .accordion-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .accordion-icon { transition: transform 0.3s; }
+        .accordion-item.open .accordion-icon { transform: rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .accordion-item.open .accordion-content { max-height: 2000px; }
+        .accordion-body { padding: 0 20px 20px; }
+        .exercise {
+            background: linear-gradient(135deg, rgba(204, 0, 0, 0.1) 0%, rgba(255, 102, 0, 0.1) 100%);
+            border: 1px solid var(--rh-red);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+        .exercise-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .exercise-badge {
+            background: var(--rh-red);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .exercise-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .exercise-steps { counter-reset: step; }
+        .exercise-step { display: flex; gap: 16px; margin-bottom: 24px; padding-left: 8px; }
+        .exercise-step::before {
+            counter-increment: step;
+            content: counter(step);
+            background: var(--rh-red);
+            color: white;
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .checklist {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            color: transparent;
+            margin-top: 2px;
+        }
+        .checklist-check:hover { border-color: var(--success); }
+        .checklist-check.checked { background: var(--success); border-color: var(--success); color: white; }
+        .diagram {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+            text-align: center;
+        }
+        .diagram-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; margin-bottom: 24px; }
+        .playbook-structure { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .structure-item {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 32px;
+            min-width: 250px;
+            transition: all 0.3s;
+        }
+        .structure-item:hover { border-color: var(--rh-red); transform: scale(1.02); }
+        .structure-label { font-family: 'Red Hat Mono', monospace; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+        .structure-name { font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 16px; }
+        .structure-arrow { color: var(--text-muted); font-size: 24px; }
+        .module-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .module-name { font-family: 'Red Hat Mono', monospace; font-size: 16px; color: var(--accent-purple); font-weight: 600; margin-bottom: 8px; }
+        .module-collection { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .module-desc { color: var(--text-secondary); margin-bottom: 16px; }
+        @media (max-width: 1024px) {
+            nav { transform: translateX(-100%); transition: transform 0.3s; }
+            nav.open { transform: translateX(0); }
+            main { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .demo-editor { grid-template-columns: 1fr; }
+            .progress-bar { width: 120px; }
+        }
+        @media (max-width: 768px) {
+            .section { padding: 24px; }
+            h1 { font-size: 32px; }
+            h2 { font-size: 26px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .header-brand { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .progress-container { display: none; }
+        }
+        @media print {
+            nav, header, .skip-link, .nav-buttons, .demo-controls, .quiz-btn { display: none !important; }
+            main { margin: 0; }
+            .section { display: block !important; break-inside: avoid; page-break-inside: avoid; }
+        }
+        @media (prefers-contrast: high) {
+            :root { --border-color: #FFFFFF; --text-muted: #E0E0E0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header role="banner">
+        <div class="header-brand">
+            <div class="logo" aria-hidden="true">A</div>
+            <div>
+                <div class="course-title">RHA 294</div>
+                <div class="chapter-title">Chapter 2: Implementing an Ansible Playbook</div>
+            </div>
+        </div>
+        <button class="menu-toggle" onclick="toggleNav()" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+        <div class="progress-container">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Course progress">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+    </header>
+    <nav id="nav" role="navigation" aria-label="Chapter sections">
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="#" class="nav-item active" data-section="welcome" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🏠</span>Welcome</a>
+            <a href="#" class="nav-item" data-section="objectives" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🎯</span>Learning Objectives</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Core Concepts</div>
+            <a href="#" class="nav-item" data-section="playbook-intro" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📖</span>What is a Playbook?</a>
+            <a href="#" class="nav-item" data-section="yaml-syntax" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📝</span>YAML Syntax</a>
+            <a href="#" class="nav-item" data-section="structure" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🏗️</span>Playbook Structure</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Building Playbooks</div>
+            <a href="#" class="nav-item" data-section="modules" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🧩</span>Working with Modules</a>
+            <a href="#" class="nav-item" data-section="variables" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔤</span>Variables</a>
+            <a href="#" class="nav-item" data-section="handlers" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔔</span>Handlers</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Execution</div>
+            <a href="#" class="nav-item" data-section="running" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🚀</span>Running Playbooks</a>
+            <a href="#" class="nav-item" data-section="validation" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">✅</span>Validation & Dry Runs</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Practice</div>
+            <a href="#" class="nav-item" data-section="lab" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">💻</span>Hands-On Lab</a>
+            <a href="#" class="nav-item" data-section="quiz" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📋</span>Knowledge Check</a>
+            <a href="#" class="nav-item" data-section="summary" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📚</span>Summary</a>
+        </div>
+    </nav>
+    <main id="main-content" role="main">
+        <!-- Welcome Section -->
+        <section id="section-welcome" class="section active" aria-labelledby="welcome-heading">
+            <h1 id="welcome-heading">Welcome to Chapter 2</h1>
+            <p class="lead">Learn to write, validate, and execute Ansible playbooks to automate complex IT tasks across your infrastructure.</p>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📖</div>
+                    <div class="card-title">Playbook Fundamentals</div>
+                    <div class="card-content">Understand playbook structure, YAML syntax, and how plays organize automation tasks.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🧩</div>
+                    <div class="card-title">Modules & Variables</div>
+                    <div class="card-content">Work with Ansible modules, define variables, and create flexible, reusable automation.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🚀</div>
+                    <div class="card-title">Execution & Testing</div>
+                    <div class="card-content">Run playbooks, validate syntax, perform dry runs, and troubleshoot issues.</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title"><span aria-hidden="true">⏱️</span> Estimated Time</div>
+                <p>This chapter takes approximately <strong>2-3 hours</strong> to complete, including hands-on exercises.</p>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">✅</span> Prerequisites</div>
+                <p>Before starting, ensure you have completed Chapter 1 and understand Ansible architecture, inventory management, and ad-hoc commands.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" onclick="navigateTo('objectives')">
+                    Get Started
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Objectives Section -->
+        <section id="section-objectives" class="section" aria-labelledby="objectives-heading">
+            <h1 id="objectives-heading">Learning Objectives</h1>
+            <p class="lead">By the end of this chapter, you will be able to accomplish the following tasks.</p>
+
+            <div class="objectives-list">
+                <div class="objectives-title"><span aria-hidden="true">🎯</span> Chapter Goals</div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Describe Ansible playbooks and explain how they differ from ad-hoc commands</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Write properly formatted YAML files for Ansible playbooks</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Create playbooks with multiple plays, tasks, and handlers</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Use modules with proper Fully Qualified Collection Names (FQCNs)</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Define and reference variables within playbooks</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Execute playbooks using ansible-playbook and ansible-navigator</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Validate playbook syntax and perform dry runs before execution</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div class="objective-text">Troubleshoot and debug common playbook errors</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('welcome')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('playbook-intro')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Playbook Introduction Section -->
+        <section id="section-playbook-intro" class="section" aria-labelledby="playbook-intro-heading">
+            <h1 id="playbook-intro-heading">What is a Playbook?</h1>
+            <p class="lead">Playbooks are Ansible's configuration, deployment, and orchestration language, expressed in YAML format.</p>
+
+            <h2>Ad-hoc Commands vs. Playbooks</h2>
+            <p>While <span class="term" tabindex="0">ad-hoc commands<span class="tooltip" role="tooltip">Single-line Ansible commands executed directly from the command line. Useful for quick, one-time tasks but not reusable or version-controllable.</span></span> are useful for quick tasks, <span class="term" tabindex="0">playbooks<span class="tooltip" role="tooltip">YAML files containing one or more plays that define automation tasks. Playbooks are reusable, version-controllable, and can express complex multi-step workflows.</span></span> provide a more powerful and flexible approach.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Ad-hoc Commands</th>
+                            <th>Playbooks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Reusability</td><td>Not easily reusable</td><td>Highly reusable</td></tr>
+                        <tr><td>Version Control</td><td>Difficult to track</td><td>Easy to version with Git</td></tr>
+                        <tr><td>Complexity</td><td>Single tasks only</td><td>Multi-step workflows</td></tr>
+                        <tr><td>Variables</td><td>Limited support</td><td>Full variable support</td></tr>
+                        <tr><td>Conditionals</td><td>Not supported</td><td>Full conditional logic</td></tr>
+                        <tr><td>Documentation</td><td>None</td><td>Self-documenting</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Playbook Hierarchy</h2>
+            <div class="diagram">
+                <div class="diagram-title">Playbook Structure</div>
+                <div class="playbook-structure">
+                    <div class="structure-item" style="border-color: var(--rh-red);">
+                        <div class="structure-label">FILE</div>
+                        <div class="structure-name">Playbook</div>
+                    </div>
+                    <div class="structure-arrow" aria-hidden="true">↓ contains one or more</div>
+                    <div class="structure-item" style="border-color: var(--accent-orange);">
+                        <div class="structure-label">SECTION</div>
+                        <div class="structure-name">Play</div>
+                    </div>
+                    <div class="structure-arrow" aria-hidden="true">↓ contains one or more</div>
+                    <div class="structure-item" style="border-color: var(--accent-yellow);">
+                        <div class="structure-label">UNIT</div>
+                        <div class="structure-name">Task</div>
+                    </div>
+                    <div class="structure-arrow" aria-hidden="true">↓ calls one</div>
+                    <div class="structure-item" style="border-color: var(--accent-green);">
+                        <div class="structure-label">ACTION</div>
+                        <div class="structure-name">Module</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Key Concept</div>
+                <p>A <strong>playbook</strong> contains <strong>plays</strong>. Each play targets a group of hosts and contains <strong>tasks</strong>. Each task calls a <strong>module</strong> to perform an action.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('objectives')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('yaml-syntax')">Continue to YAML Syntax <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- YAML Syntax Section -->
+        <section id="section-yaml-syntax" class="section" aria-labelledby="yaml-syntax-heading">
+            <h1 id="yaml-syntax-heading">YAML Syntax</h1>
+            <p class="lead">YAML (YAML Ain't Markup Language) is a human-readable data serialization format used for Ansible playbooks.</p>
+
+            <h2>YAML Basics</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📏</div>
+                    <div class="card-title">Indentation</div>
+                    <div class="card-content">Use <strong>spaces only</strong> (never tabs). Standard is 2 spaces per level.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔑</div>
+                    <div class="card-title">Key-Value Pairs</div>
+                    <div class="card-content">Format: <code>key: value</code> with a space after the colon.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📋</div>
+                    <div class="card-title">Lists</div>
+                    <div class="card-content">Items start with a dash and space: <code>- item</code></div>
+                </div>
+            </div>
+
+            <h2>Data Types</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">YAML data types</span>
+                    <button class="code-copy" onclick="copyCode(this)" aria-label="Copy code">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Strings</span>
+<span class="yaml-key">name</span>: <span class="yaml-string">Configure webserver</span>
+<span class="yaml-key">quoted</span>: <span class="yaml-string">"String with: special chars"</span>
+
+<span class="yaml-comment"># Numbers</span>
+<span class="yaml-key">port</span>: <span class="yaml-number">80</span>
+<span class="yaml-key">timeout</span>: <span class="yaml-number">30.5</span>
+
+<span class="yaml-comment"># Booleans</span>
+<span class="yaml-key">enabled</span>: <span class="yaml-value">true</span>
+<span class="yaml-key">debug</span>: <span class="yaml-value">false</span>
+
+<span class="yaml-comment"># Lists</span>
+<span class="yaml-key">packages</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+  <span class="yaml-dash">-</span> <span class="yaml-value">firewalld</span>
+  <span class="yaml-dash">-</span> <span class="yaml-value">mod_ssl</span>
+
+<span class="yaml-comment"># Dictionaries</span>
+<span class="yaml-key">server</span>:
+  <span class="yaml-key">hostname</span>: <span class="yaml-value">web1</span>
+  <span class="yaml-key">ip</span>: <span class="yaml-value">192.168.1.10</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Common Mistakes</div>
+                <p><strong>Tabs:</strong> Never use tabs - YAML requires spaces only.<br>
+                <strong>Colons:</strong> Values with colons need quotes: <code>"http://example.com"</code><br>
+                <strong>Variables:</strong> Values starting with {{ must be quoted.</p>
+            </div>
+
+            <h2>Interactive YAML Validator</h2>
+            <div class="demo-container">
+                <div class="demo-header">
+                    <span class="demo-title"><span aria-hidden="true">🔍</span> YAML Syntax Checker</span>
+                    <div class="demo-controls">
+                        <button class="demo-btn secondary" onclick="resetYamlEditor()">Reset</button>
+                        <button class="demo-btn" onclick="validateYaml()">Validate</button>
+                    </div>
+                </div>
+                <div class="demo-body">
+                    <div class="demo-editor">
+                        <div class="demo-panel">
+                            <div class="demo-panel-header">Input YAML</div>
+                            <div class="demo-panel-content">
+                                <textarea id="yaml-input" aria-label="YAML input">---
+- name: Configure web server
+  hosts: webservers
+  become: true
+  
+  tasks:
+    - name: Install httpd
+      ansible.builtin.dnf:
+        name: httpd
+        state: present</textarea>
+                            </div>
+                        </div>
+                        <div class="demo-panel">
+                            <div class="demo-panel-header">Validation Result</div>
+                            <div class="demo-panel-content">
+                                <div id="yaml-output" class="demo-output">Click "Validate" to check your YAML</div>
+                                <div id="yaml-status" class="validation-status" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('playbook-intro')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('structure')">Continue to Structure <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Playbook Structure Section -->
+        <section id="section-structure" class="section" aria-labelledby="structure-heading">
+            <h1 id="structure-heading">Playbook Structure</h1>
+            <p class="lead">Understanding the anatomy of a playbook is essential for writing effective automation.</p>
+
+            <h2>Complete Playbook Example</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">webserver.yml</span>
+                    <button class="code-copy" onclick="copyCode(this)" aria-label="Copy code">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web servers</span>       <span class="yaml-comment"># Play name</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>                   <span class="yaml-comment"># Target hosts</span>
+  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>                        <span class="yaml-comment"># Privilege escalation</span>
+
+  <span class="yaml-key">vars</span>:                                <span class="yaml-comment"># Play variables</span>
+    <span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+    <span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span>
+
+  <span class="yaml-key">tasks</span>:                               <span class="yaml-comment"># Task list</span>
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install Apache</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start and enable httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+        <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span>
+
+  <span class="yaml-key">handlers</span>:                            <span class="yaml-comment"># Handler list</span>
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                </div>
+            </div>
+
+            <h2>Play Attributes</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Attribute</th><th>Required</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>name</code></td><td>Recommended</td><td>Descriptive name for the play</td></tr>
+                        <tr><td><code>hosts</code></td><td><strong>Yes</strong></td><td>Target hosts or groups from inventory</td></tr>
+                        <tr><td><code>become</code></td><td>No</td><td>Enable privilege escalation (sudo)</td></tr>
+                        <tr><td><code>vars</code></td><td>No</td><td>Define variables for the play</td></tr>
+                        <tr><td><code>tasks</code></td><td>No*</td><td>List of tasks to execute</td></tr>
+                        <tr><td><code>handlers</code></td><td>No</td><td>Tasks triggered by notifications</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Host Patterns</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Common host patterns</span></div>
+                <div class="code-content">
+<pre><span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>                      <span class="yaml-comment"># All hosts in inventory</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>               <span class="yaml-comment"># Single group</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:dbservers</span>     <span class="yaml-comment"># Multiple groups (OR)</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:&dbservers</span>    <span class="yaml-comment"># Intersection (AND)</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:!staging</span>      <span class="yaml-comment"># Exclude group</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">web1.example.com</span>        <span class="yaml-comment"># Single host</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">*.example.com</span>           <span class="yaml-comment"># Wildcard</span></pre>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('yaml-syntax')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('modules')">Continue to Modules <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Modules Section -->
+        <section id="section-modules" class="section" aria-labelledby="modules-heading">
+            <h1 id="modules-heading">Working with Modules</h1>
+            <p class="lead">Modules are the building blocks of Ansible tasks, providing specific functionality for different automation needs.</p>
+
+            <h2>Fully Qualified Collection Names (FQCNs)</h2>
+            <p>Always use <span class="term" tabindex="0">FQCNs<span class="tooltip" role="tooltip">Fully Qualified Collection Name - the complete path to a module including namespace, collection, and module name. Example: ansible.builtin.copy</span></span> for clarity and to avoid naming conflicts:</p>
+
+            <div class="code-block">
+                <div class="code-content">
+<pre><span class="yaml-comment"># Recommended: FQCN</span>
+<span class="yaml-module">ansible.builtin.copy</span>:
+  <span class="yaml-key">src</span>: <span class="yaml-value">file.txt</span>
+  <span class="yaml-key">dest</span>: <span class="yaml-value">/tmp/file.txt</span>
+
+<span class="yaml-comment"># Not recommended: short name</span>
+<span class="yaml-module">copy</span>:
+  <span class="yaml-key">src</span>: <span class="yaml-value">file.txt</span>
+  <span class="yaml-key">dest</span>: <span class="yaml-value">/tmp/file.txt</span></pre>
+                </div>
+            </div>
+
+            <h2>Essential Modules Reference</h2>
+            <div class="tabs">
+                <div class="tab-buttons" role="tablist">
+                    <button class="tab-btn active" id="btn-files" onclick="switchTab('files')" role="tab" aria-selected="true">Files</button>
+                    <button class="tab-btn" id="btn-packages" onclick="switchTab('packages')" role="tab" aria-selected="false">Packages</button>
+                    <button class="tab-btn" id="btn-services" onclick="switchTab('services')" role="tab" aria-selected="false">Services</button>
+                    <button class="tab-btn" id="btn-users" onclick="switchTab('users')" role="tab" aria-selected="false">Users</button>
+                    <button class="tab-btn" id="btn-commands" onclick="switchTab('commands')" role="tab" aria-selected="false">Commands</button>
+                </div>
+
+                <div class="tab-content active" id="tab-files" role="tabpanel">
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.copy</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Copy files from the control node to managed hosts.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy configuration file</span>
+  <span class="yaml-module">ansible.builtin.copy</span>:
+    <span class="yaml-key">src</span>: <span class="yaml-value">files/httpd.conf</span>
+    <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+    <span class="yaml-key">owner</span>: <span class="yaml-value">root</span>
+    <span class="yaml-key">group</span>: <span class="yaml-value">root</span>
+    <span class="yaml-key">mode</span>: <span class="yaml-string">'0644'</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.file</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Manage file and directory properties.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create directory</span>
+  <span class="yaml-module">ansible.builtin.file</span>:
+    <span class="yaml-key">path</span>: <span class="yaml-value">/var/www/html</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">directory</span>
+    <span class="yaml-key">mode</span>: <span class="yaml-string">'0755'</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.template</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Process Jinja2 templates and copy to managed hosts.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy config from template</span>
+  <span class="yaml-module">ansible.builtin.template</span>:
+    <span class="yaml-key">src</span>: <span class="yaml-value">templates/httpd.conf.j2</span>
+    <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-packages" role="tabpanel">
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.dnf</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Manage packages with DNF (RHEL 8+, Fedora).</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">firewalld</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update all packages</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-string">"*"</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">latest</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.yum</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Manage packages with YUM (RHEL 7 and earlier).</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package with yum</span>
+  <span class="yaml-module">ansible.builtin.yum</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-services" role="tabpanel">
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.service</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Manage services (works with multiple init systems).</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start and enable httpd</span>
+  <span class="yaml-module">ansible.builtin.service</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+    <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.posix.firewalld</div>
+                        <div class="module-collection">Collection: ansible.posix</div>
+                        <div class="module-desc">Manage firewalld rules and zones.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Allow HTTP through firewall</span>
+  <span class="yaml-module">ansible.posix.firewalld</span>:
+    <span class="yaml-key">service</span>: <span class="yaml-value">http</span>
+    <span class="yaml-key">permanent</span>: <span class="yaml-value">true</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
+    <span class="yaml-key">immediate</span>: <span class="yaml-value">true</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-users" role="tabpanel">
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.user</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Manage user accounts.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create application user</span>
+  <span class="yaml-module">ansible.builtin.user</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">appuser</span>
+    <span class="yaml-key">uid</span>: <span class="yaml-number">1050</span>
+    <span class="yaml-key">group</span>: <span class="yaml-value">appgroup</span>
+    <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/bash</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.group</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Manage groups.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create application group</span>
+  <span class="yaml-module">ansible.builtin.group</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">appgroup</span>
+    <span class="yaml-key">gid</span>: <span class="yaml-number">1050</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-commands" role="tabpanel">
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.command</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Execute commands on targets. Safe but limited (no shell features).</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run a command</span>
+  <span class="yaml-module">ansible.builtin.command</span>:
+    <span class="yaml-key">cmd</span>: <span class="yaml-value">/usr/bin/myapp --init</span>
+    <span class="yaml-key">creates</span>: <span class="yaml-value">/opt/myapp/.initialized</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.shell</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Execute commands through the shell. Supports pipes, redirects.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run shell command</span>
+  <span class="yaml-module">ansible.builtin.shell</span>:
+    <span class="yaml-key">cmd</span>: <span class="yaml-value">cat /var/log/messages | grep error | wc -l</span>
+  <span class="yaml-key">register</span>: <span class="yaml-value">error_count</span>
+  <span class="yaml-key">changed_when</span>: <span class="yaml-value">false</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title"><span aria-hidden="true">⚠️</span> Caution</div>
+                        <p>Use <code>command</code> and <code>shell</code> sparingly. They are not idempotent by default. Prefer purpose-built modules when available.</p>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-name">ansible.builtin.debug</div>
+                        <div class="module-collection">Collection: ansible.builtin</div>
+                        <div class="module-desc">Print statements during execution for debugging.</div>
+                        <div class="code-block">
+                            <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display variable</span>
+  <span class="yaml-module">ansible.builtin.debug</span>:
+    <span class="yaml-key">msg</span>: <span class="yaml-string">"Port is {{ http_port }}"</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Module Documentation</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible-doc commands</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># List all modules</span>
+$ ansible-doc -l
+
+<span class="yaml-comment"># View module documentation</span>
+$ ansible-doc ansible.builtin.copy
+
+<span class="yaml-comment"># Show examples only</span>
+$ ansible-doc ansible.builtin.copy -s</pre>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('structure')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('variables')">Continue to Variables <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Variables Section -->
+        <section id="section-variables" class="section" aria-labelledby="variables-heading">
+            <h1 id="variables-heading">Variables in Playbooks</h1>
+            <p class="lead">Variables make your playbooks flexible and reusable by parameterizing configuration values.</p>
+
+            <h2>Why Use Variables?</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔄</div>
+                    <div class="card-title">Reusability</div>
+                    <div class="card-content">Write once, use everywhere with different values for each environment.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔒</div>
+                    <div class="card-title">Security</div>
+                    <div class="card-content">Keep sensitive data separate from playbook code.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📋</div>
+                    <div class="card-title">Maintainability</div>
+                    <div class="card-content">Change values in one place instead of searching through code.</div>
+                </div>
+            </div>
+
+            <h2>Defining Variables</h2>
+
+            <h3>1. Play-Level Variables (vars)</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Variables in play</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+    <span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span>
+    <span class="yaml-key">packages</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">mod_ssl</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-string">"{{ packages }}"</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                </div>
+            </div>
+
+            <h3>2. External Variable Files (vars_files)</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">vars/webserver.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+<span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span>
+<span class="yaml-key">admin_email</span>: <span class="yaml-string">admin@example.com</span></pre>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Playbook using vars_files</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  
+  <span class="yaml-key">vars_files</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">vars/webserver.yml</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display port</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">msg</span>: <span class="yaml-string">"HTTP port is {{ http_port }}"</span></pre>
+                </div>
+            </div>
+
+            <h3>3. Command Line Variables</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Passing variables at runtime</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Single variable</span>
+$ ansible-playbook site.yml -e "http_port=8080"
+
+<span class="yaml-comment"># Multiple variables</span>
+$ ansible-playbook site.yml -e "http_port=8080 env=production"
+
+<span class="yaml-comment"># Variables from file</span>
+$ ansible-playbook site.yml -e @vars/production.yml</pre>
+                </div>
+            </div>
+
+            <h2>Using Variables</h2>
+            <p>Reference variables using <span class="term" tabindex="0">Jinja2<span class="tooltip" role="tooltip">A templating engine for Python that Ansible uses for variable substitution, conditionals, loops, and filters.</span></span> syntax with double curly braces:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Variable reference syntax</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Simple variable</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create document root</span>
+    <span class="yaml-module">ansible.builtin.file</span>:
+      <span class="yaml-key">path</span>: <span class="yaml-string">"{{ doc_root }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">directory</span>
+
+  <span class="yaml-comment"># Dictionary access</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display config</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Max clients: {{ server_config.max_clients }}"</span>
+
+  <span class="yaml-comment"># List access</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display first package</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"First: {{ packages[0] }}"</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Important: Quoting Variables</div>
+                <p>When a value <strong>starts with</strong> a variable reference, you must quote the entire value:</p>
+                <div class="code-block" style="margin-top: 12px;">
+                    <div class="code-content">
+<pre><span class="yaml-comment"># Wrong - YAML syntax error</span>
+<span class="yaml-key">path</span>: <span class="yaml-value">{{ doc_root }}/html</span>
+
+<span class="yaml-comment"># Correct - quoted</span>
+<span class="yaml-key">path</span>: <span class="yaml-string">"{{ doc_root }}/html"</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Registered Variables</h2>
+            <p>Capture task output using <code>register</code>:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using register</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check service status</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl is-active httpd</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">httpd_status</span>
+    <span class="yaml-key">ignore_errors</span>: <span class="yaml-value">true</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-value">false</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display status</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"httpd is {{ httpd_status.stdout }}"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start if not running</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">httpd_status.rc != 0</span></pre>
+                </div>
+            </div>
+
+            <h3>Common Registered Variable Attributes</h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>changed</code></td><td>Boolean - if task made changes</td></tr>
+                        <tr><td><code>failed</code></td><td>Boolean - if task failed</td></tr>
+                        <tr><td><code>rc</code></td><td>Return code (command/shell)</td></tr>
+                        <tr><td><code>stdout</code></td><td>Standard output</td></tr>
+                        <tr><td><code>stderr</code></td><td>Standard error</td></tr>
+                        <tr><td><code>stdout_lines</code></td><td>Output as list of lines</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('modules')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('handlers')">Continue to Handlers <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Handlers Section -->
+        <section id="section-handlers" class="section" aria-labelledby="handlers-heading">
+            <h1 id="handlers-heading">Handlers</h1>
+            <p class="lead">Handlers are special tasks that only run when notified by other tasks.</p>
+
+            <h2>What are Handlers?</h2>
+            <p><span class="term" tabindex="0">Handlers<span class="tooltip" role="tooltip">Special tasks that only execute when notified. Run once at end of play, regardless of how many times notified. Perfect for service restarts.</span></span> respond to notifications from tasks. Key characteristics:</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔔</div>
+                    <div class="card-title">Notification Triggered</div>
+                    <div class="card-content">Only run when notified by a task that reports "changed"</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">1️⃣</div>
+                    <div class="card-title">Run Once</div>
+                    <div class="card-content">Each handler runs only once, even if notified multiple times</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⏰</div>
+                    <div class="card-title">End of Play</div>
+                    <div class="card-content">Execute at the end of the play, after all tasks complete</div>
+                </div>
+            </div>
+
+            <h2>Basic Handler Syntax</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Handler example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install httpd</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy httpd configuration</span>
+      <span class="yaml-module">ansible.builtin.copy</span>:
+        <span class="yaml-key">src</span>: <span class="yaml-value">files/httpd.conf</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+      <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy SSL configuration</span>
+      <span class="yaml-module">ansible.builtin.copy</span>:
+        <span class="yaml-key">src</span>: <span class="yaml-value">files/ssl.conf</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf.d/ssl.conf</span>
+      <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
+
+  <span class="yaml-key">handlers</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                </div>
+            </div>
+
+            <h2>Handler Execution Flow</h2>
+            <div class="diagram">
+                <div class="diagram-title">When Do Handlers Run?</div>
+                <div class="playbook-structure">
+                    <div class="structure-item" style="background: rgba(0, 153, 51, 0.1); border-color: var(--accent-green);">
+                        <div class="structure-name">✓ Task 1: Install httpd</div>
+                        <div class="structure-label">STATUS: ok (no change)</div>
+                    </div>
+                    <div class="structure-arrow" aria-hidden="true">↓</div>
+                    <div class="structure-item" style="background: rgba(255, 204, 0, 0.1); border-color: var(--accent-yellow);">
+                        <div class="structure-name">✓ Task 2: Copy httpd.conf</div>
+                        <div class="structure-label">STATUS: changed → notify</div>
+                    </div>
+                    <div class="structure-arrow" aria-hidden="true">↓</div>
+                    <div class="structure-item" style="background: rgba(255, 204, 0, 0.1); border-color: var(--accent-yellow);">
+                        <div class="structure-name">✓ Task 3: Copy ssl.conf</div>
+                        <div class="structure-label">STATUS: changed → notify</div>
+                    </div>
+                    <div class="structure-arrow" aria-hidden="true">↓ All tasks complete</div>
+                    <div class="structure-item" style="background: rgba(255, 102, 0, 0.1); border-color: var(--accent-orange);">
+                        <div class="structure-name">🔔 Handler: Restart httpd</div>
+                        <div class="structure-label">RUNS ONCE (despite 2 notifications)</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Multiple Handlers</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Notifying multiple handlers</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update app configuration</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">app.conf.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/myapp/app.conf</span>
+    <span class="yaml-key">notify</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">Restart application</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">Clear application cache</span>
+
+<span class="yaml-key">handlers</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart application</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Clear application cache</span>
+    <span class="yaml-module">ansible.builtin.file</span>:
+      <span class="yaml-key">path</span>: <span class="yaml-value">/var/cache/myapp</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
+                </div>
+            </div>
+
+            <h2>Flushing Handlers</h2>
+            <p>Force handlers to run mid-play with <code>meta: flush_handlers</code>:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Flush handlers</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update configuration</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+    <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Force handlers now</span>
+    <span class="yaml-module">ansible.builtin.meta</span>: <span class="yaml-value">flush_handlers</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Verify service</span>
+    <span class="yaml-module">ansible.builtin.uri</span>:
+      <span class="yaml-key">url</span>: <span class="yaml-value">http://localhost/</span>
+      <span class="yaml-key">status_code</span>: <span class="yaml-number">200</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
+                <p>Use handlers for operations that should only happen when configuration changes, like service restarts. This prevents unnecessary service disruptions.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('variables')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('running')">Continue to Running Playbooks <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Running Playbooks Section -->
+        <section id="section-running" class="section" aria-labelledby="running-heading">
+            <h1 id="running-heading">Running Playbooks</h1>
+            <p class="lead">Execute playbooks using ansible-playbook and ansible-navigator commands.</p>
+
+            <h2>The ansible-playbook Command</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Basic usage</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Basic execution</span>
+$ ansible-playbook playbook.yml
+
+<span class="yaml-comment"># Specify inventory</span>
+$ ansible-playbook -i inventory/production playbook.yml
+
+<span class="yaml-comment"># Verbose output</span>
+$ ansible-playbook -v playbook.yml
+$ ansible-playbook -vvv playbook.yml
+
+<span class="yaml-comment"># Limit to specific hosts</span>
+$ ansible-playbook playbook.yml --limit webservers
+
+<span class="yaml-comment"># Pass extra variables</span>
+$ ansible-playbook playbook.yml -e "env=production"
+
+<span class="yaml-comment"># Ask for become password</span>
+$ ansible-playbook playbook.yml --ask-become-pass</pre>
+                </div>
+            </div>
+
+            <h2>Common Options</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Option</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>-i INVENTORY</code></td><td>Specify inventory file</td></tr>
+                        <tr><td><code>-e VARS</code></td><td>Set additional variables</td></tr>
+                        <tr><td><code>--limit SUBSET</code></td><td>Limit to specific hosts</td></tr>
+                        <tr><td><code>-v, -vv, -vvv</code></td><td>Increase verbosity</td></tr>
+                        <tr><td><code>--check</code></td><td>Dry run (no changes)</td></tr>
+                        <tr><td><code>--diff</code></td><td>Show file differences</td></tr>
+                        <tr><td><code>--syntax-check</code></td><td>Check syntax only</td></tr>
+                        <tr><td><code>--list-tasks</code></td><td>List tasks without running</td></tr>
+                        <tr><td><code>--list-hosts</code></td><td>List targeted hosts</td></tr>
+                        <tr><td><code>--tags TAGS</code></td><td>Only run tagged tasks</td></tr>
+                        <tr><td><code>--skip-tags TAGS</code></td><td>Skip tagged tasks</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Playbook Execution Simulator</h2>
+            <div class="demo-container">
+                <div class="demo-header">
+                    <span class="demo-title"><span aria-hidden="true">🚀</span> Execution Simulator</span>
+                    <div class="demo-controls">
+                        <button class="demo-btn secondary" onclick="resetSimulator()">Reset</button>
+                        <button class="demo-btn" onclick="runSimulator()" id="run-btn">Run Playbook</button>
+                    </div>
+                </div>
+                <div class="demo-body">
+                    <div class="demo-editor">
+                        <div class="demo-panel">
+                            <div class="demo-panel-header">webserver.yml</div>
+                            <div class="demo-panel-content">
+<pre style="margin:0;color:var(--text-secondary);font-size:13px;"><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install httpd</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+        <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Open firewall</span>
+      <span class="yaml-module">ansible.posix.firewalld</span>:
+        <span class="yaml-key">service</span>: <span class="yaml-value">http</span>
+        <span class="yaml-key">permanent</span>: <span class="yaml-value">true</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span></pre>
+                            </div>
+                        </div>
+                        <div class="demo-panel">
+                            <div class="demo-panel-header">Output</div>
+                            <div class="demo-panel-content">
+                                <div id="simulator-output" class="demo-output" role="status" aria-live="polite">Click "Run Playbook" to execute</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Using ansible-navigator</h2>
+            <p><span class="term" tabindex="0">ansible-navigator<span class="tooltip" role="tooltip">A text-based UI for running playbooks with improved visualization and execution environment support.</span></span> provides an interactive experience:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible-navigator usage</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Run playbook (interactive)</span>
+$ ansible-navigator run playbook.yml
+
+<span class="yaml-comment"># Run in stdout mode</span>
+$ ansible-navigator run playbook.yml -m stdout
+
+<span class="yaml-comment"># View documentation</span>
+$ ansible-navigator doc ansible.builtin.copy</pre>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('handlers')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('validation')">Continue to Validation <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Validation Section -->
+        <section id="section-validation" class="section" aria-labelledby="validation-heading">
+            <h1 id="validation-heading">Validation and Dry Runs</h1>
+            <p class="lead">Test your playbooks before execution to catch errors early.</p>
+
+            <h2>Syntax Check</h2>
+            <p>Use <code>--syntax-check</code> to validate playbook syntax:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Syntax check</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Check syntax</span>
+$ ansible-playbook --syntax-check playbook.yml
+
+<span class="yaml-comment"># Success output</span>
+playbook: playbook.yml
+
+<span class="yaml-comment"># Error output example</span>
+ERROR! Syntax Error while loading YAML.
+  mapping values are not allowed in this context
+The error appears to be in 'playbook.yml': line 10, column 12</pre>
+                </div>
+            </div>
+
+            <h2>Common Syntax Errors</h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Indentation Errors</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>The most common error. YAML requires consistent spaces (not tabs).</p>
+                            <p><strong>Solution:</strong> Check indentation, use 2 spaces per level, never use tabs.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Missing Quotes</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Values with special characters need quotes.</p>
+                            <p><strong>Solution:</strong> Quote values starting with <code>{{</code> or containing colons.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Invalid Module Names</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>Typos in module names or non-existent modules.</p>
+                            <p><strong>Solution:</strong> Check spelling. Use <code>ansible-doc -l</code> to list modules.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Check Mode (Dry Run)</h2>
+            <p><span class="term" tabindex="0">Check mode<span class="tooltip" role="tooltip">Executes the playbook without making changes, showing what would change if run normally.</span></span> shows what would happen without making changes:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Check mode</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Dry run</span>
+$ ansible-playbook playbook.yml --check
+
+<span class="yaml-comment"># Dry run with diff</span>
+$ ansible-playbook playbook.yml --check --diff</pre>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Check Mode Limitations</div>
+                <p>Not all modules support check mode. Modules like <code>command</code> and <code>shell</code> cannot predict changes.</p>
+            </div>
+
+            <h2>Using ansible-lint</h2>
+            <p><span class="term" tabindex="0">ansible-lint<span class="tooltip" role="tooltip">A tool that checks playbooks for best practices beyond syntax checking.</span></span> enforces best practices:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible-lint</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Install</span>
+$ pip install ansible-lint
+
+<span class="yaml-comment"># Run lint</span>
+$ ansible-lint playbook.yml
+
+<span class="yaml-comment"># Example output</span>
+WARNING Listing 2 violation(s) that are fatal
+name[missing]: All tasks should be named.
+fqcn[action-core]: Use FQCN for builtin modules.</pre>
+                </div>
+            </div>
+
+            <h2>Pre-Execution Checks</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Pre-run commands</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># List tasks</span>
+$ ansible-playbook playbook.yml --list-tasks
+
+<span class="yaml-comment"># List hosts</span>
+$ ansible-playbook playbook.yml --list-hosts
+
+<span class="yaml-comment"># List tags</span>
+$ ansible-playbook playbook.yml --list-tags</pre>
+                </div>
+            </div>
+
+            <h2>Testing Best Practices</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div>Run <code>--syntax-check</code> first</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div>Use <code>--check --diff</code> to preview changes</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div>Run <code>--list-tasks</code> and <code>--list-hosts</code></div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div>Test on single host with <code>--limit</code></div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div>Use staging environment when possible</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeypress="handleCheckboxKey(event, this)">✓</div>
+                    <div>Run <code>ansible-lint</code> for best practices</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('running')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Lab Section -->
+        <section id="section-lab" class="section" aria-labelledby="lab-heading">
+            <h1 id="lab-heading">Hands-On Lab</h1>
+            <p class="lead">Build a complete playbook to configure a web server.</p>
+
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Lab Exercise</span>
+                    <span class="exercise-title">Configure a Web Server with Ansible</span>
+                </div>
+
+                <p>Create a playbook that performs the following:</p>
+                <ul style="margin: 16px 0 24px 24px; color: var(--text-secondary);">
+                    <li>Install Apache HTTP Server (httpd)</li>
+                    <li>Create a custom index.html page</li>
+                    <li>Start and enable the httpd service</li>
+                    <li>Configure firewall for HTTP traffic</li>
+                    <li>Use handlers to restart on config changes</li>
+                </ul>
+
+                <div class="exercise-steps">
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Create playbook structure</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
+
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+    <span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-comment"># Tasks go here</span>
+
+  <span class="yaml-key">handlers</span>:
+    <span class="yaml-comment"># Handlers go here</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Add package installation</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre>  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>:
+          <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+          <span class="yaml-dash">-</span> <span class="yaml-value">firewalld</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Add service management</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre>    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start and enable httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+        <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Add content deployment</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre>    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create index.html</span>
+      <span class="yaml-module">ansible.builtin.copy</span>:
+        <span class="yaml-key">content</span>: <span class="yaml-value">|</span>
+          <span class="yaml-string">&lt;h1&gt;Managed by Ansible&lt;/h1&gt;</span>
+          <span class="yaml-string">&lt;p&gt;Server: {{ ansible_hostname }}&lt;/p&gt;</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-string">"{{ doc_root }}/index.html"</span>
+        <span class="yaml-key">mode</span>: <span class="yaml-string">'0644'</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Configure firewall</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre>    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start firewalld</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">firewalld</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+        <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Allow HTTP</span>
+      <span class="yaml-module">ansible.posix.firewalld</span>:
+        <span class="yaml-key">service</span>: <span class="yaml-value">http</span>
+        <span class="yaml-key">permanent</span>: <span class="yaml-value">true</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
+        <span class="yaml-key">immediate</span>: <span class="yaml-value">true</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Add handler</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre>  <span class="yaml-key">handlers</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercise-step">
+                        <div>
+                            <h4 style="margin-top: 0;">Test and run</h4>
+                            <div class="code-block">
+                                <div class="code-content">
+<pre><span class="yaml-comment"># Check syntax</span>
+$ ansible-playbook webserver.yml --syntax-check
+
+<span class="yaml-comment"># Dry run</span>
+$ ansible-playbook webserver.yml --check --diff
+
+<span class="yaml-comment"># Run</span>
+$ ansible-playbook webserver.yml</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('validation')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="section-quiz" class="section" aria-labelledby="quiz-heading">
+            <h1 id="quiz-heading">Knowledge Check</h1>
+            <p class="lead">Test your understanding of Ansible playbooks.</p>
+
+            <div class="quiz-container" id="quiz-container" role="region" aria-label="Quiz"></div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('lab')"><span aria-hidden="true">←</span> Back to Lab</button>
+                <button class="btn btn-primary" onclick="navigateTo('summary')">View Summary <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section id="section-summary" class="section" aria-labelledby="summary-heading">
+            <h1 id="summary-heading">Chapter Summary</h1>
+            <p class="lead">Congratulations! You've learned the fundamentals of Ansible playbooks.</p>
+
+            <h2>Key Concepts</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📖</div>
+                    <div class="card-title">Playbooks</div>
+                    <div class="card-content">YAML files containing plays that define automation. More powerful than ad-hoc commands.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📝</div>
+                    <div class="card-title">YAML</div>
+                    <div class="card-content">Human-readable format using spaces for indentation, key-value pairs, and lists.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🧩</div>
+                    <div class="card-title">Modules</div>
+                    <div class="card-content">Building blocks for tasks. Use FQCNs for clarity. Modules are idempotent.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔤</div>
+                    <div class="card-title">Variables</div>
+                    <div class="card-content">Make playbooks flexible. Use {{ variable }} syntax with quotes when needed.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔔</div>
+                    <div class="card-title">Handlers</div>
+                    <div class="card-content">Special tasks triggered by notifications. Run once at play end.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">✅</div>
+                    <div class="card-title">Validation</div>
+                    <div class="card-content">Always test with --syntax-check and --check before running.</div>
+                </div>
+            </div>
+
+            <h2>Command Reference</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ansible-playbook playbook.yml</code></td><td>Run a playbook</td></tr>
+                        <tr><td><code>ansible-playbook --syntax-check</code></td><td>Validate syntax</td></tr>
+                        <tr><td><code>ansible-playbook --check --diff</code></td><td>Dry run with preview</td></tr>
+                        <tr><td><code>ansible-playbook --list-tasks</code></td><td>List tasks</td></tr>
+                        <tr><td><code>ansible-playbook -e "var=value"</code></td><td>Pass variables</td></tr>
+                        <tr><td><code>ansible-playbook --limit host</code></td><td>Limit to hosts</td></tr>
+                        <tr><td><code>ansible-doc module</code></td><td>View documentation</td></tr>
+                        <tr><td><code>ansible-lint playbook.yml</code></td><td>Check best practices</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Best Practices</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Always name plays and tasks descriptively</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Use FQCNs for modules (ansible.builtin.copy)</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Quote values starting with {{</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Use handlers for service restarts</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Test with --syntax-check and --check first</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Use variables for changeable values</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" aria-checked="true" tabindex="0">✓</div>
+                    <div>Keep playbooks in version control</div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Next Steps</div>
+                <p>Continue with Chapter 3: Managing Variables and Facts to learn more about working with data in Ansible.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('quiz')"><span aria-hidden="true">←</span> Back to Quiz</button>
+                <button class="btn btn-primary" onclick="navigateTo('welcome')">Review Chapter <span aria-hidden="true">↺</span></button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Quiz Questions
+        const quizQuestions = [
+            {
+                question: "What file format is used for Ansible playbooks?",
+                options: ["JSON", "XML", "YAML", "INI"],
+                correct: 2,
+                explanation: "Ansible playbooks are written in YAML, a human-readable format using indentation."
+            },
+            {
+                question: "What must YAML use for indentation?",
+                options: ["Tabs only", "Spaces only", "Either tabs or spaces", "No indentation"],
+                correct: 1,
+                explanation: "YAML requires spaces only, never tabs. Standard is 2 spaces per level."
+            },
+            {
+                question: "Which attribute is required in every play?",
+                options: ["name", "hosts", "become", "tasks"],
+                correct: 1,
+                explanation: "The 'hosts' attribute is required to specify target hosts."
+            },
+            {
+                question: "What is the recommended way to reference modules?",
+                options: ["Short names (copy)", "Full path", "FQCN (ansible.builtin.copy)", "Module ID"],
+                correct: 2,
+                explanation: "FQCNs are recommended for clarity and to avoid naming conflicts."
+            },
+            {
+                question: "When do handlers run in a playbook?",
+                options: ["Immediately when notified", "At play start", "At play end after all tasks", "Random order"],
+                correct: 2,
+                explanation: "Handlers run at the end of a play, after all tasks complete."
+            },
+            {
+                question: "If a handler is notified multiple times, how many times does it run?",
+                options: ["Once per notification", "Twice", "Only once", "Depends on module"],
+                correct: 2,
+                explanation: "Handlers run only once per play, regardless of notifications."
+            },
+            {
+                question: "What is the purpose of --check?",
+                options: ["Check syntax only", "Dry run without changes", "Check host connectivity", "Verify inventory"],
+                correct: 1,
+                explanation: "The --check option runs without making changes, showing what would happen."
+            },
+            {
+                question: "How should you quote a value starting with {{ ?",
+                options: ["path: {{ var }}/html", "path: '{{ var }}/html'", "path: \"{{ var }}/html\"", "Both B and C"],
+                correct: 3,
+                explanation: "Values starting with {{ must be quoted with single or double quotes."
+            },
+            {
+                question: "What does 'idempotent' mean in Ansible?",
+                options: ["Tasks run parallel", "Multiple runs produce same result", "Tasks can be skipped", "Tasks run in order"],
+                correct: 1,
+                explanation: "Idempotent means running a task multiple times produces the same result."
+            },
+            {
+                question: "Which command validates playbook syntax?",
+                options: ["ansible-playbook --dry-run", "ansible-playbook --validate", "ansible-playbook --syntax-check", "ansible-lint"],
+                correct: 2,
+                explanation: "The --syntax-check option validates YAML syntax without executing."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = quizQuestions[currentQuestion];
+            
+            container.innerHTML = `
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" style="width: ${(currentQuestion / quizQuestions.length) * 100}%"></div>
+                    </div>
+                    <span class="quiz-progress-text">${currentQuestion + 1} / ${quizQuestions.length}</span>
+                </div>
+                <div class="quiz-question">${q.question}</div>
+                <div class="quiz-options" role="radiogroup">
+                    ${q.options.map((opt, i) => `
+                        <div class="quiz-option" role="radio" aria-checked="false" tabindex="0" 
+                             data-correct="${i === q.correct}"
+                             onclick="selectOption(${i})"
+                             onkeypress="handleOptionKey(event, ${i})">
+                            <div class="quiz-option-marker">${String.fromCharCode(65 + i)}</div>
+                            <div>${opt}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="quiz-explanation" id="explanation">
+                    <div class="quiz-explanation-title" id="explanation-title"></div>
+                    <p>${q.explanation}</p>
+                </div>
+                <button class="quiz-btn" id="quiz-btn" onclick="nextQuestion()" disabled>
+                    ${currentQuestion < quizQuestions.length - 1 ? 'Next Question' : 'See Results'} <span aria-hidden="true">→</span>
+                </button>
+            `;
+            answered = false;
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+            const options = document.querySelectorAll('.quiz-option');
+            const selected = options[index];
+            const isCorrect = selected.dataset.correct === 'true';
+            options.forEach((opt, i) => {
+                opt.setAttribute('aria-checked', i === index ? 'true' : 'false');
+                if (opt.dataset.correct === 'true') opt.classList.add('correct');
+            });
+            if (isCorrect) score++;
+            else selected.classList.add('incorrect');
+            const explanation = document.getElementById('explanation');
+            const explanationTitle = document.getElementById('explanation-title');
+            explanationTitle.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            explanationTitle.className = 'quiz-explanation-title ' + (isCorrect ? 'correct' : 'incorrect');
+            explanation.classList.add('visible');
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function handleOptionKey(event, index) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectOption(index);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizQuestions.length) renderQuestion();
+            else showResults();
+        }
+
+        function showResults() {
+            const container = document.getElementById('quiz-container');
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            container.innerHTML = `
+                <div class="quiz-score">
+                    <div class="quiz-score-value">${percentage}%</div>
+                    <div class="quiz-score-label">You got ${score} out of ${quizQuestions.length} correct</div>
+                    <p style="margin-top: 24px; color: var(--text-muted);">
+                        ${percentage >= 80 ? '🎉 Excellent! Strong understanding of playbooks.' :
+                          percentage >= 60 ? '👍 Good job! Review challenging sections.' :
+                          '📚 Consider reviewing the chapter material.'}
+                    </p>
+                    <button class="quiz-btn" onclick="initQuiz()" style="margin-top: 24px;">Retake Quiz <span aria-hidden="true">↺</span></button>
+                </div>
+            `;
+            markSectionComplete('quiz');
+        }
+
+        // Navigation
+        const sections = ['welcome', 'objectives', 'playbook-intro', 'yaml-syntax', 'structure', 'modules', 'variables', 'handlers', 'running', 'validation', 'lab', 'quiz', 'summary'];
+        let completedSections = new Set();
+
+        function navigateTo(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('section-' + sectionId);
+            if (target) {
+                target.classList.add('active');
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.section === sectionId) item.classList.add('active');
+                });
+                const idx = sections.indexOf(sectionId);
+                if (idx > 0) markSectionComplete(sections[idx - 1]);
+                window.scrollTo(0, 0);
+                updateProgress();
+                if (sectionId === 'quiz') initQuiz();
+            }
+        }
+
+        function markSectionComplete(sectionId) {
+            completedSections.add(sectionId);
+            const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+            if (navItem) navItem.classList.add('completed');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (completedSections.size / sections.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = Math.round(progress) + '%';
+        }
+
+        // Tab Functions
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('btn-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).setAttribute('aria-selected', 'true');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // Interactive Elements
+        function toggleObjective(el) {
+            el.classList.toggle('checked');
+            el.setAttribute('aria-checked', el.classList.contains('checked'));
+        }
+
+        function toggleCheck(el) { el.classList.toggle('checked'); }
+
+        function handleCheckboxKey(event, el) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                if (el.classList.contains('objective-checkbox')) toggleObjective(el);
+                else toggleCheck(el);
+            }
+        }
+
+        function toggleNav() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('open');
+            document.querySelector('.menu-toggle').setAttribute('aria-expanded', nav.classList.contains('open'));
+        }
+
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            item.classList.toggle('open');
+            header.setAttribute('aria-expanded', item.classList.contains('open'));
+        }
+
+        // Copy Code
+        function copyCode(button) {
+            const code = button.closest('.code-block').querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const orig = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => button.textContent = orig, 2000);
+            });
+        }
+
+        // YAML Validator
+        function validateYaml() {
+            const input = document.getElementById('yaml-input').value;
+            const output = document.getElementById('yaml-output');
+            const status = document.getElementById('yaml-status');
+            try {
+                if (input.includes('\t')) throw new Error('Tabs not allowed. Use spaces.');
+                output.innerHTML = '<span class="output-ok">✓ YAML syntax appears valid!</span><br><br><strong>Structure:</strong><br>';
+                if (input.includes('hosts:')) output.innerHTML += '• Play targeting hosts<br>';
+                if (input.includes('tasks:')) output.innerHTML += '• Tasks section<br>';
+                if (input.includes('vars:')) output.innerHTML += '• Variables section<br>';
+                if (input.includes('handlers:')) output.innerHTML += '• Handlers section<br>';
+                status.className = 'validation-status';
+                status.innerHTML = '<span style="color:var(--success)">✓ Valid</span>';
+                status.style.display = 'block';
+            } catch (e) {
+                output.innerHTML = `<span class="output-failed">✗ Error: ${e.message}</span>`;
+                status.className = 'validation-status';
+                status.innerHTML = '<span style="color:var(--error)">✗ Invalid</span>';
+                status.style.display = 'block';
+            }
+        }
+
+        function resetYamlEditor() {
+            document.getElementById('yaml-input').value = `---
+- name: Configure web server
+  hosts: webservers
+  become: true
+  
+  tasks:
+    - name: Install httpd
+      ansible.builtin.dnf:
+        name: httpd
+        state: present`;
+            document.getElementById('yaml-output').innerHTML = 'Click "Validate" to check your YAML';
+            document.getElementById('yaml-status').style.display = 'none';
+        }
+
+        // Simulator
+        let simulatorRunning = false;
+        async function runSimulator() {
+            if (simulatorRunning) return;
+            simulatorRunning = true;
+            const output = document.getElementById('simulator-output');
+            const btn = document.getElementById('run-btn');
+            btn.disabled = true;
+            btn.textContent = 'Running...';
+            output.innerHTML = '';
+            const lines = [
+                { text: '$ ansible-playbook webserver.yml', class: '' },
+                { text: '', class: '' },
+                { text: 'PLAY [Configure web server] ***********************', class: 'output-play' },
+                { text: '', class: '' },
+                { text: 'TASK [Gathering Facts] ****************************', class: 'output-task' },
+                { text: 'ok: [web1.example.com]', class: 'output-ok' },
+                { text: '', class: '' },
+                { text: 'TASK [Install httpd] *******************************', class: 'output-task' },
+                { text: 'changed: [web1.example.com]', class: 'output-changed' },
+                { text: '', class: '' },
+                { text: 'TASK [Start httpd] *********************************', class: 'output-task' },
+                { text: 'changed: [web1.example.com]', class: 'output-changed' },
+                { text: '', class: '' },
+                { text: 'TASK [Open firewall] *******************************', class: 'output-task' },
+                { text: 'changed: [web1.example.com]', class: 'output-changed' },
+                { text: '', class: '' },
+                { text: 'PLAY RECAP ****************************************', class: 'output-play' },
+                { text: 'web1.example.com : ok=4 changed=3 unreachable=0 failed=0', class: 'output-ok' }
+            ];
+            for (const line of lines) {
+                await new Promise(r => setTimeout(r, 150));
+                const div = document.createElement('div');
+                div.className = 'output-line ' + line.class;
+                div.textContent = line.text;
+                output.appendChild(div);
+                output.scrollTop = output.scrollHeight;
+            }
+            simulatorRunning = false;
+            btn.disabled = false;
+            btn.textContent = 'Run Playbook';
+        }
+
+        function resetSimulator() {
+            document.getElementById('simulator-output').innerHTML = 'Click "Run Playbook" to execute';
+        }
+
+        // Tooltip positioning
+        function positionTooltips() {
+            document.querySelectorAll('.term').forEach(term => {
+                const rect = term.getBoundingClientRect();
+                const tooltip = term.querySelector('.tooltip');
+                if (!tooltip) return;
+                term.classList.remove('tooltip-left', 'tooltip-right', 'tooltip-bottom');
+                if (rect.left < 140) term.classList.add('tooltip-left');
+                else if (rect.right + 140 > window.innerWidth) term.classList.add('tooltip-right');
+                if (rect.top < 150) term.classList.add('tooltip-bottom');
+            });
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                navigateTo(item.dataset.section);
+                if (window.innerWidth <= 1024) document.getElementById('nav').classList.remove('open');
+            });
+            item.addEventListener('keypress', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateTo(item.dataset.section);
+                }
+            });
+        });
+
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('keypress', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleAccordion(header);
+                }
+            });
+        });
+
+        // Initialize
+        window.addEventListener('load', () => { positionTooltips(); updateProgress(); });
+        window.addEventListener('resize', positionTooltips);
+        window.addEventListener('scroll', positionTooltips);
+    </script>
+</body>
+</html>

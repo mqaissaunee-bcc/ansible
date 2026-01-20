@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHA 294 - Chapter 3: Managing Variables and Facts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rh-red: #CC0000;
+            --rh-red-dark: #A30000;
+            --rh-red-light: #FF6666;
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --bg-tertiary: #3D3D3D;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --text-muted: #B0B0B0;
+            --accent-blue: #0066CC;
+            --accent-green: #009933;
+            --accent-yellow: #FFCC00;
+            --accent-orange: #FF6600;
+            --accent-purple: #9966CC;
+            --accent-cyan: #00CCCC;
+            --border-color: #4D4D4D;
+            --success: #00CC66;
+            --error: #FF3333;
+            --warning: #FF9900;
+            --code-bg: #0D0D0D;
+            --tooltip-bg: #FFFFCC;
+            --tooltip-text: #1A1A1A;
+            --focus-outline: #FFCC00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+        .skip-link {
+            position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--rh-red); color: white; padding: 12px 24px;
+            text-decoration: none; border-radius: 0 0 8px 8px; z-index: 10000;
+            font-weight: 600; transition: top 0.3s;
+        }
+        .skip-link:focus { top: 0; outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus:not(:focus-visible) { outline: none; }
+        :focus-visible { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 3px solid var(--rh-red); padding: 16px 24px;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .header-brand { display: flex; align-items: center; gap: 16px; }
+        .logo {
+            width: 40px; height: 40px; background: var(--rh-red); border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Red Hat Display', sans-serif; font-weight: 900; font-size: 20px;
+        }
+        .course-title { font-family: 'Red Hat Display', sans-serif; font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .chapter-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; }
+        .progress-container { display: flex; align-items: center; gap: 12px; }
+        .progress-bar { width: 200px; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--rh-red) 0%, var(--accent-orange) 100%); width: 0%; transition: width 0.5s ease; border-radius: 4px; }
+        .progress-text { font-family: 'Red Hat Mono', monospace; font-size: 14px; color: var(--text-muted); min-width: 45px; }
+        .menu-toggle { display: none; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 20px; }
+        nav { position: fixed; left: 0; top: 76px; bottom: 0; width: 300px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; z-index: 999; }
+        .nav-section { margin-bottom: 8px; }
+        .nav-section-title { font-family: 'Red Hat Display', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); padding: 12px 24px 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; font-size: 15px; transition: all 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-item.active { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); color: var(--text-primary); }
+        .nav-item.completed::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--success); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: -32px; margin-left: -8px; }
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
+        .section { display: none; padding: 48px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { font-family: 'Red Hat Display', sans-serif; font-size: 42px; font-weight: 900; margin-bottom: 16px; line-height: 1.2; }
+        h2 { font-family: 'Red Hat Display', sans-serif; font-size: 32px; font-weight: 700; margin: 48px 0 24px; color: var(--text-primary); border-bottom: 2px solid var(--rh-red); padding-bottom: 12px; }
+        h3 { font-family: 'Red Hat Display', sans-serif; font-size: 24px; font-weight: 600; margin: 32px 0 16px; color: var(--accent-yellow); }
+        h4 { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 600; margin: 24px 0 12px; color: var(--text-secondary); }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        .lead { font-size: 20px; color: var(--text-muted); margin-bottom: 32px; }
+        .code-block { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; margin: 24px 0; overflow: hidden; }
+        .code-header { background: var(--bg-tertiary); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .code-title { font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
+        .code-copy { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .code-copy:hover { background: var(--rh-red); color: white; border-color: var(--rh-red); }
+        .code-content { padding: 20px; overflow-x: auto; }
+        pre { font-family: 'Red Hat Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre; margin: 0; }
+        code { font-family: 'Red Hat Mono', monospace; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: var(--accent-cyan); }
+        .yaml-key { color: var(--accent-cyan); }
+        .yaml-value { color: var(--accent-green); }
+        .yaml-string { color: var(--accent-yellow); }
+        .yaml-comment { color: var(--text-muted); font-style: italic; }
+        .yaml-dash { color: var(--rh-red-light); }
+        .yaml-module { color: var(--accent-purple); }
+        .yaml-number { color: var(--accent-orange); }
+        .term { position: relative; color: var(--accent-cyan); border-bottom: 1px dotted var(--accent-cyan); cursor: help; display: inline; }
+        .tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--tooltip-bg); color: var(--tooltip-text); padding: 12px 16px; border-radius: 8px; font-size: 14px; line-height: 1.5; width: 280px; max-width: 90vw; box-shadow: 0 4px 20px rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 1000; pointer-events: none; }
+        .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--tooltip-bg); }
+        .term:hover .tooltip, .term:focus .tooltip { opacity: 1; visibility: visible; }
+        .term.tooltip-left .tooltip { left: 0; transform: translateX(0); }
+        .term.tooltip-left .tooltip::after { left: 20px; }
+        .term.tooltip-right .tooltip { left: auto; right: 0; transform: translateX(0); }
+        .term.tooltip-right .tooltip::after { left: auto; right: 20px; }
+        .term.tooltip-bottom .tooltip { bottom: auto; top: calc(100% + 8px); }
+        .term.tooltip-bottom .tooltip::after { top: auto; bottom: 100%; border: 8px solid transparent; border-bottom-color: var(--tooltip-bg); }
+        .info-box { background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+        .info-box.warning { border-left-color: var(--warning); background: rgba(255, 153, 0, 0.1); }
+        .info-box.tip { border-left-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
+        .info-box.danger { border-left-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .info-box-title { font-family: 'Red Hat Display', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .info-box.warning .info-box-title { color: var(--warning); }
+        .info-box.tip .info-box-title { color: var(--accent-green); }
+        .info-box.danger .info-box-title { color: var(--error); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 32px 0; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s; }
+        .card:hover { border-color: var(--rh-red); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(204, 0, 0, 0.2); }
+        .card-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--rh-red) 0%, var(--accent-orange) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+        .card-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .card-content { color: var(--text-muted); font-size: 15px; }
+        .objectives-list { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .objectives-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        .objective-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .objective-item:last-child { border-bottom: none; }
+        .objective-checkbox { width: 24px; height: 24px; min-width: 24px; border: 2px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: transparent; font-size: 14px; }
+        .objective-checkbox:hover { border-color: var(--rh-red); }
+        .objective-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+        .objective-text { color: var(--text-secondary); line-height: 1.6; }
+        .table-container { overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); }
+        th { background: var(--bg-tertiary); padding: 16px; text-align: left; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--rh-red); }
+        td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--bg-tertiary); }
+        .tabs { margin: 32px 0; }
+        .tab-buttons { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; padding: 12px 24px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--rh-red); border-bottom-color: var(--rh-red); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-primary { background: var(--rh-red); color: white; }
+        .btn-primary:hover { background: var(--rh-red-dark); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-tertiary); }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color); }
+        .diagram { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; text-align: center; }
+        .diagram-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; margin-bottom: 24px; }
+        .precedence-chart { display: flex; flex-direction: column; gap: 8px; max-width: 600px; margin: 0 auto; }
+        .precedence-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--bg-tertiary); border-radius: 6px; transition: all 0.3s; border-left: 4px solid transparent; }
+        .precedence-item:hover { transform: translateX(8px); }
+        .precedence-item.high { border-left-color: var(--rh-red); }
+        .precedence-item.medium { border-left-color: var(--accent-yellow); }
+        .precedence-item.low { border-left-color: var(--accent-blue); }
+        .precedence-rank { background: var(--bg-secondary); color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Red Hat Mono', monospace; font-size: 12px; font-weight: 600; }
+        .precedence-item.high .precedence-rank { background: var(--rh-red); color: white; }
+        .precedence-item.medium .precedence-rank { background: var(--accent-yellow); color: var(--bg-primary); }
+        .precedence-item.low .precedence-rank { background: var(--accent-blue); color: white; }
+        .precedence-name { flex: 1; text-align: left; font-size: 14px; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin: 4px; }
+        .badge.green { background: var(--success); color: white; }
+        .badge.blue { background: var(--accent-blue); color: white; }
+        .badge.red { background: var(--rh-red); color: white; }
+        .badge.yellow { background: var(--accent-yellow); color: var(--bg-primary); }
+        .exercise { background: linear-gradient(135deg, rgba(204, 0, 0, 0.1) 0%, rgba(255, 102, 0, 0.1) 100%); border: 1px solid var(--rh-red); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .exercise-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .exercise-badge { background: var(--rh-red); color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .exercise-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; }
+        .exercise-steps { counter-reset: step; }
+        .exercise-step { display: flex; gap: 16px; margin-bottom: 24px; padding-left: 8px; }
+        .exercise-step::before { counter-increment: step; content: counter(step); background: var(--rh-red); color: white; width: 28px; height: 28px; min-width: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .checklist { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-check { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 12px; color: transparent; margin-top: 2px; }
+        .checklist-check:hover { border-color: var(--success); }
+        .checklist-check.checked { background: var(--success); border-color: var(--success); color: white; }
+        .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .quiz-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .quiz-progress-bar { flex: 1; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+        .quiz-progress-fill { height: 100%; background: var(--rh-red); transition: width 0.3s; }
+        .quiz-progress-text { font-family: 'Red Hat Mono', monospace; font-size: 14px; color: var(--text-muted); }
+        .quiz-question { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 24px; line-height: 1.5; }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+        .quiz-option { background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; padding: 16px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 16px; }
+        .quiz-option:hover:not(.selected):not(.correct):not(.incorrect) { border-color: var(--rh-red); background: rgba(204, 0, 0, 0.1); }
+        .quiz-option.selected { border-color: var(--accent-blue); background: rgba(0, 102, 204, 0.1); }
+        .quiz-option.correct { border-color: var(--success); background: rgba(0, 204, 102, 0.1); }
+        .quiz-option.incorrect { border-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .quiz-option-marker { width: 28px; height: 28px; border: 2px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: var(--text-muted); flex-shrink: 0; }
+        .quiz-option.correct .quiz-option-marker { background: var(--success); border-color: var(--success); color: white; }
+        .quiz-option.incorrect .quiz-option-marker { background: var(--error); border-color: var(--error); color: white; }
+        .quiz-explanation { background: var(--bg-primary); border-radius: 8px; padding: 20px; margin-top: 24px; display: none; }
+        .quiz-explanation.visible { display: block; animation: fadeIn 0.3s ease; }
+        .quiz-explanation-title { font-weight: 600; margin-bottom: 8px; }
+        .quiz-explanation-title.correct { color: var(--success); }
+        .quiz-explanation-title.incorrect { color: var(--error); }
+        .quiz-btn { background: var(--rh-red); border: none; color: white; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 24px; display: flex; align-items: center; gap: 8px; }
+        .quiz-btn:hover:not(:disabled) { background: var(--rh-red-dark); }
+        .quiz-btn:disabled { background: var(--bg-tertiary); cursor: not-allowed; }
+        .quiz-score { text-align: center; padding: 40px; }
+        .quiz-score-value { font-family: 'Red Hat Display', sans-serif; font-size: 64px; font-weight: 900; color: var(--rh-red); }
+        .quiz-score-label { font-size: 18px; color: var(--text-muted); margin-top: 8px; }
+        .var-playground { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin: 32px 0; }
+        .var-playground-header { background: var(--bg-tertiary); padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .var-playground-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
+        .var-playground-body { padding: 20px; }
+        .var-input-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .var-input { display: flex; flex-direction: column; gap: 6px; }
+        .var-input label { font-size: 12px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
+        .var-input input { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; color: var(--text-primary); font-family: 'Red Hat Mono', monospace; font-size: 14px; }
+        .var-input input:focus { outline: none; border-color: var(--rh-red); }
+        .var-result { background: var(--code-bg); border-radius: 8px; padding: 16px; font-family: 'Red Hat Mono', monospace; font-size: 14px; }
+        .var-result-label { color: var(--text-muted); margin-bottom: 8px; }
+        .var-result-value { color: var(--success); font-size: 18px; font-weight: 600; }
+        .demo-btn { background: var(--rh-red); border: none; color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .demo-btn:hover { background: var(--rh-red-dark); }
+        .fact-explorer { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin: 32px 0; }
+        .fact-explorer-header { background: var(--bg-tertiary); padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+        .fact-explorer-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; margin-bottom: 8px; }
+        .fact-explorer-search { display: flex; gap: 8px; }
+        .fact-explorer-search input { flex: 1; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 16px; color: var(--text-primary); font-family: 'Red Hat Mono', monospace; font-size: 14px; }
+        .fact-explorer-search input:focus { outline: none; border-color: var(--rh-red); }
+        .fact-explorer-body { padding: 20px; max-height: 400px; overflow-y: auto; }
+        .fact-tree { font-family: 'Red Hat Mono', monospace; font-size: 13px; }
+        .fact-node { margin-left: 20px; }
+        .fact-key { color: var(--accent-cyan); }
+        .fact-string { color: var(--accent-yellow); }
+        .fact-number { color: var(--accent-orange); }
+        .fact-value { color: var(--accent-green); }
+        .fact-toggle { cursor: pointer; user-select: none; }
+        .fact-toggle::before { content: '▶ '; color: var(--text-muted); }
+        .fact-toggle.open::before { content: '▼ '; }
+        @media (max-width: 1024px) {
+            nav { transform: translateX(-100%); transition: transform 0.3s; }
+            nav.open { transform: translateX(0); }
+            main { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .progress-bar { width: 120px; }
+            .var-input-group { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .section { padding: 24px; }
+            h1 { font-size: 32px; }
+            h2 { font-size: 26px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .header-brand { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .progress-container { display: none; }
+        }
+        @media print {
+            nav, header, .skip-link, .nav-buttons, .quiz-btn { display: none !important; }
+            main { margin: 0; }
+            .section { display: block !important; break-inside: avoid; }
+        }
+        @media (prefers-contrast: high) {
+            :root { --border-color: #FFFFFF; --text-muted: #E0E0E0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header role="banner">
+        <div class="header-brand">
+            <div class="logo" aria-hidden="true">A</div>
+            <div>
+                <div class="course-title">RHA 294</div>
+                <div class="chapter-title">Chapter 3: Managing Variables and Facts</div>
+            </div>
+        </div>
+        <button class="menu-toggle" onclick="toggleNav()" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+        <div class="progress-container">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Course progress">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+    </header>
+    <nav id="nav" role="navigation" aria-label="Chapter sections">
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="#" class="nav-item active" data-section="welcome" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🏠</span>Welcome</a>
+            <a href="#" class="nav-item" data-section="objectives" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🎯</span>Learning Objectives</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Variables</div>
+            <a href="#" class="nav-item" data-section="var-intro" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📦</span>Variable Fundamentals</a>
+            <a href="#" class="nav-item" data-section="var-scope" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🎚️</span>Variable Scope</a>
+            <a href="#" class="nav-item" data-section="var-precedence" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📊</span>Variable Precedence</a>
+            <a href="#" class="nav-item" data-section="var-files" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📁</span>Managing Variable Files</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Facts</div>
+            <a href="#" class="nav-item" data-section="facts-intro" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔍</span>Understanding Facts</a>
+            <a href="#" class="nav-item" data-section="facts-custom" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⚙️</span>Custom Facts</a>
+            <a href="#" class="nav-item" data-section="magic-vars" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">✨</span>Magic Variables</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Practice</div>
+            <a href="#" class="nav-item" data-section="lab" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">💻</span>Hands-On Lab</a>
+            <a href="#" class="nav-item" data-section="quiz" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📋</span>Knowledge Check</a>
+            <a href="#" class="nav-item" data-section="summary" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📚</span>Summary</a>
+        </div>
+    </nav>
+    <main id="main-content" role="main">
+        <!-- Welcome Section -->
+        <section id="section-welcome" class="section active" aria-labelledby="welcome-heading">
+            <h1 id="welcome-heading">Welcome to Chapter 3</h1>
+            <p class="lead">Master the art of managing variables and facts to create dynamic, flexible, and reusable Ansible automation.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Variables</div>
+                    <div class="card-content">Learn to define, scope, and use variables at multiple levels for flexible automation.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔍</div>
+                    <div class="card-title">Facts</div>
+                    <div class="card-content">Discover host-specific data automatically gathered by Ansible and create custom facts.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">✨</div>
+                    <div class="card-title">Magic Variables</div>
+                    <div class="card-content">Explore special variables that provide inventory and host information dynamically.</div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-box-title"><span aria-hidden="true">⏱️</span> Estimated Time</div>
+                <p>This chapter takes approximately <strong>2-3 hours</strong> to complete, including hands-on exercises.</p>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">✅</span> Prerequisites</div>
+                <p>Before starting, ensure you have completed Chapter 2 and understand playbook structure, YAML syntax, and basic task execution.</p>
+            </div>
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" onclick="navigateTo('objectives')">Get Started <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Objectives Section -->
+        <section id="section-objectives" class="section" aria-labelledby="objectives-heading">
+            <h1 id="objectives-heading">Learning Objectives</h1>
+            <p class="lead">By the end of this chapter, you will be able to accomplish the following tasks.</p>
+            <div class="objectives-list">
+                <div class="objectives-title"><span aria-hidden="true">🎯</span> Chapter Goals</div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Define and reference variables in Ansible playbooks</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Understand variable scope and where variables can be defined</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Manage variable precedence to control which values are used</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Organize variables using host_vars and group_vars directories</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Work with Ansible facts gathered from managed hosts</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Create and use custom facts on managed hosts</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Use magic variables to access inventory and host information</div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('welcome')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('var-intro')">Continue to Variables <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Variable Fundamentals Section -->
+        <section id="section-var-intro" class="section" aria-labelledby="var-intro-heading">
+            <h1 id="var-intro-heading">Variable Fundamentals</h1>
+            <p class="lead">Variables in Ansible store values that can be reused throughout your playbooks, making automation flexible and maintainable.</p>
+            <h2>Why Use Variables?</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔄</div>
+                    <div class="card-title">Reusability</div>
+                    <div class="card-content">Write playbooks once and use them across different environments by changing variable values.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔧</div>
+                    <div class="card-title">Maintainability</div>
+                    <div class="card-content">Change values in one place instead of searching through multiple playbooks.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔒</div>
+                    <div class="card-title">Security</div>
+                    <div class="card-content">Separate sensitive data from playbook code and use Ansible Vault for encryption.</div>
+                </div>
+            </div>
+            <h2>Variable Naming Rules</h2>
+            <div class="info-box">
+                <div class="info-box-title"><span aria-hidden="true">📝</span> Naming Requirements</div>
+                <ul style="margin: 12px 0 0 20px; color: var(--text-secondary);">
+                    <li>Must start with a letter (a-z, A-Z)</li>
+                    <li>Can contain letters, numbers, and underscores only</li>
+                    <li>Cannot contain spaces, hyphens, or special characters</li>
+                    <li>Case-sensitive (<code>MyVar</code> ≠ <code>myvar</code>)</li>
+                </ul>
+            </div>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Valid and Invalid Variable Names</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Valid variable names</span>
+<span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+<span class="yaml-key">maxRetries</span>: <span class="yaml-number">3</span>
+<span class="yaml-key">server_name_1</span>: <span class="yaml-string">web01</span>
+
+<span class="yaml-comment"># Invalid - DO NOT USE</span>
+<span class="yaml-comment"># 1server: value       # Cannot start with number</span>
+<span class="yaml-comment"># server-name: value   # Cannot contain hyphens</span>
+<span class="yaml-comment"># my var: value        # Cannot contain spaces</span></pre>
+                </div>
+            </div>
+            <h2>Defining Variables in Playbooks</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">play-vars.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
+  
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+    <span class="yaml-key">https_port</span>: <span class="yaml-number">443</span>
+    <span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span>
+    <span class="yaml-key">packages</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">mod_ssl</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install web packages</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-string">"{{ packages }}"</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                </div>
+            </div>
+            <h2>Variable Data Types</h2>
+            <div class="tabs">
+                <div class="tab-buttons" role="tablist">
+                    <button class="tab-btn active" onclick="switchTab(event, 'type-strings')" role="tab">Strings</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'type-numbers')" role="tab">Numbers</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'type-lists')" role="tab">Lists</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'type-dicts')" role="tab">Dictionaries</button>
+                </div>
+                <div id="type-strings" class="tab-content active">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">server_name</span>: <span class="yaml-string">webserver01</span>
+  <span class="yaml-key">message</span>: <span class="yaml-string">"Welcome to {{ server_name }}"</span>
+  <span class="yaml-key">banner</span>: <span class="yaml-value">|</span>
+    <span class="yaml-string">Welcome to the server.</span>
+    <span class="yaml-string">Unauthorized access prohibited.</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="type-numbers" class="tab-content">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+  <span class="yaml-key">max_connections</span>: <span class="yaml-number">1000</span>
+  <span class="yaml-key">timeout</span>: <span class="yaml-number">30.5</span>
+  <span class="yaml-key">file_mode</span>: <span class="yaml-string">'0755'</span>  <span class="yaml-comment"># Quote to preserve</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="type-lists" class="tab-content">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">packages</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">mod_ssl</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">php</span>
+  <span class="yaml-key">ports</span>: <span class="yaml-value">[80, 443, 8080]</span>
+  <span class="yaml-comment"># Access: {{ packages[0] }} → httpd</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="type-dicts" class="tab-content">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">server_config</span>:
+    <span class="yaml-key">hostname</span>: <span class="yaml-string">web01.example.com</span>
+    <span class="yaml-key">ip_address</span>: <span class="yaml-string">192.168.1.10</span>
+    <span class="yaml-key">port</span>: <span class="yaml-number">80</span>
+  <span class="yaml-comment"># Access: {{ server_config.hostname }}</span>
+  <span class="yaml-comment"># Or: {{ server_config['ip_address'] }}</span></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2>Using Variables with <span class="term" tabindex="0">Jinja2<span class="tooltip" role="tooltip">A templating engine for Python that Ansible uses for variable substitution, conditionals, loops, and filters.</span></span></h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Variable Reference Syntax</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display the HTTP port</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"HTTP port is {{ http_port }}"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create document root</span>
+    <span class="yaml-module">ansible.builtin.file</span>:
+      <span class="yaml-key">path</span>: <span class="yaml-string">"{{ doc_root }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">directory</span></pre>
+                </div>
+            </div>
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Important: Quoting Variables</div>
+                <p>When a value <strong>starts with</strong> a variable reference, you must quote the entire value:</p>
+                <div class="code-block" style="margin-top: 12px; margin-bottom: 0;">
+                    <div class="code-content">
+<pre><span class="yaml-comment"># Wrong - YAML syntax error</span>
+<span class="yaml-key">path</span>: <span class="yaml-value">{{ doc_root }}/html</span>
+
+<span class="yaml-comment"># Correct - quoted</span>
+<span class="yaml-key">path</span>: <span class="yaml-string">"{{ doc_root }}/html"</span></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('objectives')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('var-scope')">Continue to Variable Scope <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Variable Scope Section -->
+        <section id="section-var-scope" class="section" aria-labelledby="var-scope-heading">
+            <h1 id="var-scope-heading">Variable Scope</h1>
+            <p class="lead">Understanding where variables can be defined helps you organize your automation effectively and avoid conflicts.</p>
+            <h2>Variable Scope Levels</h2>
+            <p>Variables in Ansible exist at different <span class="term" tabindex="0">scope levels<span class="tooltip" role="tooltip">The context in which a variable is accessible. Variables defined at a broader scope are available to all narrower scopes.</span></span>:</p>
+            <div class="diagram">
+                <div class="diagram-title">Variable Scope Hierarchy</div>
+                <div class="precedence-chart">
+                    <div class="precedence-item high" tabindex="0"><div class="precedence-rank">1</div><div class="precedence-name"><strong>Global Scope</strong> — Extra vars (-e), set_fact, include_vars</div></div>
+                    <div class="precedence-item medium" tabindex="0"><div class="precedence-rank">2</div><div class="precedence-name"><strong>Play Scope</strong> — Play vars, vars_files, vars_prompt</div></div>
+                    <div class="precedence-item medium" tabindex="0"><div class="precedence-rank">3</div><div class="precedence-name"><strong>Host Scope</strong> — host_vars, inventory host variables</div></div>
+                    <div class="precedence-item low" tabindex="0"><div class="precedence-rank">4</div><div class="precedence-name"><strong>Group Scope</strong> — group_vars, inventory group variables</div></div>
+                </div>
+            </div>
+            <h2>Where to Define Variables</h2>
+            <h3>1. Inventory Variables</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">inventory/hosts</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Host variables - specific to a single host</span>
+<span class="yaml-value">[webservers]</span>
+<span class="yaml-string">web1.example.com</span> <span class="yaml-key">http_port</span>=<span class="yaml-number">80</span>
+<span class="yaml-string">web2.example.com</span> <span class="yaml-key">http_port</span>=<span class="yaml-number">8080</span>
+
+<span class="yaml-comment"># Group variables - shared by all hosts</span>
+<span class="yaml-value">[webservers:vars]</span>
+<span class="yaml-key">doc_root</span>=<span class="yaml-string">/var/www/html</span>
+<span class="yaml-key">max_clients</span>=<span class="yaml-number">256</span></pre>
+                </div>
+            </div>
+            <h3>2. Play Variables (vars)</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">playbook.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure application</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">app_name</span>: <span class="yaml-string">mywebapp</span>
+    <span class="yaml-key">app_version</span>: <span class="yaml-string">"2.1.0"</span>
+    <span class="yaml-key">env</span>: <span class="yaml-string">production</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display app info</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">msg</span>: <span class="yaml-string">"Deploying {{ app_name }} v{{ app_version }}"</span></pre>
+                </div>
+            </div>
+            <h3>3. External Variable Files (vars_files)</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">vars/webserver.yml</span></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+<span class="yaml-key">https_port</span>: <span class="yaml-number">443</span>
+<span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span></pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Playbook using vars_files</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  
+  <span class="yaml-key">vars_files</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">vars/webserver.yml</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show configuration</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">msg</span>: <span class="yaml-string">"HTTP: {{ http_port }}"</span></pre>
+                </div>
+            </div>
+            <h3>4. Command Line Variables (-e)</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Command line variable examples</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Single variable</span>
+$ ansible-playbook site.yml -e "env=staging"
+
+<span class="yaml-comment"># Multiple variables</span>
+$ ansible-playbook site.yml -e "env=staging http_port=8080"
+
+<span class="yaml-comment"># Variables from file</span>
+$ ansible-playbook site.yml -e @vars/staging.yml</pre>
+                </div>
+            </div>
+            <h3>5. Registered Variables</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using register to capture output</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check service status</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl is-active httpd</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">httpd_status</span>
+    <span class="yaml-key">ignore_errors</span>: <span class="yaml-value">true</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-value">false</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start httpd if not running</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">httpd_status.rc != 0</span></pre>
+                </div>
+            </div>
+            <h3>Registered Variable Attributes</h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>rc</code></td><td>Return code (0 = success)</td></tr>
+                        <tr><td><code>stdout</code></td><td>Standard output as string</td></tr>
+                        <tr><td><code>stdout_lines</code></td><td>Standard output as list of lines</td></tr>
+                        <tr><td><code>stderr</code></td><td>Standard error as string</td></tr>
+                        <tr><td><code>changed</code></td><td>Whether task made changes (boolean)</td></tr>
+                        <tr><td><code>failed</code></td><td>Whether task failed (boolean)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('var-intro')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('var-precedence')">Continue to Precedence <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Variable Precedence Section -->
+        <section id="section-var-precedence" class="section" aria-labelledby="var-precedence-heading">
+            <h1 id="var-precedence-heading">Variable Precedence</h1>
+            <p class="lead">When the same variable is defined in multiple places, Ansible uses a specific precedence order to determine which value to use.</p>
+            <h2>Understanding Precedence</h2>
+            <p>Ansible has <strong>22 levels of variable precedence</strong>. Variables defined at higher precedence levels override those at lower levels.</p>
+            <div class="diagram">
+                <div class="diagram-title">Variable Precedence (Highest to Lowest)</div>
+                <div class="precedence-chart">
+                    <div class="precedence-item high" tabindex="0"><div class="precedence-rank">1</div><div class="precedence-name">Extra vars (<code>-e</code> command line)</div></div>
+                    <div class="precedence-item high" tabindex="0"><div class="precedence-rank">2</div><div class="precedence-name">Task vars (only for the task)</div></div>
+                    <div class="precedence-item high" tabindex="0"><div class="precedence-rank">3</div><div class="precedence-name">Block vars (only for tasks in block)</div></div>
+                    <div class="precedence-item medium" tabindex="0"><div class="precedence-rank">4</div><div class="precedence-name">Play vars_files</div></div>
+                    <div class="precedence-item medium" tabindex="0"><div class="precedence-rank">5</div><div class="precedence-name">Play vars</div></div>
+                    <div class="precedence-item medium" tabindex="0"><div class="precedence-rank">6</div><div class="precedence-name">host_vars (file)</div></div>
+                    <div class="precedence-item medium" tabindex="0"><div class="precedence-rank">7</div><div class="precedence-name">Inventory host vars</div></div>
+                    <div class="precedence-item low" tabindex="0"><div class="precedence-rank">8</div><div class="precedence-name">group_vars (file)</div></div>
+                    <div class="precedence-item low" tabindex="0"><div class="precedence-rank">9</div><div class="precedence-name">Inventory group vars</div></div>
+                    <div class="precedence-item low" tabindex="0"><div class="precedence-rank">10</div><div class="precedence-name">Role defaults</div></div>
+                </div>
+                <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+                    <span class="badge red">High</span> Always wins
+                    <span class="badge yellow">Medium</span> Common overrides
+                    <span class="badge blue">Low</span> Base values
+                </p>
+            </div>
+            <h2>Precedence Simulator</h2>
+            <div class="var-playground">
+                <div class="var-playground-header">
+                    <div class="var-playground-title"><span aria-hidden="true">🎮</span> Variable Precedence Simulator</div>
+                    <button class="demo-btn" onclick="calculatePrecedence()">Calculate Winner</button>
+                </div>
+                <div class="var-playground-body">
+                    <p style="margin-bottom: 16px; color: var(--text-muted);">Enter values for <code>http_port</code> at different levels:</p>
+                    <div class="var-input-group">
+                        <div class="var-input"><label>Extra vars (-e)</label><input type="text" id="prec-extra" placeholder="e.g., 8080"></div>
+                        <div class="var-input"><label>Play vars</label><input type="text" id="prec-play" placeholder="e.g., 80"></div>
+                        <div class="var-input"><label>host_vars file</label><input type="text" id="prec-host" placeholder="e.g., 8000"></div>
+                    </div>
+                    <div class="var-input-group">
+                        <div class="var-input"><label>group_vars file</label><input type="text" id="prec-group" placeholder="e.g., 80"></div>
+                        <div class="var-input"><label>Role defaults</label><input type="text" id="prec-role" placeholder="e.g., 80"></div>
+                        <div class="var-input"><label>Inventory group</label><input type="text" id="prec-inv" placeholder="e.g., 8888"></div>
+                    </div>
+                    <div class="var-result">
+                        <div class="var-result-label">Effective value of http_port:</div>
+                        <div class="var-result-value" id="prec-result">Enter values and click "Calculate Winner"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practices</div>
+                <ul style="margin: 12px 0 0 20px; color: var(--text-secondary);">
+                    <li><strong>Use role defaults for base values</strong> — Easy to override</li>
+                    <li><strong>Use group_vars for environment settings</strong> — Apply to multiple hosts</li>
+                    <li><strong>Use host_vars for host-specific overrides</strong> — One host, one config</li>
+                    <li><strong>Reserve extra vars for runtime overrides</strong> — Testing and emergencies</li>
+                </ul>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('var-scope')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('var-files')">Continue to Variable Files <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Managing Variable Files Section -->
+        <section id="section-var-files" class="section" aria-labelledby="var-files-heading">
+            <h1 id="var-files-heading">Managing Variable Files</h1>
+            <p class="lead">Organize variables using host_vars and group_vars directories for clean, maintainable automation.</p>
+            <h2>Directory Structure</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Recommended Project Structure</span></div>
+                <div class="code-content">
+<pre>project/
+├── ansible.cfg
+├── inventory/
+│   ├── hosts                 <span class="yaml-comment"># Inventory file</span>
+│   ├── group_vars/
+│   │   ├── all.yml          <span class="yaml-comment"># Variables for all hosts</span>
+│   │   ├── webservers.yml   <span class="yaml-comment"># Variables for webservers</span>
+│   │   └── dbservers.yml    <span class="yaml-comment"># Variables for dbservers</span>
+│   └── host_vars/
+│       ├── web1.example.com.yml
+│       └── db1.example.com.yml
+├── playbooks/
+│   └── site.yml
+└── roles/</pre>
+                </div>
+            </div>
+            <h2>The <span class="term" tabindex="0">group_vars<span class="tooltip" role="tooltip">A directory containing YAML files named after inventory groups. Variables defined here apply to all hosts in the corresponding group.</span></span> Directory</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">group_vars/all.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-comment"># Variables for ALL hosts</span>
+<span class="yaml-key">ntp_server</span>: <span class="yaml-string">time.example.com</span>
+<span class="yaml-key">dns_servers</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-string">8.8.8.8</span>
+  <span class="yaml-dash">-</span> <span class="yaml-string">8.8.4.4</span>
+<span class="yaml-key">timezone</span>: <span class="yaml-string">America/New_York</span></pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">group_vars/webservers.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-comment"># Variables for webservers group only</span>
+<span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
+<span class="yaml-key">https_port</span>: <span class="yaml-number">443</span>
+<span class="yaml-key">doc_root</span>: <span class="yaml-string">/var/www/html</span>
+<span class="yaml-key">packages</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+  <span class="yaml-dash">-</span> <span class="yaml-value">mod_ssl</span></pre>
+                </div>
+            </div>
+            <h2>The <span class="term" tabindex="0">host_vars<span class="tooltip" role="tooltip">A directory containing YAML files named after specific hosts. Variables defined here apply only to that particular host and override group variables.</span></span> Directory</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">host_vars/web1.example.com.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-comment"># Variables specific to this host</span>
+<span class="yaml-key">http_port</span>: <span class="yaml-number">8080</span>         <span class="yaml-comment"># Override from group_vars</span>
+<span class="yaml-key">ssl_cert</span>: <span class="yaml-string">/etc/pki/tls/certs/web1.crt</span>
+<span class="yaml-key">ssl_key</span>: <span class="yaml-string">/etc/pki/tls/private/web1.key</span></pre>
+                </div>
+            </div>
+            <h2>Dynamic Variable Loading with include_vars</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using include_vars</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Load based on environment</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Load environment-specific variables</span>
+    <span class="yaml-module">ansible.builtin.include_vars</span>:
+      <span class="yaml-key">file</span>: <span class="yaml-string">"vars/{{ env }}.yml"</span>
+
+  <span class="yaml-comment"># Load based on OS family</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Load OS-specific variables</span>
+    <span class="yaml-module">ansible.builtin.include_vars</span>:
+      <span class="yaml-key">file</span>: <span class="yaml-string">"vars/{{ ansible_facts['os_family'] }}.yml"</span></pre>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('var-precedence')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('facts-intro')">Continue to Facts <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Understanding Facts Section -->
+        <section id="section-facts-intro" class="section" aria-labelledby="facts-intro-heading">
+            <h1 id="facts-intro-heading">Understanding Ansible Facts</h1>
+            <p class="lead">Facts are system information automatically discovered by Ansible when it connects to managed hosts.</p>
+            <h2>What Are <span class="term" tabindex="0">Ansible Facts<span class="tooltip" role="tooltip">Variables automatically discovered and set by Ansible when connecting to managed hosts. They contain system information like IP addresses, OS version, and hardware details.</span></span>?</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🖥️</div>
+                    <div class="card-title">System Info</div>
+                    <div class="card-content">Operating system, kernel version, architecture, hostname, and domain.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🌐</div>
+                    <div class="card-title">Network Info</div>
+                    <div class="card-content">IP addresses, MAC addresses, interfaces, and DNS configuration.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">💾</div>
+                    <div class="card-title">Hardware Info</div>
+                    <div class="card-content">CPU count, memory size, disk devices, and virtualization details.</div>
+                </div>
+            </div>
+            <h2>Viewing Facts</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Gathering facts from command line</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># View all facts for a host</span>
+$ ansible web1.example.com -m ansible.builtin.setup
+
+<span class="yaml-comment"># Filter specific facts</span>
+$ ansible web1.example.com -m ansible.builtin.setup -a "filter=ansible_distribution*"
+
+<span class="yaml-comment"># View network-related facts</span>
+$ ansible web1.example.com -m ansible.builtin.setup -a "filter=ansible_*_ipv4"</pre>
+                </div>
+            </div>
+            <h2>Fact Explorer</h2>
+            <div class="fact-explorer">
+                <div class="fact-explorer-header">
+                    <div class="fact-explorer-title"><span aria-hidden="true">🔍</span> Interactive Fact Browser</div>
+                    <div class="fact-explorer-search">
+                        <input type="text" id="fact-search" placeholder="Search facts (e.g., distribution, memory)" oninput="filterFacts(this.value)">
+                    </div>
+                </div>
+                <div class="fact-explorer-body">
+                    <div class="fact-tree" id="fact-tree">
+                        <div class="fact-node">
+                            <span class="fact-toggle open" onclick="toggleFactNode(this)">ansible_facts</span>
+                            <div class="fact-children">
+                                <div class="fact-node">
+                                    <span class="fact-toggle open" onclick="toggleFactNode(this)">distribution</span>
+                                    <div class="fact-children">
+                                        <div class="fact-node"><span class="fact-key">ansible_distribution:</span> <span class="fact-string">"RedHat"</span></div>
+                                        <div class="fact-node"><span class="fact-key">ansible_distribution_version:</span> <span class="fact-string">"9.2"</span></div>
+                                        <div class="fact-node"><span class="fact-key">ansible_os_family:</span> <span class="fact-string">"RedHat"</span></div>
+                                    </div>
+                                </div>
+                                <div class="fact-node">
+                                    <span class="fact-toggle" onclick="toggleFactNode(this)">network</span>
+                                    <div class="fact-children" style="display: none;">
+                                        <div class="fact-node"><span class="fact-key">ansible_hostname:</span> <span class="fact-string">"web1"</span></div>
+                                        <div class="fact-node"><span class="fact-key">ansible_fqdn:</span> <span class="fact-string">"web1.example.com"</span></div>
+                                        <div class="fact-node"><span class="fact-key">ansible_default_ipv4.address:</span> <span class="fact-string">"192.168.1.10"</span></div>
+                                    </div>
+                                </div>
+                                <div class="fact-node">
+                                    <span class="fact-toggle" onclick="toggleFactNode(this)">hardware</span>
+                                    <div class="fact-children" style="display: none;">
+                                        <div class="fact-node"><span class="fact-key">ansible_processor_vcpus:</span> <span class="fact-number">4</span></div>
+                                        <div class="fact-node"><span class="fact-key">ansible_memtotal_mb:</span> <span class="fact-number">8192</span></div>
+                                        <div class="fact-node"><span class="fact-key">ansible_architecture:</span> <span class="fact-string">"x86_64"</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2>Using Facts in Playbooks</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Referencing facts in playbooks</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Using ansible_facts dictionary (recommended)</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display OS information</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"</span>
+
+  <span class="yaml-comment"># Conditional based on facts</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install on Red Hat systems only</span>
+    <span class="yaml-module">ansible.builtin.dnf</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['os_family'] == "RedHat"</span>
+
+  <span class="yaml-comment"># Using network facts</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure based on IP</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">config.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/app/config.conf</span>
+    <span class="yaml-key">vars</span>:
+      <span class="yaml-key">server_ip</span>: <span class="yaml-string">"{{ ansible_facts['default_ipv4']['address'] }}"</span></pre>
+                </div>
+            </div>
+            <h2>Controlling Fact Gathering</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Fact gathering options</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Disable fact gathering (faster execution)</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Quick task without facts</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>
+  <span class="yaml-key">gather_facts</span>: <span class="yaml-value">false</span>
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run a command</span>
+      <span class="yaml-module">ansible.builtin.command</span>:
+        <span class="yaml-key">cmd</span>: <span class="yaml-value">uptime</span>
+
+<span class="yaml-comment"># Gather facts explicitly when needed</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Gather facts manually</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>
+  <span class="yaml-key">gather_facts</span>: <span class="yaml-value">false</span>
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Now gather facts</span>
+      <span class="yaml-module">ansible.builtin.setup</span>:</pre>
+                </div>
+            </div>
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Performance Note</div>
+                <p>Fact gathering takes time, especially with many hosts. If you don't need facts, disable gathering with <code>gather_facts: false</code> to speed up playbook execution.</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('var-files')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('facts-custom')">Continue to Custom Facts <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Custom Facts Section -->
+        <section id="section-facts-custom" class="section" aria-labelledby="facts-custom-heading">
+            <h1 id="facts-custom-heading">Custom Facts</h1>
+            <p class="lead">Create your own facts on managed hosts to provide application-specific or organizational data.</p>
+            <h2>What Are <span class="term" tabindex="0">Custom Facts<span class="tooltip" role="tooltip">User-defined facts stored on managed hosts in the /etc/ansible/facts.d/ directory. These are gathered automatically alongside system facts.</span></span>?</h2>
+            <p>Custom facts (also called local facts) are facts you define on managed hosts. They are stored in <code>/etc/ansible/facts.d/</code>.</p>
+            <h2>Creating Custom Facts</h2>
+            <div class="tabs">
+                <div class="tab-buttons" role="tablist">
+                    <button class="tab-btn active" onclick="switchTab(event, 'fact-ini')" role="tab">INI Format</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'fact-json')" role="tab">JSON Format</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'fact-script')" role="tab">Executable Script</button>
+                </div>
+                <div id="fact-ini" class="tab-content active">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-header"><span class="code-title">/etc/ansible/facts.d/custom.fact</span></div>
+                        <div class="code-content">
+<pre><span class="yaml-value">[application]</span>
+<span class="yaml-key">name</span> = <span class="yaml-string">mywebapp</span>
+<span class="yaml-key">version</span> = <span class="yaml-string">2.1.0</span>
+<span class="yaml-key">environment</span> = <span class="yaml-string">production</span>
+
+<span class="yaml-value">[deployment]</span>
+<span class="yaml-key">last_deploy</span> = <span class="yaml-string">2024-01-15</span>
+<span class="yaml-key">deployed_by</span> = <span class="yaml-string">admin</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="fact-json" class="tab-content">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-header"><span class="code-title">/etc/ansible/facts.d/custom.fact</span></div>
+                        <div class="code-content">
+<pre>{
+  "application": {
+    "name": "mywebapp",
+    "version": "2.1.0",
+    "environment": "production"
+  },
+  "deployment": {
+    "last_deploy": "2024-01-15",
+    "deployed_by": "admin"
+  }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="fact-script" class="tab-content">
+                    <div class="code-block" style="margin-top: 0;">
+                        <div class="code-header"><span class="code-title">/etc/ansible/facts.d/dynamic.fact (executable)</span></div>
+                        <div class="code-content">
+<pre>#!/bin/bash
+# Dynamic fact script - must output JSON
+APP_VERSION=$(myapp --version 2>/dev/null || echo "unknown")
+CONNECTIONS=$(ss -tun | wc -l)
+
+cat &lt;&lt;EOF
+{
+  "runtime": {
+    "app_version": "$APP_VERSION",
+    "active_connections": $CONNECTIONS
+  }
+}
+EOF</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2>Deploying Custom Facts</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">deploy-facts.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy custom facts</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>
+  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create facts directory</span>
+      <span class="yaml-module">ansible.builtin.file</span>:
+        <span class="yaml-key">path</span>: <span class="yaml-value">/etc/ansible/facts.d</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">directory</span>
+        <span class="yaml-key">mode</span>: <span class="yaml-string">'0755'</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy application fact</span>
+      <span class="yaml-module">ansible.builtin.copy</span>:
+        <span class="yaml-key">content</span>: <span class="yaml-value">|</span>
+          <span class="yaml-string">[application]</span>
+          <span class="yaml-string">name = mywebapp</span>
+          <span class="yaml-string">version = 2.1.0</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/ansible/facts.d/app.fact</span>
+        <span class="yaml-key">mode</span>: <span class="yaml-string">'0644'</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Re-gather facts</span>
+      <span class="yaml-module">ansible.builtin.setup</span>:
+        <span class="yaml-key">filter</span>: <span class="yaml-value">ansible_local</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display custom facts</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">var</span>: <span class="yaml-value">ansible_local</span></pre>
+                </div>
+            </div>
+            <h2>Accessing Custom Facts</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using custom facts</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Access INI-style facts</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show application name</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"App: {{ ansible_local.app.application.name }}"</span>
+
+  <span class="yaml-comment"># Use in conditionals</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Production-only task</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Running in production!"</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">ansible_local.app.application.environment == 'production'</span></pre>
+                </div>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Use Cases for Custom Facts</div>
+                <ul style="margin: 12px 0 0 20px; color: var(--text-secondary);">
+                    <li>Track application versions across servers</li>
+                    <li>Store deployment metadata</li>
+                    <li>Define server roles or tiers</li>
+                    <li>Capture dynamic runtime information</li>
+                </ul>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('facts-intro')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('magic-vars')">Continue to Magic Variables <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Magic Variables Section -->
+        <section id="section-magic-vars" class="section" aria-labelledby="magic-vars-heading">
+            <h1 id="magic-vars-heading">Magic Variables</h1>
+            <p class="lead">Special variables automatically set by Ansible that provide information about hosts, groups, and execution context.</p>
+            <h2>What Are <span class="term" tabindex="0">Magic Variables<span class="tooltip" role="tooltip">Reserved variable names that Ansible sets automatically. They cannot be directly overwritten and provide access to inventory data and execution context.</span></span>?</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>hostvars</code></td><td>Dictionary of all hosts' variables, keyed by hostname</td></tr>
+                        <tr><td><code>groups</code></td><td>Dictionary of all groups and their member hosts</td></tr>
+                        <tr><td><code>group_names</code></td><td>List of groups the current host belongs to</td></tr>
+                        <tr><td><code>inventory_hostname</code></td><td>Name of the current host as in the inventory</td></tr>
+                        <tr><td><code>inventory_hostname_short</code></td><td>Short version of the hostname (first part)</td></tr>
+                        <tr><td><code>ansible_play_hosts</code></td><td>List of active hosts in the current play</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h2>Using hostvars</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Accessing other hosts' variables</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Get a fact from another host</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display database server IP</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"DB IP: {{ hostvars['db1.example.com']['ansible_default_ipv4']['address'] }}"</span>
+
+  <span class="yaml-comment"># Configure app to connect to database</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create database configuration</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">db_config.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/app/database.conf</span>
+    <span class="yaml-key">vars</span>:
+      <span class="yaml-key">db_host</span>: <span class="yaml-string">"{{ hostvars['db1.example.com']['ansible_fqdn'] }}"</span></pre>
+                </div>
+            </div>
+            <h2>Using groups</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Working with groups variable</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># List all hosts in a group</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show all web servers</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Web servers: {{ groups['webservers'] }}"</span>
+
+  <span class="yaml-comment"># Run only on load balancers</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create HAProxy config</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">haproxy.cfg.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/haproxy/haproxy.cfg</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">"'loadbalancers' in group_names"</span></pre>
+                </div>
+            </div>
+            <h2>Using inventory_hostname</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using inventory_hostname</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display current host</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Running on: {{ inventory_hostname }}"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Set hostname to match inventory</span>
+    <span class="yaml-module">ansible.builtin.hostname</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ inventory_hostname_short }}"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create host-specific log directory</span>
+    <span class="yaml-module">ansible.builtin.file</span>:
+      <span class="yaml-key">path</span>: <span class="yaml-string">"/var/log/app/{{ inventory_hostname }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">directory</span></pre>
+                </div>
+            </div>
+            <h2>Using group_names</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Conditional execution based on group</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show groups for this host</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Member of: {{ group_names }}"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install web server packages</span>
+    <span class="yaml-module">ansible.builtin.dnf</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">when</span>: <span class="yaml-string">"'webservers' in group_names"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install database packages</span>
+    <span class="yaml-module">ansible.builtin.dnf</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">mysql-server</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">when</span>: <span class="yaml-string">"'dbservers' in group_names"</span></pre>
+                </div>
+            </div>
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Important: Facts Must Be Gathered First</div>
+                <p>When accessing another host's facts via <code>hostvars</code>, those facts must have been gathered first. Either run a play against those hosts first, or use <code>delegate_to</code>.</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('facts-custom')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Hands-On Lab Section -->
+        <section id="section-lab" class="section" aria-labelledby="lab-heading">
+            <h1 id="lab-heading">Hands-On Lab</h1>
+            <p class="lead">Practice managing variables and facts with these guided exercises.</p>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Lab 3.1</span>
+                    <span class="exercise-title">Organizing Variables with group_vars and host_vars</span>
+                </div>
+                <p>Create a project structure with properly organized variables.</p>
+                <div class="exercise-steps">
+                    <div class="exercise-step"><div><strong>Create the project structure:</strong>
+                        <div class="code-block" style="margin-top: 8px;"><div class="code-content"><pre>mkdir -p ~/lab-vars/inventory/{group_vars,host_vars}
+cd ~/lab-vars</pre></div></div></div></div>
+                    <div class="exercise-step"><div><strong>Create group_vars/webservers.yml:</strong>
+                        <div class="code-block" style="margin-top: 8px;"><div class="code-content"><pre>---
+http_port: 80
+https_port: 443
+doc_root: /var/www/html
+packages:
+  - httpd
+  - mod_ssl</pre></div></div></div></div>
+                    <div class="exercise-step"><div><strong>Create host_vars/serverb.lab.example.com.yml to override:</strong>
+                        <div class="code-block" style="margin-top: 8px;"><div class="code-content"><pre>---
+http_port: 8080</pre></div></div></div></div>
+                    <div class="exercise-step"><div><strong>Run playbook and observe precedence:</strong>
+                        <div class="code-block" style="margin-top: 8px;"><div class="code-content"><pre>ansible-playbook -i inventory/hosts show-vars.yml</pre></div></div></div></div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Lab 3.2</span>
+                    <span class="exercise-title">Working with Facts and Custom Facts</span>
+                </div>
+                <p>Gather system facts and create custom facts on managed hosts.</p>
+                <div class="exercise-steps">
+                    <div class="exercise-step"><div><strong>Create a playbook to display facts:</strong>
+                        <div class="code-block" style="margin-top: 8px;"><div class="code-header"><span class="code-title">gather-facts.yml</span></div><div class="code-content"><pre>---
+- name: Gather and display facts
+  hosts: all
+  
+  tasks:
+    - name: Display OS information
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} runs {{ ansible_facts['distribution'] }}"</pre></div></div></div></div>
+                    <div class="exercise-step"><div><strong>Create and deploy a custom fact:</strong>
+                        <div class="code-block" style="margin-top: 8px;"><div class="code-content"><pre>---
+- name: Deploy custom facts
+  hosts: all
+  become: true
+  tasks:
+    - name: Create facts directory
+      ansible.builtin.file:
+        path: /etc/ansible/facts.d
+        state: directory
+        mode: '0755'
+    - name: Deploy fact
+      ansible.builtin.copy:
+        content: |
+          [application]
+          name = lab-app
+          version = 1.0.0
+        dest: /etc/ansible/facts.d/app.fact</pre></div></div></div></div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('magic-vars')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="section-quiz" class="section" aria-labelledby="quiz-heading">
+            <h1 id="quiz-heading">Knowledge Check</h1>
+            <p class="lead">Test your understanding of managing variables and facts in Ansible.</p>
+            <div class="quiz-container" id="quiz-container">
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+                    <span class="quiz-progress-text" id="quiz-progress-text">Question 1 of 10</span>
+                </div>
+                <div id="quiz-content">
+                    <div class="quiz-question" id="quiz-question"></div>
+                    <div class="quiz-options" id="quiz-options" role="radiogroup"></div>
+                    <div class="quiz-explanation" id="quiz-explanation">
+                        <div class="quiz-explanation-title" id="quiz-explanation-title"></div>
+                        <p id="quiz-explanation-text"></p>
+                    </div>
+                </div>
+                <button class="quiz-btn" id="quiz-btn" onclick="handleQuizAction()" disabled>Check Answer</button>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('lab')"><span aria-hidden="true">←</span> Back to Lab</button>
+                <button class="btn btn-primary" onclick="navigateTo('summary')">View Summary <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section id="section-summary" class="section" aria-labelledby="summary-heading">
+            <h1 id="summary-heading">Chapter Summary</h1>
+            <p class="lead">Congratulations! You've learned how to manage variables and facts in Ansible.</p>
+            <h2>Key Concepts</h2>
+            <div class="card-grid">
+                <div class="card"><div class="card-icon" aria-hidden="true">📦</div><div class="card-title">Variables</div><div class="card-content">Store reusable values using various data types. Reference with {{ variable }} syntax.</div></div>
+                <div class="card"><div class="card-icon" aria-hidden="true">🎚️</div><div class="card-title">Scope & Precedence</div><div class="card-content">Variables exist at different levels. Higher precedence always wins. Extra vars (-e) win.</div></div>
+                <div class="card"><div class="card-icon" aria-hidden="true">📁</div><div class="card-title">group_vars & host_vars</div><div class="card-content">Organize variables in directories. group_vars for shared, host_vars for specific.</div></div>
+                <div class="card"><div class="card-icon" aria-hidden="true">🔍</div><div class="card-title">Facts</div><div class="card-content">System info gathered automatically. Access via ansible_facts dictionary.</div></div>
+                <div class="card"><div class="card-icon" aria-hidden="true">⚙️</div><div class="card-title">Custom Facts</div><div class="card-content">User-defined facts in /etc/ansible/facts.d/. Available as ansible_local.</div></div>
+                <div class="card"><div class="card-icon" aria-hidden="true">✨</div><div class="card-title">Magic Variables</div><div class="card-content">hostvars, groups, group_names, inventory_hostname for dynamic access.</div></div>
+            </div>
+            <h2>Quick Reference</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Concept</th><th>Example / Syntax</th></tr></thead>
+                    <tbody>
+                        <tr><td>Define variable</td><td><code>vars: http_port: 80</code></td></tr>
+                        <tr><td>Reference variable</td><td><code>"{{ http_port }}"</code></td></tr>
+                        <tr><td>Command line var</td><td><code>-e "http_port=8080"</code></td></tr>
+                        <tr><td>External vars file</td><td><code>vars_files: - vars/web.yml</code></td></tr>
+                        <tr><td>Register output</td><td><code>register: result</code></td></tr>
+                        <tr><td>Access fact</td><td><code>ansible_facts['distribution']</code></td></tr>
+                        <tr><td>Custom fact location</td><td><code>/etc/ansible/facts.d/*.fact</code></td></tr>
+                        <tr><td>Access custom fact</td><td><code>ansible_local.filename.section.key</code></td></tr>
+                        <tr><td>Disable fact gathering</td><td><code>gather_facts: false</code></td></tr>
+                        <tr><td>Access other host vars</td><td><code>hostvars['hostname']['var']</code></td></tr>
+                        <tr><td>List hosts in group</td><td><code>groups['groupname']</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="checklist">
+                <h3 style="margin-top: 0; margin-bottom: 16px;">Best Practices Checklist</h3>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use descriptive variable names with underscores</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Organize variables in group_vars and host_vars directories</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Quote variables when they start a value</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use role defaults for base values that should be easily overridable</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Disable fact gathering when not needed for faster execution</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use Ansible Vault for sensitive variable values</div></div>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Next Steps</div>
+                <p>Continue with Chapter 4 to learn about implementing task control with conditionals, loops, and handlers.</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('quiz')"><span aria-hidden="true">←</span> Back to Quiz</button>
+                <button class="btn btn-primary" onclick="navigateTo('welcome')">Review Chapter <span aria-hidden="true">↺</span></button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Quiz Questions
+        const quizQuestions = [
+            { question: "Which variable naming convention is valid in Ansible?", options: ["server-name", "server_name", "1server", "server name"], correct: 1, explanation: "Variable names must start with a letter and can only contain letters, numbers, and underscores." },
+            { question: "What is the highest precedence for variable definitions?", options: ["Play vars", "group_vars", "Extra vars (-e)", "Role defaults"], correct: 2, explanation: "Extra vars passed via -e on the command line have the highest precedence." },
+            { question: "Where are custom facts stored on managed hosts?", options: ["/etc/facts.d/", "/etc/ansible/facts.d/", "/var/ansible/facts/", "~/.ansible/facts/"], correct: 1, explanation: "Custom facts are stored in /etc/ansible/facts.d/ with .fact extension." },
+            { question: "How do you access custom facts in a playbook?", options: ["ansible_facts['custom']", "ansible_local.filename.section", "custom_facts['name']", "local_facts.name"], correct: 1, explanation: "Custom facts are accessed via ansible_local using pattern: ansible_local.filename.section.key" },
+            { question: "Which magic variable provides access to all hosts' variables?", options: ["all_vars", "host_variables", "hostvars", "inventory_vars"], correct: 2, explanation: "hostvars is a dictionary containing all hosts' variables, accessed via hostvars['hostname']['variable']." },
+            { question: "What happens when a value starts with {{ in YAML?", options: ["It works fine", "YAML syntax error", "Variable is ignored", "Template error"], correct: 1, explanation: "Values starting with {{ cause syntax errors. Quote the entire value: \"{{ variable }}\"" },
+            { question: "Which keyword loads variables from external files in a play?", options: ["var_files", "vars_files", "include_vars", "load_vars"], correct: 1, explanation: "vars_files at play level loads external YAML files. include_vars is a module for dynamic loading." },
+            { question: "How do you disable automatic fact gathering in a play?", options: ["facts: false", "gather_facts: false", "no_facts: true", "skip_facts: true"], correct: 1, explanation: "Set gather_facts: false at play level to disable automatic fact gathering." },
+            { question: "Which magic variable lists groups the current host belongs to?", options: ["host_groups", "member_groups", "group_names", "groups_list"], correct: 2, explanation: "group_names is a list of all groups the current host is a member of." },
+            { question: "What is the correct precedence order (highest to lowest)?", options: ["Extra vars > Play vars > group_vars > Role defaults", "Play vars > Extra vars > host_vars > group_vars", "Role defaults > group_vars > host_vars > Extra vars", "group_vars > host_vars > Play vars > Extra vars"], correct: 0, explanation: "Correct order: Extra vars (-e) > Play vars > host_vars > group_vars > Role defaults." }
+        ];
+
+        let currentQuestion = 0, selectedOption = null, score = 0, quizState = 'selecting';
+        const sections = {};
+        const completedSections = new Set();
+        let currentSection = 'welcome';
+
+        function initNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const section = item.dataset.section;
+                sections[section] = item;
+                item.addEventListener('click', (e) => { e.preventDefault(); navigateTo(section); });
+                item.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateTo(section); } });
+            });
+        }
+
+        function navigateTo(section) {
+            if (currentSection && currentSection !== section) {
+                completedSections.add(currentSection);
+                if (sections[currentSection]) sections[currentSection].classList.add('completed');
+            }
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (sections[section]) sections[section].classList.add('active');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const sectionEl = document.getElementById('section-' + section);
+            if (sectionEl) sectionEl.classList.add('active');
+            currentSection = section;
+            updateProgress();
+            if (section === 'quiz') initQuiz();
+            document.getElementById('nav').classList.remove('open');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            const totalSections = Object.keys(sections).length;
+            const percentage = Math.round((completedSections.size / totalSections) * 100);
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = percentage + '%';
+        }
+
+        function toggleNav() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('open');
+            document.querySelector('.menu-toggle').setAttribute('aria-expanded', nav.classList.contains('open'));
+        }
+
+        function initQuiz() {
+            currentQuestion = 0; selectedOption = null; score = 0; quizState = 'selecting';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= quizQuestions.length) { showScore(); return; }
+            const q = quizQuestions[currentQuestion];
+            document.getElementById('quiz-question').textContent = q.question;
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'quiz-option';
+                optionEl.setAttribute('role', 'radio');
+                optionEl.setAttribute('tabindex', '0');
+                optionEl.innerHTML = `<div class="quiz-option-marker">${String.fromCharCode(65 + index)}</div><div>${option}</div>`;
+                optionEl.addEventListener('click', () => selectOption(index));
+                optionEl.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectOption(index); } });
+                optionsContainer.appendChild(optionEl);
+            });
+            document.getElementById('quiz-explanation').classList.remove('visible');
+            document.getElementById('quiz-btn').disabled = true;
+            document.getElementById('quiz-btn').textContent = 'Check Answer';
+            updateQuizProgress();
+            quizState = 'selecting';
+        }
+
+        function selectOption(index) {
+            if (quizState !== 'selecting') return;
+            selectedOption = index;
+            document.querySelectorAll('.quiz-option').forEach((opt, i) => { opt.classList.remove('selected'); opt.setAttribute('aria-checked', i === index); });
+            document.querySelectorAll('.quiz-option')[index].classList.add('selected');
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function handleQuizAction() {
+            if (quizState === 'selecting') checkAnswer();
+            else if (quizState === 'answered') nextQuestion();
+        }
+
+        function checkAnswer() {
+            const q = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            options[q.correct].classList.add('correct');
+            if (selectedOption !== q.correct) options[selectedOption].classList.add('incorrect');
+            else score++;
+            const explanationEl = document.getElementById('quiz-explanation');
+            const titleEl = document.getElementById('quiz-explanation-title');
+            titleEl.textContent = selectedOption === q.correct ? '✓ Correct!' : '✗ Incorrect';
+            titleEl.className = 'quiz-explanation-title ' + (selectedOption === q.correct ? 'correct' : 'incorrect');
+            document.getElementById('quiz-explanation-text').textContent = q.explanation;
+            explanationEl.classList.add('visible');
+            document.getElementById('quiz-btn').textContent = currentQuestion < quizQuestions.length - 1 ? 'Next Question →' : 'See Results';
+            quizState = 'answered';
+        }
+
+        function nextQuestion() { currentQuestion++; selectedOption = null; showQuestion(); }
+
+        function showScore() {
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            document.getElementById('quiz-content').innerHTML = `<div class="quiz-score"><div class="quiz-score-value">${percentage}%</div><div class="quiz-score-label">${score} of ${quizQuestions.length} correct</div><p style="margin-top: 24px; color: var(--text-secondary);">${percentage >= 80 ? 'Excellent work! You have a strong understanding of variables and facts.' : percentage >= 60 ? 'Good effort! Review the sections you found challenging.' : 'Keep practicing! Review the chapter and try again.'}</p></div>`;
+            document.getElementById('quiz-btn').textContent = 'Retake Quiz';
+            document.getElementById('quiz-btn').disabled = false;
+            document.getElementById('quiz-btn').onclick = initQuiz;
+            quizState = 'finished';
+        }
+
+        function updateQuizProgress() {
+            const percentage = ((currentQuestion) / quizQuestions.length) * 100;
+            document.getElementById('quiz-progress-fill').style.width = percentage + '%';
+            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
+        }
+
+        function switchTab(event, tabId) {
+            const tabButtons = event.target.parentElement.querySelectorAll('.tab-btn');
+            const tabContents = event.target.parentElement.parentElement.querySelectorAll('.tab-content');
+            tabButtons.forEach(btn => { btn.classList.remove('active'); btn.setAttribute('aria-selected', 'false'); });
+            tabContents.forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            event.target.setAttribute('aria-selected', 'true');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function toggleObjective(el) { el.classList.toggle('checked'); el.setAttribute('aria-checked', el.classList.contains('checked')); }
+
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => { const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = orig, 2000); });
+        }
+
+        function calculatePrecedence() {
+            const levels = [
+                { id: 'prec-extra', name: 'Extra vars (-e)', priority: 1 },
+                { id: 'prec-play', name: 'Play vars', priority: 2 },
+                { id: 'prec-host', name: 'host_vars file', priority: 3 },
+                { id: 'prec-group', name: 'group_vars file', priority: 4 },
+                { id: 'prec-inv', name: 'Inventory group vars', priority: 5 },
+                { id: 'prec-role', name: 'Role defaults', priority: 6 }
+            ];
+            let winner = null, winnerPriority = 999, winnerName = '';
+            levels.forEach(level => {
+                const value = document.getElementById(level.id).value.trim();
+                if (value && level.priority < winnerPriority) { winner = value; winnerPriority = level.priority; winnerName = level.name; }
+            });
+            const resultEl = document.getElementById('prec-result');
+            resultEl.innerHTML = winner ? `<span style="color: var(--success);">${winner}</span> <span style="font-size: 14px; color: var(--text-muted);">(from ${winnerName})</span>` : 'No values entered';
+        }
+
+        function toggleFactNode(el) {
+            el.classList.toggle('open');
+            const children = el.nextElementSibling;
+            if (children) children.style.display = el.classList.contains('open') ? 'block' : 'none';
+        }
+
+        function filterFacts(query) {
+            const factTree = document.getElementById('fact-tree');
+            const allNodes = factTree.querySelectorAll('.fact-node');
+            if (!query) { allNodes.forEach(node => node.style.display = 'block'); return; }
+            query = query.toLowerCase();
+            allNodes.forEach(node => {
+                const text = node.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    node.style.display = 'block';
+                    let parent = node.parentElement;
+                    while (parent) { if (parent.classList && parent.classList.contains('fact-children')) parent.style.display = 'block'; parent = parent.parentElement; }
+                } else { node.style.display = 'none'; }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            document.addEventListener('click', (e) => {
+                const nav = document.getElementById('nav');
+                const toggle = document.querySelector('.menu-toggle');
+                if (!nav.contains(e.target) && !toggle.contains(e.target)) nav.classList.remove('open');
+            });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.getElementById('nav').classList.remove('open'); });
+        });
+    </script>
+</body>
+</html>

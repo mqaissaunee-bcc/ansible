@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHA 294 - Chapter 4: Implementing Task Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rh-red: #CC0000;
+            --rh-red-dark: #A30000;
+            --rh-red-light: #FF6666;
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --bg-tertiary: #3D3D3D;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --text-muted: #B0B0B0;
+            --accent-blue: #0066CC;
+            --accent-green: #009933;
+            --accent-yellow: #FFCC00;
+            --accent-orange: #FF6600;
+            --accent-purple: #9966CC;
+            --accent-cyan: #00CCCC;
+            --border-color: #4D4D4D;
+            --success: #00CC66;
+            --error: #FF3333;
+            --warning: #FF9900;
+            --code-bg: #0D0D0D;
+            --tooltip-bg: #FFFFCC;
+            --tooltip-text: #1A1A1A;
+            --focus-outline: #FFCC00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; font-size: 17px; }
+        .skip-link { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); background: var(--rh-red); color: white; padding: 12px 24px; text-decoration: none; border-radius: 0 0 8px 8px; z-index: 10000; font-weight: 600; transition: top 0.3s; }
+        .skip-link:focus { top: 0; outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus:not(:focus-visible) { outline: none; }
+        :focus-visible { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        header { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%); border-bottom: 3px solid var(--rh-red); padding: 16px 24px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; }
+        .header-brand { display: flex; align-items: center; gap: 16px; }
+        .logo { width: 40px; height: 40px; background: var(--rh-red); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Red Hat Display', sans-serif; font-weight: 900; font-size: 20px; }
+        .course-title { font-family: 'Red Hat Display', sans-serif; font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .chapter-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; }
+        .progress-container { display: flex; align-items: center; gap: 12px; }
+        .progress-bar { width: 200px; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--rh-red) 0%, var(--accent-orange) 100%); width: 0%; transition: width 0.5s ease; border-radius: 4px; }
+        .progress-text { font-family: 'Red Hat Mono', monospace; font-size: 14px; color: var(--text-muted); min-width: 45px; }
+        .menu-toggle { display: none; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 20px; }
+        nav { position: fixed; left: 0; top: 76px; bottom: 0; width: 300px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; z-index: 999; }
+        .nav-section { margin-bottom: 8px; }
+        .nav-section-title { font-family: 'Red Hat Display', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); padding: 12px 24px 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; font-size: 15px; transition: all 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-item.active { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); color: var(--text-primary); }
+        .nav-item.completed::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--success); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: -32px; margin-left: -8px; }
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
+        .section { display: none; padding: 48px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { font-family: 'Red Hat Display', sans-serif; font-size: 42px; font-weight: 900; margin-bottom: 16px; line-height: 1.2; }
+        h2 { font-family: 'Red Hat Display', sans-serif; font-size: 28px; font-weight: 700; margin-top: 48px; margin-bottom: 20px; color: var(--text-primary); border-bottom: 2px solid var(--rh-red); padding-bottom: 12px; }
+        h3 { font-family: 'Red Hat Display', sans-serif; font-size: 22px; font-weight: 600; margin-top: 32px; margin-bottom: 16px; color: var(--text-primary); }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        .lead { font-size: 20px; color: var(--text-primary); margin-bottom: 32px; line-height: 1.6; }
+        code { font-family: 'Red Hat Mono', monospace; background: var(--bg-tertiary); padding: 2px 8px; border-radius: 4px; font-size: 0.9em; color: var(--accent-cyan); }
+        .term { position: relative; cursor: help; border-bottom: 2px dotted var(--accent-yellow); font-weight: 500; color: var(--accent-yellow); }
+        .term .tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--tooltip-bg); color: var(--tooltip-text); padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 1.5; width: max-content; max-width: 320px; opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none; }
+        .term .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--tooltip-bg); }
+        .term:hover .tooltip, .term:focus .tooltip { opacity: 1; visibility: visible; }
+        .term.tooltip-left .tooltip { left: 0; transform: translateX(0); }
+        .term.tooltip-left .tooltip::after { left: 24px; }
+        .term.tooltip-right .tooltip { left: auto; right: 0; transform: translateX(0); }
+        .term.tooltip-right .tooltip::after { left: auto; right: 24px; }
+        .code-block { background: var(--code-bg); border-radius: 8px; margin: 24px 0; overflow: hidden; border: 1px solid var(--border-color); }
+        .code-header { background: var(--bg-tertiary); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .code-title { font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
+        .code-copy { background: var(--rh-red); border: none; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .code-copy:hover { background: var(--rh-red-dark); }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Red Hat Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre; margin: 0; }
+        .yaml-key { color: var(--accent-cyan); }
+        .yaml-value { color: var(--accent-green); }
+        .yaml-string { color: var(--accent-yellow); }
+        .yaml-comment { color: var(--text-muted); font-style: italic; }
+        .yaml-dash { color: var(--accent-orange); }
+        .yaml-module { color: var(--accent-purple); }
+        .yaml-bool { color: var(--accent-orange); }
+        .info-box { background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
+        .info-box.warning { border-left-color: var(--warning); background: rgba(255, 153, 0, 0.1); }
+        .info-box.tip { border-left-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
+        .info-box.danger { border-left-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .info-box-title { font-family: 'Red Hat Display', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .info-box.warning .info-box-title { color: var(--warning); }
+        .info-box.tip .info-box-title { color: var(--accent-green); }
+        .info-box.danger .info-box-title { color: var(--error); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 32px 0; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s; }
+        .card:hover { border-color: var(--rh-red); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(204, 0, 0, 0.2); }
+        .card-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--rh-red) 0%, var(--accent-orange) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+        .card-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .card-content { color: var(--text-muted); font-size: 15px; }
+        .objectives-list { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .objectives-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        .objective-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .objective-item:last-child { border-bottom: none; }
+        .objective-checkbox { width: 24px; height: 24px; min-width: 24px; border: 2px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: transparent; font-size: 14px; }
+        .objective-checkbox:hover { border-color: var(--rh-red); }
+        .objective-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+        .objective-text { color: var(--text-secondary); line-height: 1.6; }
+        .table-container { overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); }
+        th { background: var(--bg-tertiary); padding: 16px; text-align: left; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--rh-red); }
+        td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--bg-tertiary); }
+        .tabs { margin: 32px 0; }
+        .tab-buttons { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; padding: 12px 24px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--rh-red); border-bottom-color: var(--rh-red); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-primary { background: var(--rh-red); color: white; }
+        .btn-primary:hover { background: var(--rh-red-dark); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-tertiary); }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color); }
+        .diagram { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; text-align: center; }
+        .diagram-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; margin-bottom: 24px; }
+        .flow-chart { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 500px; margin: 0 auto; }
+        .flow-item { background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; padding: 16px 24px; width: 100%; text-align: center; transition: all 0.3s; }
+        .flow-item:hover { border-color: var(--rh-red); transform: scale(1.02); }
+        .flow-item.block { border-color: var(--accent-blue); background: rgba(0, 102, 204, 0.1); }
+        .flow-item.rescue { border-color: var(--accent-orange); background: rgba(255, 102, 0, 0.1); }
+        .flow-item.always { border-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
+        .flow-arrow { color: var(--text-muted); font-size: 24px; }
+        .flow-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .exercise { background: linear-gradient(135deg, rgba(204, 0, 0, 0.1) 0%, rgba(255, 102, 0, 0.1) 100%); border: 1px solid var(--rh-red); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .exercise-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .exercise-badge { background: var(--rh-red); color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .exercise-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; }
+        .exercise-steps { counter-reset: step; }
+        .exercise-step { display: flex; gap: 16px; margin-bottom: 24px; padding-left: 8px; }
+        .exercise-step::before { counter-increment: step; content: counter(step); background: var(--rh-red); color: white; width: 28px; height: 28px; min-width: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .checklist { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-check { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 12px; color: transparent; margin-top: 2px; }
+        .checklist-check:hover { border-color: var(--success); }
+        .checklist-check.checked { background: var(--success); border-color: var(--success); color: white; }
+        .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .quiz-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .quiz-progress-bar { flex: 1; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+        .quiz-progress-fill { height: 100%; background: var(--rh-red); transition: width 0.3s; }
+        .quiz-progress-text { font-family: 'Red Hat Mono', monospace; font-size: 14px; color: var(--text-muted); }
+        .quiz-question { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 24px; line-height: 1.5; }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+        .quiz-option { background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; padding: 16px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 16px; }
+        .quiz-option:hover:not(.selected):not(.correct):not(.incorrect) { border-color: var(--rh-red); background: rgba(204, 0, 0, 0.1); }
+        .quiz-option.selected { border-color: var(--accent-blue); background: rgba(0, 102, 204, 0.1); }
+        .quiz-option.correct { border-color: var(--success); background: rgba(0, 204, 102, 0.1); }
+        .quiz-option.incorrect { border-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .quiz-option-marker { width: 28px; height: 28px; border: 2px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: var(--text-muted); flex-shrink: 0; }
+        .quiz-option.correct .quiz-option-marker { background: var(--success); border-color: var(--success); color: white; }
+        .quiz-option.incorrect .quiz-option-marker { background: var(--error); border-color: var(--error); color: white; }
+        .quiz-explanation { background: var(--bg-primary); border-radius: 8px; padding: 20px; margin-top: 24px; display: none; }
+        .quiz-explanation.visible { display: block; animation: fadeIn 0.3s ease; }
+        .quiz-explanation-title { font-weight: 600; margin-bottom: 8px; }
+        .quiz-explanation-title.correct { color: var(--success); }
+        .quiz-explanation-title.incorrect { color: var(--error); }
+        .quiz-btn { background: var(--rh-red); border: none; color: white; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 24px; display: flex; align-items: center; gap: 8px; }
+        .quiz-btn:hover:not(:disabled) { background: var(--rh-red-dark); }
+        .quiz-btn:disabled { background: var(--bg-tertiary); cursor: not-allowed; }
+        .quiz-score { text-align: center; padding: 40px; }
+        .quiz-score-value { font-family: 'Red Hat Display', sans-serif; font-size: 64px; font-weight: 900; color: var(--rh-red); }
+        .quiz-score-label { font-size: 18px; color: var(--text-muted); margin-top: 8px; }
+        .interactive-demo { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin: 32px 0; }
+        .demo-header { background: var(--bg-tertiary); padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .demo-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
+        .demo-body { padding: 20px; }
+        .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+        .demo-control { display: flex; flex-direction: column; gap: 6px; }
+        .demo-control label { font-size: 12px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
+        .demo-control select, .demo-control input { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; color: var(--text-primary); font-family: 'Red Hat Mono', monospace; font-size: 14px; min-width: 150px; }
+        .demo-control select:focus, .demo-control input:focus { outline: none; border-color: var(--rh-red); }
+        .demo-output { background: var(--code-bg); border-radius: 8px; padding: 16px; font-family: 'Red Hat Mono', monospace; font-size: 14px; min-height: 200px; max-height: 400px; overflow-y: auto; }
+        .demo-btn { background: var(--rh-red); border: none; color: white; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .demo-btn:hover { background: var(--rh-red-dark); }
+        .output-line { margin-bottom: 4px; }
+        .output-ok { color: var(--success); }
+        .output-changed { color: var(--accent-yellow); }
+        .output-failed { color: var(--error); }
+        .output-skipped { color: var(--accent-cyan); }
+        .output-task { color: var(--accent-cyan); font-weight: 600; }
+        .output-play { color: var(--accent-purple); font-weight: 700; }
+        @media (max-width: 1024px) {
+            nav { transform: translateX(-100%); transition: transform 0.3s; }
+            nav.open { transform: translateX(0); }
+            main { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .progress-bar { width: 120px; }
+        }
+        @media (max-width: 768px) {
+            .section { padding: 24px; }
+            h1 { font-size: 32px; }
+            h2 { font-size: 24px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .header-brand { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .progress-container { display: none; }
+        }
+        @media print { nav, header, .skip-link, .nav-buttons, .quiz-btn { display: none !important; } main { margin: 0; } .section { display: block !important; } }
+        @media (prefers-contrast: high) { :root { --border-color: #FFFFFF; --text-muted: #E0E0E0; } }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header role="banner">
+        <div class="header-brand">
+            <div class="logo" aria-hidden="true">A</div>
+            <div>
+                <div class="course-title">RHA 294</div>
+                <div class="chapter-title">Chapter 4: Implementing Task Control</div>
+            </div>
+        </div>
+        <button class="menu-toggle" onclick="toggleNav()" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+        <div class="progress-container">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Course progress">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+    </header>
+    <nav id="nav" role="navigation" aria-label="Chapter sections">
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="#" class="nav-item active" data-section="welcome" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🏠</span>Welcome</a>
+            <a href="#" class="nav-item" data-section="objectives" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🎯</span>Learning Objectives</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Conditionals</div>
+            <a href="#" class="nav-item" data-section="when-basics" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">❓</span>The when Clause</a>
+            <a href="#" class="nav-item" data-section="when-advanced" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔀</span>Advanced Conditionals</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Loops</div>
+            <a href="#" class="nav-item" data-section="loops-basics" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔄</span>Loop Basics</a>
+            <a href="#" class="nav-item" data-section="loops-advanced" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⚙️</span>Loop Control</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Handlers</div>
+            <a href="#" class="nav-item" data-section="handlers" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔔</span>Handler Concepts</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Error Handling</div>
+            <a href="#" class="nav-item" data-section="errors-basic" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⚠️</span>Handling Failures</a>
+            <a href="#" class="nav-item" data-section="blocks" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📦</span>Blocks</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Practice</div>
+            <a href="#" class="nav-item" data-section="quiz" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📋</span>Knowledge Check</a>
+            <a href="#" class="nav-item" data-section="summary" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📚</span>Summary</a>
+        </div>
+    </nav>
+    <main id="main-content" role="main">
+        <!-- Welcome Section -->
+        <section id="section-welcome" class="section active" aria-labelledby="welcome-heading">
+            <h1 id="welcome-heading">Welcome to Chapter 4</h1>
+            <p class="lead">Master task control in Ansible to create intelligent, robust automation that adapts to different conditions and handles errors gracefully.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">❓</div>
+                    <div class="card-title">Conditionals</div>
+                    <div class="card-content">Control when tasks execute based on variables, facts, and registered results.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔄</div>
+                    <div class="card-title">Loops</div>
+                    <div class="card-content">Iterate over lists, dictionaries, and complex data structures efficiently.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔔</div>
+                    <div class="card-title">Handlers</div>
+                    <div class="card-content">Trigger actions only when changes occur, perfect for service restarts.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Blocks</div>
+                    <div class="card-content">Group tasks and implement try/catch/finally error handling patterns.</div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-box-title"><span aria-hidden="true">⏱️</span> Estimated Time</div>
+                <p>This chapter takes approximately <strong>2-3 hours</strong> to complete, including hands-on exercises.</p>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">✅</span> Prerequisites</div>
+                <p>Before starting, ensure you have completed Chapters 1-3 and understand playbook structure, YAML syntax, variables, and facts.</p>
+            </div>
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" onclick="navigateTo('objectives')">Get Started <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Objectives Section -->
+        <section id="section-objectives" class="section" aria-labelledby="objectives-heading">
+            <h1 id="objectives-heading">Learning Objectives</h1>
+            <p class="lead">By the end of this chapter, you will be able to accomplish the following tasks.</p>
+            <div class="objectives-list">
+                <div class="objectives-title"><span aria-hidden="true">🎯</span> Chapter Goals</div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Use the <code>when</code> clause to conditionally execute tasks based on variables and facts</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Apply multiple conditions with logical operators (and, or, not)</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Implement loops using the <code>loop</code> keyword and loop control options</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Register and use task results within conditionals and loops</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Configure handlers to respond to task changes</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Handle task errors using <code>ignore_errors</code>, <code>failed_when</code>, and <code>changed_when</code></div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Group tasks with blocks and implement error recovery with rescue and always</div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('welcome')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('when-basics')">Continue to Conditionals <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- When Basics Section -->
+        <section id="section-when-basics" class="section" aria-labelledby="when-basics-heading">
+            <h1 id="when-basics-heading">The when Clause</h1>
+            <p class="lead">Conditionals allow you to control whether a task runs based on variables, facts, or registered results.</p>
+            
+            <h2>Understanding Conditionals</h2>
+            <p>The <span class="term" tabindex="0">when<span class="tooltip" role="tooltip">A task attribute that evaluates a Jinja2 expression. The task runs only if the expression evaluates to true.</span></span> clause is used to conditionally execute tasks. Ansible evaluates the condition before running the task, and skips it if the condition is false.</p>
+            
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Key Point</div>
+                <p>The <code>when</code> clause uses raw Jinja2 expressions without the double curly braces <code>{{ }}</code>. Variables are referenced by name directly.</p>
+            </div>
+
+            <h2>Basic when Syntax</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Simple conditional example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install httpd on Red Hat systems</span>
+    <span class="yaml-module">ansible.builtin.dnf</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['os_family'] == "RedHat"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install apache2 on Debian systems</span>
+    <span class="yaml-module">ansible.builtin.apt</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">apache2</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['os_family'] == "Debian"</span></pre>
+                </div>
+            </div>
+
+            <h2>Testing Variables</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Condition Type</th><th>Example</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Equality</td><td><code>when: my_var == "value"</code></td><td>True when variable equals value</td></tr>
+                        <tr><td>Inequality</td><td><code>when: my_var != "value"</code></td><td>True when variable doesn't equal value</td></tr>
+                        <tr><td>Boolean</td><td><code>when: run_task</code></td><td>True when variable is truthy</td></tr>
+                        <tr><td>Defined</td><td><code>when: my_var is defined</code></td><td>True when variable exists</td></tr>
+                        <tr><td>Undefined</td><td><code>when: my_var is not defined</code></td><td>True when variable doesn't exist</td></tr>
+                        <tr><td>In list</td><td><code>when: item in my_list</code></td><td>True when item is in the list</td></tr>
+                        <tr><td>Numeric</td><td><code>when: count > 5</code></td><td>Standard numeric comparisons</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Important</div>
+                <p>When using <code>when</code> with a list of conditions, all conditions must be true (logical AND). Each condition is a separate list item.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('objectives')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('when-advanced')">Continue to Advanced Conditionals <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Advanced Conditionals Section -->
+        <section id="section-when-advanced" class="section" aria-labelledby="when-advanced-heading">
+            <h1 id="when-advanced-heading">Advanced Conditionals</h1>
+            <p class="lead">Combine multiple conditions and test registered variables for powerful conditional logic.</p>
+
+            <h2>Multiple Conditions</h2>
+            <p>Combine conditions using <span class="term tooltip-left" tabindex="0">logical operators<span class="tooltip" role="tooltip">Boolean operators (and, or, not) that combine multiple conditions. Parentheses can group sub-expressions.</span></span>:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">AND conditions (all must be true)</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Method 1: List format (implicit AND)</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package on RHEL web servers</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+  <span class="yaml-key">when</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">ansible_facts['os_family'] == "RedHat"</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">inventory_hostname in groups['webservers']</span>
+
+<span class="yaml-comment"># Method 2: OR operator</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install on Red Hat or Fedora</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">vim</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+  <span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['distribution'] == "RedHat" or ansible_facts['distribution'] == "Fedora"</span></pre>
+                </div>
+            </div>
+
+            <h2>Testing Registered Variables</h2>
+            <p>Use the <span class="term" tabindex="0">register<span class="tooltip" role="tooltip">Stores the result of a task in a variable that can be used by subsequent tasks for conditionals or data extraction.</span></span> keyword to capture task output and test it in conditions:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using registered variables in conditions</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check if service is running</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl is-active httpd</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">httpd_status</span>
+    <span class="yaml-key">ignore_errors</span>: <span class="yaml-bool">true</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start httpd if not running</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">httpd_status.rc != 0</span></pre>
+                </div>
+            </div>
+
+            <h3>Common Registered Variable Tests</h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Test</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>result.rc == 0</code></td><td>Command exited successfully</td></tr>
+                        <tr><td><code>result is succeeded</code></td><td>Task completed without failure</td></tr>
+                        <tr><td><code>result is failed</code></td><td>Task failed</td></tr>
+                        <tr><td><code>result is changed</code></td><td>Task made changes</td></tr>
+                        <tr><td><code>result is skipped</code></td><td>Task was skipped</td></tr>
+                        <tr><td><code>'string' in result.stdout</code></td><td>String found in output</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-header"><span class="demo-title">🧪 Interactive: Conditional Logic Tester</span></div>
+                <div class="demo-body">
+                    <div class="demo-controls">
+                        <div class="demo-control">
+                            <label for="cond-os">OS Family</label>
+                            <select id="cond-os">
+                                <option value="RedHat">RedHat</option>
+                                <option value="Debian">Debian</option>
+                                <option value="Windows">Windows</option>
+                            </select>
+                        </div>
+                        <div class="demo-control">
+                            <label for="cond-env">Environment</label>
+                            <select id="cond-env">
+                                <option value="production">production</option>
+                                <option value="staging">staging</option>
+                                <option value="development">development</option>
+                            </select>
+                        </div>
+                        <div class="demo-control">
+                            <label for="cond-memory">Free Memory (MB)</label>
+                            <input type="number" id="cond-memory" value="1024" min="0" max="16384">
+                        </div>
+                        <div class="demo-control" style="align-self: flex-end;">
+                            <button class="demo-btn" onclick="runConditionalDemo()">Evaluate Conditions</button>
+                        </div>
+                    </div>
+                    <div class="demo-output" id="cond-output">
+                        <div class="output-line" style="color: var(--text-muted);">Click "Evaluate Conditions" to see which tasks would run...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('when-basics')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('loops-basics')">Continue to Loops <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        <!-- Loops Basics Section -->
+        <section id="section-loops-basics" class="section" aria-labelledby="loops-basics-heading">
+            <h1 id="loops-basics-heading">Loop Basics</h1>
+            <p class="lead">Loops allow you to repeat a task multiple times with different values, reducing code duplication.</p>
+
+            <h2>The loop Keyword</h2>
+            <p>The <span class="term" tabindex="0">loop<span class="tooltip" role="tooltip">Iterates over a list, running the task once for each item. The current item is available as the 'item' variable.</span></span> keyword is the modern way to iterate in Ansible.</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Basic loop example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install multiple packages</span>
+    <span class="yaml-module">ansible.builtin.dnf</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">loop</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">mariadb-server</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">php</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">php-mysqlnd</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
+                <p>For package installation, pass the entire list to <code>name</code> instead of looping for better efficiency:</p>
+                <div class="code-block" style="margin: 12px 0 0 0; border: none;">
+                    <div class="code-content" style="padding: 12px;">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages (efficient)</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">mariadb-server</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Looping Over Complex Data</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Complex data loop</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">users</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">alice</span>
+      <span class="yaml-key">groups</span>: <span class="yaml-value">developers,wheel</span>
+      <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/bash</span>
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">bob</span>
+      <span class="yaml-key">groups</span>: <span class="yaml-value">admins</span>
+      <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/zsh</span>
+
+<span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create users with full configuration</span>
+    <span class="yaml-module">ansible.builtin.user</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.name }}"</span>
+      <span class="yaml-key">groups</span>: <span class="yaml-string">"{{ item.groups }}"</span>
+      <span class="yaml-key">shell</span>: <span class="yaml-string">"{{ item.shell }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ users }}"</span></pre>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('when-advanced')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('loops-advanced')">Continue to Loop Control <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Loop Control Section -->
+        <section id="section-loops-advanced" class="section" aria-labelledby="loops-advanced-heading">
+            <h1 id="loops-advanced-heading">Loop Control</h1>
+            <p class="lead">Fine-tune loop behavior with the loop_control directive.</p>
+
+            <h2>The loop_control Directive</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🏷️</div>
+                    <div class="card-title">label</div>
+                    <div class="card-content">Control what's displayed during loop execution to reduce verbose output.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📛</div>
+                    <div class="card-title">loop_var</div>
+                    <div class="card-content">Rename the default <code>item</code> variable to avoid conflicts.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔢</div>
+                    <div class="card-title">index_var</div>
+                    <div class="card-content">Track the current iteration index (0-based).</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⏸️</div>
+                    <div class="card-title">pause</div>
+                    <div class="card-content">Add a delay between loop iterations.</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">loop_control examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create users with custom label</span>
+    <span class="yaml-module">ansible.builtin.user</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.name }}"</span>
+      <span class="yaml-key">uid</span>: <span class="yaml-string">"{{ item.uid }}"</span>
+    <span class="yaml-key">loop</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">alice</span>
+        <span class="yaml-key">uid</span>: <span class="yaml-value">1001</span>
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">bob</span>
+        <span class="yaml-key">uid</span>: <span class="yaml-value">1002</span>
+    <span class="yaml-key">loop_control</span>:
+      <span class="yaml-key">label</span>: <span class="yaml-string">"{{ item.name }}"</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show item with index</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Item {{ idx }}: {{ item }}"</span>
+    <span class="yaml-key">loop</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">first</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">second</span>
+    <span class="yaml-key">loop_control</span>:
+      <span class="yaml-key">index_var</span>: <span class="yaml-value">idx</span></pre>
+                </div>
+            </div>
+
+            <h2>Extended Loop Variables</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ansible_loop.index</code></td><td>Current iteration (1-indexed)</td></tr>
+                        <tr><td><code>ansible_loop.index0</code></td><td>Current iteration (0-indexed)</td></tr>
+                        <tr><td><code>ansible_loop.first</code></td><td>True if first iteration</td></tr>
+                        <tr><td><code>ansible_loop.last</code></td><td>True if last iteration</td></tr>
+                        <tr><td><code>ansible_loop.length</code></td><td>Total number of items</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('loops-basics')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('handlers')">Continue to Handlers <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Handlers Section -->
+        <section id="section-handlers" class="section" aria-labelledby="handlers-heading">
+            <h1 id="handlers-heading">Handler Concepts</h1>
+            <p class="lead">Handlers are special tasks that only run when notified, perfect for service restarts.</p>
+
+            <h2>How Handlers Work</h2>
+            <p><span class="term" tabindex="0">Handlers<span class="tooltip" role="tooltip">Special tasks that only execute when notified. They run once at the end of the play, regardless of how many times notified.</span></span> have three key characteristics:</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔔</div>
+                    <div class="card-title">Notification Triggered</div>
+                    <div class="card-content">Only run when a task reports "changed" status.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">1️⃣</div>
+                    <div class="card-title">Run Once</div>
+                    <div class="card-content">Each handler runs only once per play.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⏰</div>
+                    <div class="card-title">End of Play</div>
+                    <div class="card-content">Execute after all tasks complete.</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Handler example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-bool">true</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy configuration file</span>
+      <span class="yaml-module">ansible.builtin.copy</span>:
+        <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+      <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy SSL configuration</span>
+      <span class="yaml-module">ansible.builtin.copy</span>:
+        <span class="yaml-key">src</span>: <span class="yaml-value">ssl.conf</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf.d/ssl.conf</span>
+      <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
+
+  <span class="yaml-key">handlers</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart httpd</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                </div>
+            </div>
+
+            <h2>Handler Execution Flow</h2>
+            <div class="diagram">
+                <div class="diagram-title">When Do Handlers Run?</div>
+                <div class="flow-chart">
+                    <div class="flow-item">
+                        <strong>Task 1: Install httpd</strong>
+                        <div class="flow-label">STATUS: ok (no change)</div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="border-color: var(--accent-yellow); background: rgba(255, 204, 0, 0.1);">
+                        <strong>Task 2: Copy httpd.conf</strong>
+                        <div class="flow-label">STATUS: changed → notifies handler</div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="border-color: var(--accent-yellow); background: rgba(255, 204, 0, 0.1);">
+                        <strong>Task 3: Copy ssl.conf</strong>
+                        <div class="flow-label">STATUS: changed → notifies handler</div>
+                    </div>
+                    <div class="flow-arrow">↓ All tasks complete</div>
+                    <div class="flow-item" style="border-color: var(--accent-orange); background: rgba(255, 102, 0, 0.1);">
+                        <strong>🔔 Handler: Restart httpd</strong>
+                        <div class="flow-label">RUNS ONCE (despite 2 notifications)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Handler Order</div>
+                <p>Handlers run in the order they are defined in the <code>handlers</code> section, not the order they are notified.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('loops-advanced')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('errors-basic')">Continue to Error Handling <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        <!-- Error Handling Section -->
+        <section id="section-errors-basic" class="section" aria-labelledby="errors-basic-heading">
+            <h1 id="errors-basic-heading">Handling Failures</h1>
+            <p class="lead">Control how Ansible responds to task failures with options to ignore errors and define custom failure conditions.</p>
+
+            <h2>Ignoring Errors</h2>
+            <p>Use <span class="term tooltip-left" tabindex="0">ignore_errors<span class="tooltip" role="tooltip">Allows playbook execution to continue even if this task fails. The task is still marked as failed in statistics.</span></span> to continue execution when a task fails:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ignore_errors example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Try to stop a service that might not exist</span>
+  <span class="yaml-module">ansible.builtin.service</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">optional-service</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">stopped</span>
+  <span class="yaml-key">ignore_errors</span>: <span class="yaml-bool">true</span></pre>
+                </div>
+            </div>
+
+            <h2>Custom Failure Conditions</h2>
+            <p>Use <span class="term" tabindex="0">failed_when<span class="tooltip" role="tooltip">Defines custom conditions that determine when a task should be considered failed.</span></span> to define when a task should fail:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">failed_when examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Fail based on output content</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run deployment script</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/deploy.sh</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">deploy_result</span>
+    <span class="yaml-key">failed_when</span>: <span class="yaml-string">"'ERROR' in deploy_result.stderr"</span>
+
+  <span class="yaml-comment"># Never fail (useful for checking status)</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check service status</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl is-active myservice</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">service_status</span>
+    <span class="yaml-key">failed_when</span>: <span class="yaml-bool">false</span></pre>
+                </div>
+            </div>
+
+            <h2>Custom Change Detection</h2>
+            <p>Use <span class="term tooltip-right" tabindex="0">changed_when<span class="tooltip" role="tooltip">Defines custom conditions that determine when a task should report a change.</span></span> to control when a task reports as "changed":</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">changed_when examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Never report change (for status checks)</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Get current user</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">whoami</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">current_user</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
+
+  <span class="yaml-comment"># Change based on output</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Apply database migrations</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/migrate.sh</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">migration</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-string">"'Migrations applied' in migration.stdout"</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
+                <p>Always use <code>changed_when: false</code> for tasks that only gather information to maintain accurate change reporting.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('handlers')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('blocks')">Continue to Blocks <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Blocks Section -->
+        <section id="section-blocks" class="section" aria-labelledby="blocks-heading">
+            <h1 id="blocks-heading">Blocks</h1>
+            <p class="lead">Group related tasks together and implement try/catch/finally error handling patterns.</p>
+
+            <h2>What are Blocks?</h2>
+            <p><span class="term" tabindex="0">Blocks<span class="tooltip" role="tooltip">A way to group multiple tasks together. Tasks in a block can share common attributes and participate in error handling.</span></span> group tasks and allow you to apply common attributes. They also provide error handling similar to try/catch.</p>
+
+            <h2>Block Error Handling</h2>
+            <div class="diagram">
+                <div class="diagram-title">Block Error Handling Flow</div>
+                <div class="flow-chart">
+                    <div class="flow-item block">
+                        <strong>block:</strong>
+                        <div class="flow-label">Main tasks - try to execute these</div>
+                    </div>
+                    <div class="flow-arrow">↓ If any task fails</div>
+                    <div class="flow-item rescue">
+                        <strong>rescue:</strong>
+                        <div class="flow-label">Error recovery tasks - run on failure</div>
+                    </div>
+                    <div class="flow-arrow">↓ Always runs</div>
+                    <div class="flow-item always">
+                        <strong>always:</strong>
+                        <div class="flow-label">Cleanup tasks - run regardless of outcome</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Complete block with rescue and always</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Upgrade application with rollback</span>
+    <span class="yaml-key">block</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create backup</span>
+        <span class="yaml-module">ansible.builtin.copy</span>:
+          <span class="yaml-key">src</span>: <span class="yaml-value">/opt/app</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app.backup</span>
+          <span class="yaml-key">remote_src</span>: <span class="yaml-bool">true</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy new version</span>
+        <span class="yaml-module">ansible.builtin.unarchive</span>:
+          <span class="yaml-key">src</span>: <span class="yaml-value">app-v2.0.tar.gz</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Verify deployment</span>
+        <span class="yaml-module">ansible.builtin.uri</span>:
+          <span class="yaml-key">url</span>: <span class="yaml-value">http://localhost:8080/health</span>
+          <span class="yaml-key">status_code</span>: <span class="yaml-value">200</span>
+
+    <span class="yaml-key">rescue</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Rollback - Restore from backup</span>
+        <span class="yaml-module">ansible.builtin.copy</span>:
+          <span class="yaml-key">src</span>: <span class="yaml-value">/opt/app.backup</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app</span>
+          <span class="yaml-key">remote_src</span>: <span class="yaml-bool">true</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Log failure</span>
+        <span class="yaml-module">ansible.builtin.debug</span>:
+          <span class="yaml-key">msg</span>: <span class="yaml-string">"Error: {{ ansible_failed_task.name }}"</span>
+
+    <span class="yaml-key">always</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart application service</span>
+        <span class="yaml-module">ansible.builtin.service</span>:
+          <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
+          <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove backup</span>
+        <span class="yaml-module">ansible.builtin.file</span>:
+          <span class="yaml-key">path</span>: <span class="yaml-value">/opt/app.backup</span>
+          <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
+                </div>
+            </div>
+
+            <h2>Special Variables in Rescue</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ansible_failed_task</code></td><td>Information about the task that triggered rescue</td></tr>
+                        <tr><td><code>ansible_failed_result</code></td><td>The result of the failed task</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box danger">
+                <div class="info-box-title"><span aria-hidden="true">❌</span> Rescue Limitations</div>
+                <p>The <code>rescue</code> section only runs for task failures, not for syntax errors, unreachable hosts, or undefined variables.</p>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-header"><span class="demo-title">🧪 Interactive: Block Execution Simulator</span></div>
+                <div class="demo-body">
+                    <div class="demo-controls">
+                        <div class="demo-control">
+                            <label for="block-scenario">Scenario</label>
+                            <select id="block-scenario">
+                                <option value="success">All tasks succeed</option>
+                                <option value="fail-task2">Task 2 fails</option>
+                                <option value="fail-task3">Task 3 fails</option>
+                                <option value="rescue-fails">Rescue also fails</option>
+                            </select>
+                        </div>
+                        <div class="demo-control" style="align-self: flex-end;">
+                            <button class="demo-btn" onclick="runBlockDemo()">Run Block</button>
+                        </div>
+                    </div>
+                    <div class="demo-output" id="block-output">
+                        <div class="output-line" style="color: var(--text-muted);">Select a scenario and click "Run Block" to see execution flow...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('errors-basic')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        <!-- Quiz Section -->
+        <section id="section-quiz" class="section" aria-labelledby="quiz-heading">
+            <h1 id="quiz-heading">Knowledge Check</h1>
+            <p class="lead">Test your understanding of task control concepts.</p>
+
+            <div class="quiz-container">
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+                    <span class="quiz-progress-text" id="quiz-progress-text">Question 1 of 10</span>
+                </div>
+                <div id="quiz-content">
+                    <div class="quiz-question" id="quiz-question"></div>
+                    <div class="quiz-options" id="quiz-options" role="radiogroup"></div>
+                    <div class="quiz-explanation" id="quiz-explanation">
+                        <div class="quiz-explanation-title" id="quiz-explanation-title"></div>
+                        <div id="quiz-explanation-text"></div>
+                    </div>
+                </div>
+                <button class="quiz-btn" id="quiz-btn" onclick="handleQuizAction()" disabled>Check Answer</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('blocks')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('summary')">View Summary <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section id="section-summary" class="section" aria-labelledby="summary-heading">
+            <h1 id="summary-heading">Chapter Summary</h1>
+            <p class="lead">You've learned to implement comprehensive task control in Ansible playbooks.</p>
+
+            <h2>Key Concepts</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">❓</div>
+                    <div class="card-title">Conditionals</div>
+                    <div class="card-content">Use <code>when</code> to control task execution based on variables, facts, and registered results.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔄</div>
+                    <div class="card-title">Loops</div>
+                    <div class="card-content">Iterate with <code>loop</code> keyword and control behavior with <code>loop_control</code>.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔔</div>
+                    <div class="card-title">Handlers</div>
+                    <div class="card-content">Respond to changes with handlers that run once at play end when notified.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⚠️</div>
+                    <div class="card-title">Error Handling</div>
+                    <div class="card-content">Control failures with <code>ignore_errors</code>, <code>failed_when</code>, and <code>changed_when</code>.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Blocks</div>
+                    <div class="card-content">Group tasks and implement try/catch/finally with <code>block</code>/<code>rescue</code>/<code>always</code>.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📝</div>
+                    <div class="card-title">Register</div>
+                    <div class="card-content">Capture task output for use in conditionals and subsequent tasks.</div>
+                </div>
+            </div>
+
+            <h2>Quick Reference</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Feature</th><th>Syntax</th><th>Purpose</th></tr></thead>
+                    <tbody>
+                        <tr><td>Conditional</td><td><code>when: condition</code></td><td>Execute task only if condition is true</td></tr>
+                        <tr><td>Loop</td><td><code>loop: list</code></td><td>Repeat task for each item in list</td></tr>
+                        <tr><td>Handler</td><td><code>notify: handler_name</code></td><td>Trigger handler on task change</td></tr>
+                        <tr><td>Ignore Errors</td><td><code>ignore_errors: true</code></td><td>Continue on task failure</td></tr>
+                        <tr><td>Custom Failure</td><td><code>failed_when: condition</code></td><td>Define custom failure condition</td></tr>
+                        <tr><td>Custom Change</td><td><code>changed_when: condition</code></td><td>Define when task reports change</td></tr>
+                        <tr><td>Block</td><td><code>block: / rescue: / always:</code></td><td>Group tasks with error handling</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="checklist">
+                <h3 style="margin-top: 0; margin-bottom: 16px;">Best Practices Checklist</h3>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use <code>changed_when: false</code> for status check commands</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Name all tasks and handlers descriptively</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use <code>loop_control.label</code> to reduce verbose output</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Implement blocks for multi-task operations that may fail</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use handlers for service restarts to avoid unnecessary restarts</div></div>
+                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Test conditionals with diverse inventory to ensure correct behavior</div></div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Next Steps</div>
+                <p>Continue with Chapter 5 to learn about deploying files to managed hosts using templates and the Jinja2 templating language.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('quiz')"><span aria-hidden="true">←</span> Back to Quiz</button>
+                <button class="btn btn-primary" onclick="navigateTo('welcome')">Review Chapter <span aria-hidden="true">↺</span></button>
+            </div>
+        </section>
+    </main>
+    <script>
+        const sections = { 'welcome': 'Welcome', 'objectives': 'Learning Objectives', 'when-basics': 'The when Clause', 'when-advanced': 'Advanced Conditionals', 'loops-basics': 'Loop Basics', 'loops-advanced': 'Loop Control', 'handlers': 'Handler Concepts', 'errors-basic': 'Handling Failures', 'blocks': 'Blocks', 'quiz': 'Knowledge Check', 'summary': 'Summary' };
+        let currentSection = 'welcome';
+        let completedSections = new Set();
+        const quizQuestions = [
+            { question: "What keyword is used to conditionally execute a task in Ansible?", options: ["if", "when", "condition", "unless"], correct: 1, explanation: "The 'when' keyword is used to conditionally execute tasks. It evaluates a Jinja2 expression and runs the task only if true." },
+            { question: "How do you combine multiple conditions that must ALL be true?", options: ["Use OR operator", "Use a list of conditions under 'when'", "Use the 'all' keyword", "Use multiple 'when' statements"], correct: 1, explanation: "When you provide a list of conditions under 'when', all conditions must be true (implicit AND)." },
+            { question: "What variable holds the current item in a loop?", options: ["current", "loop_item", "item", "value"], correct: 2, explanation: "By default, the current iteration value is available as the 'item' variable." },
+            { question: "What is the purpose of loop_control.label?", options: ["Name the loop", "Control iteration count", "Customize output display", "Set loop variable name"], correct: 2, explanation: "The 'label' option controls what is displayed during loop execution." },
+            { question: "When do handlers run in a playbook?", options: ["Immediately when notified", "At the start of each play", "At the end of each play", "Only when explicitly called"], correct: 2, explanation: "Handlers run at the end of each play, after all tasks complete." },
+            { question: "If a handler is notified multiple times, how many times does it run?", options: ["Once per notification", "Twice", "Only once", "Depends on the handler type"], correct: 2, explanation: "Handlers run only once per play, regardless of how many times they are notified." },
+            { question: "What does 'ignore_errors: true' do?", options: ["Prevents any errors", "Continues playbook execution after task failure", "Suppresses error output", "Retries failed tasks"], correct: 1, explanation: "The 'ignore_errors: true' directive allows playbook execution to continue even if the task fails." },
+            { question: "Which block section runs only when a task in the block fails?", options: ["always", "rescue", "catch", "except"], correct: 1, explanation: "The 'rescue' section runs only when a task in the 'block' section fails." },
+            { question: "What special variable provides information about a failed task in a rescue block?", options: ["failed_task", "error_info", "ansible_failed_task", "block_error"], correct: 2, explanation: "The 'ansible_failed_task' variable contains information about the task that triggered the rescue block." },
+            { question: "What is the purpose of 'changed_when: false'?", options: ["Prevent task execution", "Never report the task as changed", "Force task to always change", "Skip change notification"], correct: 1, explanation: "Using 'changed_when: false' ensures the task never reports as changed." }
+        ];
+        let currentQuestion = 0, selectedOption = null, score = 0, quizState = 'selecting';
+
+        function initNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => { e.preventDefault(); navigateTo(item.dataset.section); });
+                item.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateTo(item.dataset.section); } });
+            });
+        }
+
+        function navigateTo(sectionId) {
+            completedSections.add(currentSection);
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const targetSection = document.getElementById('section-' + sectionId);
+            const targetNav = document.querySelector(`[data-section="${sectionId}"]`);
+            if (targetSection) { targetSection.classList.add('active'); currentSection = sectionId; }
+            if (targetNav) { targetNav.classList.add('active'); }
+            completedSections.forEach(id => { const navItem = document.querySelector(`[data-section="${id}"]`); if (navItem && id !== sectionId) navItem.classList.add('completed'); });
+            updateProgress();
+            if (sectionId === 'quiz' && quizState !== 'finished') initQuiz();
+            document.getElementById('nav').classList.remove('open');
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const percentage = Math.round((completedSections.size / Object.keys(sections).length) * 100);
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = percentage + '%';
+        }
+
+        function toggleNav() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('open');
+            document.querySelector('.menu-toggle').setAttribute('aria-expanded', nav.classList.contains('open'));
+        }
+
+        function initQuiz() { currentQuestion = 0; selectedOption = null; score = 0; quizState = 'selecting'; showQuestion(); }
+
+        function showQuestion() {
+            if (currentQuestion >= quizQuestions.length) { showScore(); return; }
+            const q = quizQuestions[currentQuestion];
+            document.getElementById('quiz-question').textContent = q.question;
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'quiz-option';
+                optionEl.setAttribute('role', 'radio');
+                optionEl.setAttribute('tabindex', '0');
+                optionEl.innerHTML = `<div class="quiz-option-marker">${String.fromCharCode(65 + index)}</div><div>${option}</div>`;
+                optionEl.addEventListener('click', () => selectOption(index));
+                optionEl.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectOption(index); } });
+                optionsContainer.appendChild(optionEl);
+            });
+            document.getElementById('quiz-explanation').classList.remove('visible');
+            document.getElementById('quiz-btn').disabled = true;
+            document.getElementById('quiz-btn').textContent = 'Check Answer';
+            updateQuizProgress();
+            quizState = 'selecting';
+        }
+
+        function selectOption(index) {
+            if (quizState !== 'selecting') return;
+            selectedOption = index;
+            document.querySelectorAll('.quiz-option').forEach((opt, i) => { opt.classList.remove('selected'); opt.setAttribute('aria-checked', i === index); });
+            document.querySelectorAll('.quiz-option')[index].classList.add('selected');
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function handleQuizAction() { if (quizState === 'selecting') checkAnswer(); else if (quizState === 'answered') nextQuestion(); }
+
+        function checkAnswer() {
+            const q = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            options[q.correct].classList.add('correct');
+            if (selectedOption !== q.correct) options[selectedOption].classList.add('incorrect'); else score++;
+            const explanationEl = document.getElementById('quiz-explanation');
+            document.getElementById('quiz-explanation-title').textContent = selectedOption === q.correct ? '✓ Correct!' : '✗ Incorrect';
+            document.getElementById('quiz-explanation-title').className = 'quiz-explanation-title ' + (selectedOption === q.correct ? 'correct' : 'incorrect');
+            document.getElementById('quiz-explanation-text').textContent = q.explanation;
+            explanationEl.classList.add('visible');
+            document.getElementById('quiz-btn').textContent = currentQuestion < quizQuestions.length - 1 ? 'Next Question →' : 'See Results';
+            quizState = 'answered';
+        }
+
+        function nextQuestion() { currentQuestion++; selectedOption = null; showQuestion(); }
+
+        function showScore() {
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            let message = percentage >= 80 ? 'Excellent work! You have a strong understanding of task control.' : percentage >= 60 ? 'Good effort! Review the sections you found challenging.' : 'Keep practicing! Review the chapter and try again.';
+            document.getElementById('quiz-content').innerHTML = `<div class="quiz-score"><div class="quiz-score-value">${percentage}%</div><div class="quiz-score-label">${score} of ${quizQuestions.length} correct</div><p style="margin-top: 24px; color: var(--text-secondary);">${message}</p></div>`;
+            document.getElementById('quiz-btn').textContent = 'Retake Quiz';
+            document.getElementById('quiz-btn').disabled = false;
+            document.getElementById('quiz-btn').onclick = initQuiz;
+            quizState = 'finished';
+            completedSections.add('quiz');
+            updateProgress();
+        }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-progress-fill').style.width = ((currentQuestion) / quizQuestions.length) * 100 + '%';
+            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
+        }
+
+        function toggleObjective(el) { el.classList.toggle('checked'); el.setAttribute('aria-checked', el.classList.contains('checked')); }
+        function toggleCheck(el) { el.classList.toggle('checked'); el.setAttribute('aria-checked', el.classList.contains('checked')); }
+
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => { const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = orig, 2000); });
+        }
+
+        function runConditionalDemo() {
+            const os = document.getElementById('cond-os').value;
+            const env = document.getElementById('cond-env').value;
+            const memory = parseInt(document.getElementById('cond-memory').value);
+            const output = document.getElementById('cond-output');
+            output.innerHTML = '';
+            const lines = [
+                { text: 'PLAY [Conditional Demo] **********************', class: 'output-play' },
+                { text: '' },
+                { text: 'TASK [Check conditions] **********************', class: 'output-task' },
+                { text: `Facts: os_family=${os}, env=${env}, memfree_mb=${memory}`, class: '' },
+                { text: '' }
+            ];
+            if (os === 'RedHat') { lines.push({ text: 'TASK [Install httpd on Red Hat] **************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' }); }
+            else { lines.push({ text: 'TASK [Install httpd on Red Hat] **************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
+            if (os === 'Debian') { lines.push({ text: 'TASK [Install apache2 on Debian] *************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' }); }
+            else { lines.push({ text: 'TASK [Install apache2 on Debian] *************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
+            if (memory < 512) { lines.push({ text: 'TASK [Warn if low memory] ********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost] => msg: "Low memory warning!"', class: 'output-changed' }); }
+            else { lines.push({ text: 'TASK [Warn if low memory] ********************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
+            if (env === 'production') { lines.push({ text: 'TASK [Production deployment] *****************', class: 'output-task' }); lines.push({ text: 'changed: [localhost]', class: 'output-changed' }); }
+            else { lines.push({ text: 'TASK [Production deployment] *****************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
+            lines.push({ text: '' }); lines.push({ text: 'PLAY RECAP ***********************************', class: 'output-play' });
+            let idx = 0;
+            function addLine() { if (idx < lines.length) { const div = document.createElement('div'); div.className = 'output-line ' + (lines[idx].class || ''); div.textContent = lines[idx].text; output.appendChild(div); idx++; setTimeout(addLine, 80); } }
+            addLine();
+        }
+
+        function runBlockDemo() {
+            const scenario = document.getElementById('block-scenario').value;
+            const output = document.getElementById('block-output');
+            output.innerHTML = '';
+            const lines = [{ text: 'PLAY [Block Demo] *****************************', class: 'output-play' }, { text: '' }];
+            lines.push({ text: 'TASK [block: Task 1 - Create backup] *********', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
+            if (scenario === 'fail-task2') {
+                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
+                lines.push({ text: '' }); lines.push({ text: 'TASK [rescue: Rollback] **********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-changed' });
+            } else if (scenario === 'fail-task3') {
+                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'changed: [localhost]', class: 'output-changed' });
+                lines.push({ text: 'TASK [block: Task 3 - Verify] ****************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
+                lines.push({ text: '' }); lines.push({ text: 'TASK [rescue: Rollback] **********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-changed' });
+            } else if (scenario === 'rescue-fails') {
+                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
+                lines.push({ text: '' }); lines.push({ text: 'TASK [rescue: Rollback] **********************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
+            } else {
+                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'changed: [localhost]', class: 'output-changed' });
+                lines.push({ text: 'TASK [block: Task 3 - Verify] ****************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
+            }
+            lines.push({ text: '' }); lines.push({ text: 'TASK [always: Restart service] ***************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
+            lines.push({ text: 'TASK [always: Clean up] **********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
+            lines.push({ text: '' }); lines.push({ text: 'PLAY RECAP ***********************************', class: 'output-play' });
+            if (scenario === 'rescue-fails') lines.push({ text: 'localhost : ok=3 changed=0 failed=1', class: 'output-failed' });
+            else if (scenario === 'success') lines.push({ text: 'localhost : ok=5 changed=1 failed=0', class: 'output-ok' });
+            else lines.push({ text: 'localhost : ok=4 changed=0 rescued=1', class: 'output-ok' });
+            let idx = 0;
+            function addLine() { if (idx < lines.length) { const div = document.createElement('div'); div.className = 'output-line ' + (lines[idx].class || ''); div.textContent = lines[idx].text; output.appendChild(div); output.scrollTop = output.scrollHeight; idx++; setTimeout(addLine, 100); } }
+            addLine();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            document.addEventListener('click', (e) => { const nav = document.getElementById('nav'); const toggle = document.querySelector('.menu-toggle'); if (!nav.contains(e.target) && !toggle.contains(e.target)) nav.classList.remove('open'); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.getElementById('nav').classList.remove('open'); });
+        });
+    </script>
+</body>
+</html>

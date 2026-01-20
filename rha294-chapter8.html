@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHA 294 - Chapter 8: Troubleshooting Ansible</title>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rh-red: #CC0000;
+            --rh-red-dark: #A30000;
+            --rh-red-light: #FF6666;
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --bg-tertiary: #3D3D3D;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --text-muted: #B0B0B0;
+            --accent-blue: #0066CC;
+            --accent-green: #009933;
+            --accent-yellow: #FFCC00;
+            --accent-orange: #FF6600;
+            --accent-purple: #9966CC;
+            --accent-cyan: #00CCCC;
+            --border-color: #4D4D4D;
+            --success: #00CC66;
+            --error: #FF3333;
+            --warning: #FF9900;
+            --code-bg: #0D0D0D;
+            --tooltip-bg: #FFFFCC;
+            --tooltip-text: #1A1A1A;
+            --focus-outline: #FFCC00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+        .skip-link {
+            position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--rh-red); color: white; padding: 12px 24px;
+            text-decoration: none; border-radius: 0 0 8px 8px; z-index: 10000;
+            font-weight: 600; transition: top 0.3s;
+        }
+        .skip-link:focus { top: 0; outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        :focus:not(:focus-visible) { outline: none; }
+        :focus-visible { outline: 3px solid var(--focus-outline); outline-offset: 2px; }
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 3px solid var(--rh-red); padding: 16px 24px;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .header-brand { display: flex; align-items: center; gap: 16px; }
+        .logo {
+            width: 40px; height: 40px; background: var(--rh-red); border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Red Hat Display', sans-serif; font-weight: 900; font-size: 20px;
+        }
+        .course-title { font-family: 'Red Hat Display', sans-serif; font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .chapter-title-header { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; }
+        .progress-container { display: flex; align-items: center; gap: 12px; }
+        .progress-bar { width: 200px; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--rh-red) 0%, var(--accent-orange) 100%); width: 0%; transition: width 0.5s ease; border-radius: 4px; }
+        .progress-text { font-family: 'Red Hat Mono', monospace; font-size: 14px; color: var(--text-muted); min-width: 45px; }
+        .menu-toggle { display: none; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 20px; }
+        nav { position: fixed; left: 0; top: 76px; bottom: 0; width: 300px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px 0; z-index: 999; }
+        .nav-section { margin-bottom: 8px; }
+        .nav-section-title { font-family: 'Red Hat Display', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); padding: 12px 24px 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; font-size: 15px; transition: all 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-item.active { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); color: var(--text-primary); }
+        .nav-item.completed::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--success); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: -32px; margin-left: -8px; }
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
+        .section { display: none; padding: 48px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { font-family: 'Red Hat Display', sans-serif; font-size: 42px; font-weight: 900; margin-bottom: 16px; line-height: 1.2; }
+        h2 { font-family: 'Red Hat Display', sans-serif; font-size: 28px; font-weight: 700; margin: 40px 0 20px; color: var(--text-primary); }
+        h3 { font-family: 'Red Hat Display', sans-serif; font-size: 22px; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary); }
+        h4 { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 600; margin: 24px 0 12px; color: var(--text-primary); }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        .lead { font-size: 20px; color: var(--text-primary); margin-bottom: 32px; line-height: 1.6; }
+        code { font-family: 'Red Hat Mono', monospace; background: var(--bg-tertiary); padding: 2px 8px; border-radius: 4px; font-size: 15px; color: var(--accent-cyan); }
+        .term { position: relative; color: var(--accent-yellow); cursor: help; border-bottom: 1px dotted var(--accent-yellow); }
+        .term .tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--tooltip-bg); color: var(--tooltip-text); padding: 12px 16px; border-radius: 8px; font-size: 14px; width: 280px; opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1.5; pointer-events: none; }
+        .term .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--tooltip-bg); }
+        .term:hover .tooltip, .term:focus .tooltip { opacity: 1; visibility: visible; }
+        .term.tooltip-left .tooltip { left: 0; transform: translateX(0); }
+        .term.tooltip-left .tooltip::after { left: 24px; }
+        .term.tooltip-right .tooltip { left: auto; right: 0; transform: translateX(0); }
+        .term.tooltip-right .tooltip::after { left: auto; right: 24px; }
+        .info-box { background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
+        .info-box.warning { border-left-color: var(--warning); background: rgba(255, 153, 0, 0.1); }
+        .info-box.tip { border-left-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
+        .info-box.danger { border-left-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .info-box.important { border-left-color: var(--accent-purple); background: rgba(153, 102, 204, 0.1); }
+        .info-box-title { font-family: 'Red Hat Display', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .info-box.warning .info-box-title { color: var(--warning); }
+        .info-box.tip .info-box-title { color: var(--accent-green); }
+        .info-box.danger .info-box-title { color: var(--error); }
+        .info-box.important .info-box-title { color: var(--accent-purple); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 32px 0; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s; }
+        .card:hover { border-color: var(--rh-red); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(204, 0, 0, 0.2); }
+        .card-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--rh-red) 0%, var(--accent-orange) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+        .card-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .card-content { color: var(--text-muted); font-size: 15px; }
+        .objectives-list { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .objectives-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        .objective-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .objective-item:last-child { border-bottom: none; }
+        .objective-checkbox { width: 24px; height: 24px; min-width: 24px; border: 2px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: transparent; font-size: 14px; }
+        .objective-checkbox:hover { border-color: var(--rh-red); }
+        .objective-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+        .objective-text { color: var(--text-secondary); line-height: 1.6; }
+        .code-block { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; margin: 20px 0; overflow: hidden; }
+        .code-header { background: var(--bg-tertiary); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .code-title { font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
+        .code-copy { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-muted); padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .code-copy:hover { background: var(--rh-red); color: white; border-color: var(--rh-red); }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Red Hat Mono', monospace; font-size: 14px; line-height: 1.6; margin: 0; }
+        .yaml-key { color: #F8C555; }
+        .yaml-value { color: #98C379; }
+        .yaml-string { color: #98C379; }
+        .yaml-comment { color: #5C6370; font-style: italic; }
+        .yaml-dash { color: #E06C75; }
+        .yaml-module { color: #61AFEF; }
+        .yaml-number { color: #D19A66; }
+        .yaml-bool { color: #D19A66; }
+        .table-container { overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); }
+        th { background: var(--bg-tertiary); padding: 16px; text-align: left; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--rh-red); }
+        td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--bg-tertiary); }
+        .nav-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color); gap: 16px; flex-wrap: wrap; }
+        .btn { padding: 14px 28px; border-radius: 8px; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; }
+        .btn-primary { background: var(--rh-red); color: white; }
+        .btn-primary:hover { background: var(--rh-red-dark); transform: translateX(4px); }
+        .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-tertiary); color: var(--text-primary); transform: translateX(-4px); }
+        .checklist { margin: 24px 0; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-check { width: 24px; height: 24px; min-width: 24px; border: 2px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; transition: all 0.2s; cursor: pointer; }
+        .checklist-check.checked { background: var(--success); border-color: var(--success); color: white; }
+        
+        /* Verbose Level Simulator */
+        .verbose-simulator { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .verbose-controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .verbose-btn { padding: 12px 20px; border: 2px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-family: 'Red Hat Mono', monospace; font-size: 14px; transition: all 0.2s; }
+        .verbose-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .verbose-btn.active { border-color: var(--rh-red); background: rgba(204, 0, 0, 0.2); color: var(--text-primary); }
+        .verbose-output { background: var(--code-bg); border-radius: 8px; padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; }
+        .verbose-output .v-task { color: var(--accent-cyan); }
+        .verbose-output .v-ok { color: var(--success); }
+        .verbose-output .v-changed { color: var(--warning); }
+        .verbose-output .v-debug { color: var(--accent-purple); }
+        .verbose-output .v-ssh { color: var(--text-muted); }
+        .verbose-output .v-result { color: var(--accent-yellow); }
+        
+        /* Error Analyzer */
+        .error-analyzer { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .error-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .error-tab { padding: 10px 18px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-secondary); border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .error-tab:hover { border-color: var(--error); }
+        .error-tab.active { border-color: var(--error); background: rgba(255, 51, 51, 0.2); color: var(--text-primary); }
+        .error-content { display: none; }
+        .error-content.active { display: block; }
+        .error-example { background: var(--code-bg); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+        .error-example pre { font-family: 'Red Hat Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--error); }
+        .error-solution { background: rgba(0, 153, 51, 0.1); border-left: 4px solid var(--success); padding: 16px; border-radius: 0 8px 8px 0; }
+        .error-solution-title { font-weight: 700; color: var(--success); margin-bottom: 8px; }
+        
+        /* Connection Troubleshooter */
+        .troubleshooter { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .troubleshoot-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .troubleshoot-step:last-child { border-bottom: none; }
+        .step-number { width: 32px; height: 32px; min-width: 32px; background: var(--rh-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .step-content { flex: 1; }
+        .step-title { font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+        .step-desc { color: var(--text-muted); font-size: 15px; }
+        
+        /* Terminal Simulator */
+        .terminal { background: var(--code-bg); border-radius: 8px; overflow: hidden; margin: 20px 0; border: 1px solid var(--border-color); }
+        .terminal-header { background: var(--bg-tertiary); padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .terminal-dot.red { background: #FF5F56; }
+        .terminal-dot.yellow { background: #FFBD2E; }
+        .terminal-dot.green { background: #27CA40; }
+        .terminal-title { margin-left: 12px; font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
+        .terminal-body { padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 14px; line-height: 1.6; }
+        .terminal-line { margin: 4px 0; }
+        .terminal-prompt { color: var(--accent-green); }
+        .terminal-command { color: var(--text-primary); }
+        .terminal-output { color: var(--text-muted); }
+        .terminal-error { color: var(--error); }
+        .terminal-warning { color: var(--warning); }
+        .terminal-success { color: var(--success); }
+        
+        /* Accordion */
+        .accordion { margin: 24px 0; }
+        .accordion-item { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+        .accordion-header { background: var(--bg-secondary); padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .accordion-header:hover { background: var(--bg-tertiary); }
+        .accordion-title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .accordion-icon { transition: transform 0.3s; }
+        .accordion-item.open .accordion-icon { transform: rotate(180deg); }
+        .accordion-content { display: none; padding: 0 20px 20px; background: var(--bg-secondary); }
+        .accordion-item.open .accordion-content { display: block; }
+        
+        /* Quiz Styles */
+        .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 24px 0; }
+        .quiz-progress { margin-bottom: 32px; }
+        .quiz-progress-bar { height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--rh-red), var(--accent-orange)); transition: width 0.3s; }
+        .quiz-progress-text { font-size: 14px; color: var(--text-muted); text-align: center; }
+        .quiz-question { font-size: 20px; font-weight: 600; margin-bottom: 24px; line-height: 1.4; }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .quiz-option { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .quiz-option:hover { border-color: var(--accent-cyan); transform: translateX(4px); }
+        .quiz-option.correct { border-color: var(--success); background: rgba(0, 204, 102, 0.1); }
+        .quiz-option.incorrect { border-color: var(--error); background: rgba(255, 51, 51, 0.1); }
+        .quiz-option-letter { width: 32px; height: 32px; background: var(--bg-secondary); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .quiz-explanation { display: none; background: var(--bg-tertiary); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+        .quiz-explanation.show { display: block; }
+        .quiz-explanation-title { font-weight: 700; margin-bottom: 8px; }
+        .quiz-explanation-title.correct { color: var(--success); }
+        .quiz-explanation-title.incorrect { color: var(--error); }
+        .quiz-btn { width: 100%; padding: 16px; background: var(--rh-red); color: white; border: none; border-radius: 8px; font-family: 'Red Hat Display', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .quiz-btn:hover:not(:disabled) { background: var(--rh-red-dark); }
+        .quiz-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Exercise */
+        .exercise { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; margin: 24px 0; overflow: hidden; }
+        .exercise-header { background: linear-gradient(135deg, var(--rh-red), var(--accent-orange)); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+        .exercise-badge { background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .exercise-title { font-size: 18px; font-weight: 700; }
+        .exercise-body { padding: 24px; }
+        .exercise-steps { margin-top: 20px; }
+        .exercise-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .exercise-step:last-child { border-bottom: none; }
+        .exercise-step-number { width: 28px; height: 28px; min-width: 28px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        
+        /* Debug Output Simulator */
+        .debug-simulator { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .debug-controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .debug-select { padding: 10px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-family: 'Red Hat Text', sans-serif; font-size: 14px; }
+        .debug-output { background: var(--code-bg); border-radius: 8px; padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 13px; line-height: 1.6; min-height: 200px; }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            nav { transform: translateX(-100%); transition: transform 0.3s; }
+            nav.open { transform: translateX(0); }
+            main { margin-left: 0; }
+            .menu-toggle { display: block; }
+        }
+        @media (max-width: 768px) {
+            .section { padding: 24px; }
+            h1 { font-size: 32px; }
+            h2 { font-size: 24px; }
+            .progress-bar { width: 120px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .verbose-controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <header>
+        <div class="header-brand">
+            <button class="menu-toggle" onclick="toggleNav()" aria-label="Toggle navigation">☰</button>
+            <div class="logo" aria-hidden="true">RH</div>
+            <div>
+                <div class="course-title">RHA 294</div>
+                <div class="chapter-title-header">Chapter 8: Troubleshooting Ansible</div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">0%</div>
+        </div>
+    </header>
+    
+    <nav id="nav" aria-label="Chapter navigation">
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <div class="nav-item active" data-section="welcome" tabindex="0">
+                <span class="nav-icon">🏠</span> Welcome
+            </div>
+            <div class="nav-item" data-section="objectives" tabindex="0">
+                <span class="nav-icon">🎯</span> Learning Objectives
+            </div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Troubleshooting Playbooks</div>
+            <div class="nav-item" data-section="verbose" tabindex="0">
+                <span class="nav-icon">📢</span> Verbose Mode
+            </div>
+            <div class="nav-item" data-section="debug-module" tabindex="0">
+                <span class="nav-icon">🔍</span> Debug Module
+            </div>
+            <div class="nav-item" data-section="syntax-check" tabindex="0">
+                <span class="nav-icon">✅</span> Syntax Checking
+            </div>
+            <div class="nav-item" data-section="check-mode" tabindex="0">
+                <span class="nav-icon">🧪</span> Check Mode & Diff
+            </div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Managed Hosts</div>
+            <div class="nav-item" data-section="connection-issues" tabindex="0">
+                <span class="nav-icon">🔗</span> Connection Issues
+            </div>
+            <div class="nav-item" data-section="privilege" tabindex="0">
+                <span class="nav-icon">🔐</span> Privilege Escalation
+            </div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Logging & Errors</div>
+            <div class="nav-item" data-section="logging" tabindex="0">
+                <span class="nav-icon">📝</span> Ansible Logging
+            </div>
+            <div class="nav-item" data-section="common-errors" tabindex="0">
+                <span class="nav-icon">⚠️</span> Common Errors
+            </div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Practice</div>
+            <div class="nav-item" data-section="lab" tabindex="0">
+                <span class="nav-icon">🔬</span> Hands-on Lab
+            </div>
+            <div class="nav-item" data-section="quiz" tabindex="0">
+                <span class="nav-icon">📝</span> Knowledge Check
+            </div>
+            <div class="nav-item" data-section="summary" tabindex="0">
+                <span class="nav-icon">📋</span> Summary
+            </div>
+        </div>
+    </nav>
+    
+    <main id="main-content">
+        <!-- Welcome Section -->
+        <section id="welcome" class="section active" aria-labelledby="welcome-heading">
+            <h1 id="welcome-heading">Chapter 8: Troubleshooting Ansible</h1>
+            <p class="lead">Master the art of debugging Ansible playbooks, diagnosing connection issues, and resolving common errors systematically.</p>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔍</div>
+                    <div class="card-title">Debug Playbooks</div>
+                    <div class="card-content">Use verbose mode, debug module, and systematic approaches to identify issues in your automation code.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔗</div>
+                    <div class="card-title">Fix Connections</div>
+                    <div class="card-content">Diagnose and resolve SSH authentication, remote user, and privilege escalation problems.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📝</div>
+                    <div class="card-title">Manage Logging</div>
+                    <div class="card-content">Configure Ansible logging for persistent troubleshooting and audit trails.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">⚡</div>
+                    <div class="card-title">Resolve Errors</div>
+                    <div class="card-content">Quickly identify and fix common YAML, module, and variable errors.</div>
+                </div>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Chapter Overview</div>
+                <p>This chapter teaches you systematic troubleshooting techniques that will save hours of debugging time. You'll learn to use Ansible's built-in diagnostic tools effectively and develop a methodical approach to problem-solving.</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" onclick="navigateTo('objectives')">Begin Chapter <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Objectives Section -->
+        <section id="objectives" class="section" aria-labelledby="objectives-heading">
+            <h1 id="objectives-heading">Learning Objectives</h1>
+            <p class="lead">By the end of this chapter, you will be able to:</p>
+            
+            <div class="objectives-list">
+                <div class="objectives-title"><span aria-hidden="true">🎯</span> Chapter Goals</div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Use <span class="term" tabindex="0">verbose mode<span class="tooltip" role="tooltip">Ansible's debugging feature that provides detailed output about task execution using -v, -vv, -vvv, or -vvvv flags.</span></span> to get detailed playbook execution information</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Debug playbooks using the <code>ansible.builtin.debug</code> module</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Validate playbook syntax before execution</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Use <span class="term" tabindex="0">check mode<span class="tooltip" role="tooltip">Executes the playbook without making changes, showing what would change if run normally. Also known as dry run.</span></span> to preview changes without applying them</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Troubleshoot SSH connections and authentication issues</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Diagnose and fix privilege escalation problems</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Configure Ansible logging for persistent troubleshooting</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
+                    <div class="objective-text">Identify and resolve common playbook errors</div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('welcome')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('verbose')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Verbose Mode Section -->
+        <section id="verbose" class="section" aria-labelledby="verbose-heading">
+            <h1 id="verbose-heading">Verbose Mode</h1>
+            <p class="lead">Verbose mode provides progressively more detailed output about playbook execution, helping you understand exactly what Ansible is doing.</p>
+            
+            <h2>Verbosity Levels</h2>
+            <p>Ansible supports four levels of verbosity, each providing more detail than the previous:</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Flag</th><th>Level</th><th>Information Provided</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>-v</code></td>
+                            <td>Level 1</td>
+                            <td>Task results and basic output</td>
+                        </tr>
+                        <tr>
+                            <td><code>-vv</code></td>
+                            <td>Level 2</td>
+                            <td>Input parameters and task configuration</td>
+                        </tr>
+                        <tr>
+                            <td><code>-vvv</code></td>
+                            <td>Level 3</td>
+                            <td>Connection details, SSH commands, file paths</td>
+                        </tr>
+                        <tr>
+                            <td><code>-vvvv</code></td>
+                            <td>Level 4</td>
+                            <td>Extra debugging including connection plugin scripts</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Interactive Verbose Simulator</h2>
+            <p>Select a verbosity level to see how the output changes:</p>
+            
+            <div class="verbose-simulator">
+                <div class="verbose-controls">
+                    <button class="verbose-btn active" onclick="setVerbosity(0)" aria-pressed="true">No Flag</button>
+                    <button class="verbose-btn" onclick="setVerbosity(1)" aria-pressed="false">-v</button>
+                    <button class="verbose-btn" onclick="setVerbosity(2)" aria-pressed="false">-vv</button>
+                    <button class="verbose-btn" onclick="setVerbosity(3)" aria-pressed="false">-vvv</button>
+                    <button class="verbose-btn" onclick="setVerbosity(4)" aria-pressed="false">-vvvv</button>
+                </div>
+                <div class="verbose-output" id="verbose-output" role="region" aria-live="polite" aria-label="Verbose output demonstration">
+                    <!-- Output populated by JavaScript -->
+                </div>
+            </div>
+            
+            <h2>Using Verbose Mode</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Command line usage</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Basic verbose output</span>
+$ ansible-navigator run -m stdout playbook.yml -v
+
+<span class="yaml-comment"># Maximum verbosity for connection debugging</span>
+$ ansible-navigator run -m stdout playbook.yml -vvvv
+
+<span class="yaml-comment"># With ansible-playbook command</span>
+$ ansible-playbook playbook.yml -vvv</pre>
+                </div>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
+                <p>Start with <code>-v</code> and increase verbosity only if needed. Level 4 (<code>-vvvv</code>) generates a lot of output and is best reserved for debugging complex connection issues.</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('objectives')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('debug-module')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Debug Module Section -->
+        <section id="debug-module" class="section" aria-labelledby="debug-heading">
+            <h1 id="debug-heading">The Debug Module</h1>
+            <p class="lead">The <code>ansible.builtin.debug</code> module prints statements during playbook execution, making it invaluable for troubleshooting variable values and execution flow.</p>
+            
+            <h2>Basic Usage</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Debug module examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># Display a simple message</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show greeting message</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Hello from {{ inventory_hostname }}"</span>
+
+  <span class="yaml-comment"># Display a variable value</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show ansible_facts</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">var</span>: <span class="yaml-value">ansible_facts['os_family']</span>
+
+  <span class="yaml-comment"># Display with controlled verbosity</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show debug info only with -vv</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Detailed debug information"</span>
+      <span class="yaml-key">verbosity</span>: <span class="yaml-number">2</span></pre>
+                </div>
+            </div>
+            
+            <h2>Debug Parameters</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Parameter</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>msg</code></td>
+                            <td>Custom message to display (supports Jinja2)</td>
+                            <td><code>msg: "Value is {{ my_var }}"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>var</code></td>
+                            <td>Variable name to display (no quotes or braces)</td>
+                            <td><code>var: ansible_hostname</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>verbosity</code></td>
+                            <td>Minimum verbosity level required to display</td>
+                            <td><code>verbosity: 2</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Debugging Registered Variables</h2>
+            <p>Use debug to inspect the structure of <span class="term" tabindex="0">registered variables<span class="tooltip" role="tooltip">Variables created using the register keyword that capture the output of a task, including stdout, stderr, return codes, and other metadata.</span></span>:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Inspecting registered output</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Get service status</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl status httpd</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">service_result</span>
+    <span class="yaml-key">ignore_errors</span>: <span class="yaml-bool">true</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show full result structure</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">var</span>: <span class="yaml-value">service_result</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show just the return code</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Return code: {{ service_result.rc }}"</span></pre>
+                </div>
+            </div>
+            
+            <h2>Interactive Debug Output Demo</h2>
+            <div class="debug-simulator">
+                <div class="debug-controls">
+                    <select class="debug-select" id="debug-type" onchange="updateDebugOutput()">
+                        <option value="msg">msg: Display message</option>
+                        <option value="var">var: Display variable</option>
+                        <option value="register">Registered variable</option>
+                        <option value="facts">Ansible facts</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="runDebugDemo()" style="padding: 10px 20px;">Run Task</button>
+                </div>
+                <div class="debug-output" id="debug-output" role="region" aria-live="polite">
+                    <span style="color: var(--text-muted);">Select debug type and click "Run Task" to see output...</span>
+                </div>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Important</div>
+                <p>The <code>var</code> parameter takes a variable name without quotes or curly braces. Using <code>var: "{{ my_var }}"</code> is incorrect and will cause unexpected results.</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('verbose')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('syntax-check')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Syntax Checking Section -->
+        <section id="syntax-check" class="section" aria-labelledby="syntax-heading">
+            <h1 id="syntax-heading">Syntax Checking</h1>
+            <p class="lead">Validate your playbook syntax before execution to catch errors early and avoid wasted time on failed runs.</p>
+            
+            <h2>The --syntax-check Option</h2>
+            <p>Use <code>--syntax-check</code> to validate YAML structure and Ansible syntax without executing any tasks:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Syntax check commands</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># With ansible-navigator</span>
+$ ansible-navigator run -m stdout playbook.yml --syntax-check
+
+<span class="yaml-comment"># With ansible-playbook</span>
+$ ansible-playbook playbook.yml --syntax-check
+
+<span class="yaml-comment"># Successful output</span>
+playbook: playbook.yml
+
+<span class="yaml-comment"># Error output example</span>
+ERROR! Syntax Error while loading YAML.
+  mapping values are not allowed in this context
+The error appears to be in 'playbook.yml': line 10, column 12</pre>
+                </div>
+            </div>
+            
+            <h2>Common Syntax Errors</h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Indentation Errors</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>YAML requires consistent spacing. Never use tabs.</p>
+                        <div class="terminal">
+                            <div class="terminal-header">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                                <div class="terminal-title">Error Example</div>
+                            </div>
+                            <div class="terminal-body">
+                                <div class="terminal-line terminal-error">ERROR! We were unable to read the playbook</div>
+                                <div class="terminal-line terminal-error">mapping values are not allowed in this context</div>
+                                <div class="terminal-line terminal-output">The error appears to be in 'playbook.yml': line 5</div>
+                            </div>
+                        </div>
+                        <div class="error-solution">
+                            <div class="error-solution-title">Solution</div>
+                            <p>Use 2 spaces per indentation level. Check that all items at the same level have identical indentation.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Missing Quotes</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Values starting with <code>{{</code> or containing special characters need quotes.</p>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-title">Wrong vs Correct</span></div>
+                            <div class="code-content">
+<pre><span class="yaml-comment"># Wrong - YAML syntax error</span>
+<span class="yaml-key">path</span>: <span class="yaml-value">{{ doc_root }}/html</span>
+
+<span class="yaml-comment"># Correct - quoted</span>
+<span class="yaml-key">path</span>: <span class="yaml-string">"{{ doc_root }}/html"</span></pre>
+                            </div>
+                        </div>
+                        <div class="error-solution">
+                            <div class="error-solution-title">Solution</div>
+                            <p>Always quote values that start with <code>{{</code> or contain colons, hashtags, or other special YAML characters.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Invalid Module Names</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Typos in module names or using deprecated names without the collection prefix.</p>
+                        <div class="terminal">
+                            <div class="terminal-header">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                                <div class="terminal-title">Error Example</div>
+                            </div>
+                            <div class="terminal-body">
+                                <div class="terminal-line terminal-error">ERROR! couldn't resolve module/action 'coppy'</div>
+                            </div>
+                        </div>
+                        <div class="error-solution">
+                            <div class="error-solution-title">Solution</div>
+                            <p>Use <code>ansible-doc -l</code> to list available modules. Always use FQCNs like <code>ansible.builtin.copy</code>.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)" tabindex="0" role="button" aria-expanded="false">
+                        <span class="accordion-title"><span aria-hidden="true">🔴</span> Boolean Value Errors</span>
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Using unquoted yes/no or true/false can cause issues in certain contexts.</p>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-title">Recommended Practice</span></div>
+                            <div class="code-content">
+<pre><span class="yaml-comment"># Recommended - explicit boolean</span>
+<span class="yaml-key">become</span>: <span class="yaml-bool">true</span>
+<span class="yaml-key">enabled</span>: <span class="yaml-bool">false</span>
+
+<span class="yaml-comment"># Also valid but less clear</span>
+<span class="yaml-key">become</span>: <span class="yaml-value">yes</span>
+<span class="yaml-key">enabled</span>: <span class="yaml-value">no</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Using ansible-lint</h2>
+            <p><span class="term" tabindex="0">ansible-lint<span class="tooltip" role="tooltip">A linting tool that checks playbooks for best practices, deprecated syntax, and potential issues beyond basic syntax checking.</span></span> goes beyond syntax checking to enforce best practices:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible-lint usage</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Install ansible-lint</span>
+$ pip install ansible-lint
+
+<span class="yaml-comment"># Run lint check</span>
+$ ansible-lint playbook.yml
+
+<span class="yaml-comment"># Example output</span>
+WARNING Listing 2 violation(s) that are fatal
+playbook.yml:5 name[missing]: All tasks should be named.
+playbook.yml:8 fqcn[action-core]: Use FQCN for builtin modules.</pre>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('debug-module')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('check-mode')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Check Mode Section -->
+        <section id="check-mode" class="section" aria-labelledby="check-heading">
+            <h1 id="check-heading">Check Mode and Diff</h1>
+            <p class="lead">Preview changes before applying them with check mode (dry run) and see exactly what will change with diff mode.</p>
+            
+            <h2>Check Mode (Dry Run)</h2>
+            <p>The <code>--check</code> option runs the playbook without making any changes, showing what <em>would</em> happen:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Check mode commands</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Basic check mode</span>
+$ ansible-navigator run -m stdout playbook.yml --check
+
+<span class="yaml-comment"># Check mode with diff to see changes</span>
+$ ansible-navigator run -m stdout playbook.yml --check --diff
+
+<span class="yaml-comment"># Using ansible-playbook</span>
+$ ansible-playbook playbook.yml --check --diff</pre>
+                </div>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Check Mode Limitations</div>
+                <p>Tasks with <code>check_mode: false</code> will still execute in check mode. Additionally, <code>command</code> and <code>shell</code> modules cannot predict changes. Always inspect the playbook and any roles before trusting <code>--check</code> completely.</p>
+            </div>
+            
+            <h2>Controlling Check Mode Behavior</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">check_mode directive</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-comment"># This task ALWAYS runs, even in check mode</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Gather required information</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">cat /etc/hostname</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">hostname_result</span>
+    <span class="yaml-key">check_mode</span>: <span class="yaml-bool">false</span>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
+
+  <span class="yaml-comment"># This task ONLY runs in check mode</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Validate configuration</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Would configure {{ hostname_result.stdout }}"</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">ansible_check_mode</span></pre>
+                </div>
+            </div>
+            
+            <h2>The --diff Option</h2>
+            <p>The <code>--diff</code> option shows line-by-line changes for file-modifying tasks:</p>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">--diff output example</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line terminal-output">TASK [Deploy configuration] ***************************</div>
+                    <div class="terminal-line terminal-warning">changed: [server1.example.com]</div>
+                    <div class="terminal-line terminal-output">--- before: /etc/httpd/conf/httpd.conf</div>
+                    <div class="terminal-line terminal-output">+++ after: /tmp/ansible_template.j2</div>
+                    <div class="terminal-line terminal-error">- Listen 80</div>
+                    <div class="terminal-line terminal-success">+ Listen 8080</div>
+                    <div class="terminal-line terminal-error">- ServerAdmin root@localhost</div>
+                    <div class="terminal-line terminal-success">+ ServerAdmin admin@example.com</div>
+                </div>
+            </div>
+            
+            <h2>Start-at-Task and Step Mode</h2>
+            <p>Use these options to control which tasks execute during troubleshooting:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Targeted execution</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Start from a specific task</span>
+$ ansible-playbook playbook.yml --start-at-task="Install packages"
+
+<span class="yaml-comment"># Step through tasks one at a time (interactive)</span>
+$ ansible-playbook playbook.yml --step
+
+<span class="yaml-comment"># List all tasks without running</span>
+$ ansible-playbook playbook.yml --list-tasks
+
+<span class="yaml-comment"># List target hosts without running</span>
+$ ansible-playbook playbook.yml --list-hosts</pre>
+                </div>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Pro Tip</div>
+                <p>The <code>--step</code> option prompts you before each task with (N)o/(y)es/(c)ontinue options. This is extremely useful for debugging complex playbooks.</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('syntax-check')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('connection-issues')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Connection Issues Section -->
+        <section id="connection-issues" class="section" aria-labelledby="connection-heading">
+            <h1 id="connection-heading">Troubleshooting Connections</h1>
+            <p class="lead">Many Ansible problems stem from connection issues to managed hosts. Learn to diagnose and resolve SSH authentication and connectivity problems.</p>
+            
+            <h2>Common Connection Errors</h2>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">UNREACHABLE Error</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line terminal-output">TASK [Gathering Facts] *********************************</div>
+                    <div class="terminal-line terminal-error">fatal: [host.example.com]: UNREACHABLE! => {"changed": false,</div>
+                    <div class="terminal-line terminal-error">"msg": "Failed to connect to the host via ssh: Permission denied</div>
+                    <div class="terminal-line terminal-error">(publickey,gssapi-keyex,gssapi-with-mic,password).",</div>
+                    <div class="terminal-line terminal-error">"unreachable": true}</div>
+                </div>
+            </div>
+            
+            <h2>Connection Troubleshooting Checklist</h2>
+            <div class="troubleshooter">
+                <div class="troubleshoot-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Verify Basic Connectivity</div>
+                        <div class="step-desc">
+                            <code>ping hostname</code> - Ensure network connectivity exists<br>
+                            <code>ssh user@hostname</code> - Test SSH connection manually
+                        </div>
+                    </div>
+                </div>
+                <div class="troubleshoot-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Check remote_user Setting</div>
+                        <div class="step-desc">
+                            Verify <code>remote_user</code> in ansible.cfg or playbook matches a valid user on the managed host.
+                        </div>
+                    </div>
+                </div>
+                <div class="troubleshoot-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Validate SSH Keys</div>
+                        <div class="step-desc">
+                            <code>ssh-add -l</code> - Check if SSH agent has your key<br>
+                            Verify public key is in <code>~/.ssh/authorized_keys</code> on the managed host
+                        </div>
+                    </div>
+                </div>
+                <div class="troubleshoot-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Check Inventory Variables</div>
+                        <div class="step-desc">
+                            Look for <code>ansible_host</code>, <code>ansible_user</code>, <code>ansible_ssh_private_key_file</code> overrides
+                        </div>
+                    </div>
+                </div>
+                <div class="troubleshoot-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Use Maximum Verbosity</div>
+                        <div class="step-desc">
+                            <code>ansible-playbook playbook.yml -vvvv</code> - Shows full SSH connection details
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Connection-Related Variables</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Variable</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ansible_host</code></td>
+                            <td>IP or hostname to connect to</td>
+                            <td><code>ansible_host: 192.168.1.100</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible_user</code></td>
+                            <td>SSH user for connection</td>
+                            <td><code>ansible_user: devops</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible_ssh_private_key_file</code></td>
+                            <td>Path to SSH private key</td>
+                            <td><code>~/.ssh/id_rsa</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible_port</code></td>
+                            <td>SSH port number</td>
+                            <td><code>ansible_port: 2222</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible_connection</code></td>
+                            <td>Connection type</td>
+                            <td><code>ansible_connection: local</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Example: Fixing Inventory Issues</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">inventory file with connection settings</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Incorrect - using wrong host variable</span>
+<span class="yaml-value">[webservers]</span>
+serverb.lab.example.com ansible_host=serverc.lab.example.com  <span class="yaml-comment"># Wrong!</span>
+
+<span class="yaml-comment"># Correct inventory</span>
+<span class="yaml-value">[webservers]</span>
+serverb.lab.example.com
+
+<span class="yaml-value">[webservers:vars]</span>
+ansible_user=devops</pre>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('check-mode')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('privilege')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Privilege Escalation Section -->
+        <section id="privilege" class="section" aria-labelledby="privilege-heading">
+            <h1 id="privilege-heading">Privilege Escalation Issues</h1>
+            <p class="lead">Many tasks require root privileges. Learn to troubleshoot <span class="term" tabindex="0">privilege escalation<span class="tooltip" role="tooltip">The process of gaining elevated permissions (typically root) to perform administrative tasks. Ansible uses 'become' to implement sudo, su, or other escalation methods.</span></span> problems with become.</p>
+            
+            <h2>Common Privilege Escalation Errors</h2>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">sudo password required</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line terminal-output">TASK [Install httpd] ***********************************</div>
+                    <div class="terminal-line terminal-error">fatal: [server1]: FAILED! => {"msg": "Missing sudo password"}</div>
+                </div>
+            </div>
+            
+            <h2>Become Configuration</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible.cfg become settings</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># ansible.cfg</span>
+<span class="yaml-value">[privilege_escalation]</span>
+become = true
+become_method = sudo
+become_user = root
+become_ask_pass = false</pre>
+                </div>
+            </div>
+            
+            <h2>Playbook-Level Become</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using become in playbooks</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-bool">true</span>              <span class="yaml-comment"># Enable privilege escalation</span>
+  <span class="yaml-key">become_method</span>: <span class="yaml-value">sudo</span>      <span class="yaml-comment"># Method (sudo, su, pbrun, etc.)</span>
+  <span class="yaml-key">become_user</span>: <span class="yaml-value">root</span>        <span class="yaml-comment"># Target user</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages (requires root)</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run as specific user</span>
+      <span class="yaml-module">ansible.builtin.command</span>:
+        <span class="yaml-key">cmd</span>: <span class="yaml-value">whoami</span>
+      <span class="yaml-key">become_user</span>: <span class="yaml-value">apache</span>    <span class="yaml-comment"># Override for this task</span></pre>
+                </div>
+            </div>
+            
+            <h2>Troubleshooting Steps</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check" onclick="toggleCheck(this)" tabindex="0">✓</div>
+                    <div>Verify the remote user has sudo privileges on the managed host</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" onclick="toggleCheck(this)" tabindex="0">✓</div>
+                    <div>Check <code>/etc/sudoers</code> for NOPASSWD configuration if not using <code>--ask-become-pass</code></div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" onclick="toggleCheck(this)" tabindex="0">✓</div>
+                    <div>Ensure <code>become_method</code> matches the system's escalation mechanism</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" onclick="toggleCheck(this)" tabindex="0">✓</div>
+                    <div>Use <code>-K</code> or <code>--ask-become-pass</code> if sudo requires a password</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" onclick="toggleCheck(this)" tabindex="0">✓</div>
+                    <div>Check for <code>requiretty</code> setting in sudoers (may need to disable)</div>
+                </div>
+            </div>
+            
+            <h2>Sudoers Configuration</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Example /etc/sudoers entry</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Allow devops user to run all commands without password</span>
+devops ALL=(ALL) NOPASSWD: ALL
+
+<span class="yaml-comment"># Or for a specific group</span>
+%wheel ALL=(ALL) NOPASSWD: ALL</pre>
+                </div>
+            </div>
+            
+            <div class="info-box important">
+                <div class="info-box-title"><span aria-hidden="true">🔒</span> Security Note</div>
+                <p>While NOPASSWD is convenient for automation, consider the security implications. In production environments, use Ansible Vault to securely store become passwords, or use certificate-based authentication where possible.</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('connection-issues')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('logging')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Logging Section -->
+        <section id="logging" class="section" aria-labelledby="logging-heading">
+            <h1 id="logging-heading">Ansible Logging</h1>
+            <p class="lead">Configure persistent logging to capture playbook execution details for later analysis and audit trails.</p>
+            
+            <h2>Enabling Log Files</h2>
+            <p>By default, Ansible does not log to a file. Enable logging in <code>ansible.cfg</code>:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible.cfg logging configuration</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-value">[defaults]</span>
+<span class="yaml-comment"># Enable logging to file</span>
+log_path = /var/log/ansible/ansible.log
+
+<span class="yaml-comment"># Alternative: log to project directory</span>
+log_path = ./ansible.log</pre>
+                </div>
+            </div>
+            
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> File Permissions</div>
+                <p>Ensure the user running Ansible has write permission to the log directory. Create the directory and set appropriate permissions before running playbooks.</p>
+            </div>
+            
+            <h2>Environment Variable</h2>
+            <p>You can also set the log path using an environment variable:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using ANSIBLE_LOG_PATH</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Set for current session</span>
+$ export ANSIBLE_LOG_PATH=/var/log/ansible/ansible.log
+
+<span class="yaml-comment"># Or set for a single command</span>
+$ ANSIBLE_LOG_PATH=./debug.log ansible-playbook playbook.yml -vvv</pre>
+                </div>
+            </div>
+            
+            <h2>Log Output Example</h2>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">/var/log/ansible/ansible.log</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line terminal-output">2024-01-15 10:23:45,123 p=12345 u=student n=ansible | PLAY [Configure servers] ***</div>
+                    <div class="terminal-line terminal-output">2024-01-15 10:23:45,456 p=12345 u=student n=ansible | TASK [Gathering Facts] ***</div>
+                    <div class="terminal-line terminal-success">2024-01-15 10:23:47,789 p=12345 u=student n=ansible | ok: [server1.example.com]</div>
+                    <div class="terminal-line terminal-output">2024-01-15 10:23:48,012 p=12345 u=student n=ansible | TASK [Install httpd] ***</div>
+                    <div class="terminal-line terminal-warning">2024-01-15 10:23:52,345 p=12345 u=student n=ansible | changed: [server1.example.com]</div>
+                </div>
+            </div>
+            
+            <h2>Callback Plugins for Enhanced Output</h2>
+            <p>Use callback plugins to change output format:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible.cfg callback configuration</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-value">[defaults]</span>
+<span class="yaml-comment"># Change output format</span>
+stdout_callback = yaml
+
+<span class="yaml-comment"># Available callbacks: default, yaml, json, debug, minimal, dense</span>
+
+<span class="yaml-comment"># Show task timing information</span>
+callbacks_enabled = ansible.posix.profile_tasks</pre>
+                </div>
+            </div>
+            
+            <h2>Log Rotation</h2>
+            <p>For production environments, configure log rotation to prevent disk space issues:</p>
+            
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">/etc/logrotate.d/ansible</span></div>
+                <div class="code-content">
+<pre>/var/log/ansible/*.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root root
+}</pre>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('privilege')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('common-errors')">Continue <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Common Errors Section -->
+        <section id="common-errors" class="section" aria-labelledby="errors-heading">
+            <h1 id="errors-heading">Common Errors</h1>
+            <p class="lead">Learn to quickly identify and resolve the most frequent Ansible errors.</p>
+            
+            <h2>Error Analysis Tool</h2>
+            <p>Click on an error type to see examples and solutions:</p>
+            
+            <div class="error-analyzer">
+                <div class="error-tabs">
+                    <button class="error-tab active" onclick="showError('yaml')" aria-pressed="true">YAML Errors</button>
+                    <button class="error-tab" onclick="showError('module')" aria-pressed="false">Module Errors</button>
+                    <button class="error-tab" onclick="showError('variable')" aria-pressed="false">Variable Errors</button>
+                    <button class="error-tab" onclick="showError('template')" aria-pressed="false">Template Errors</button>
+                    <button class="error-tab" onclick="showError('host')" aria-pressed="false">Host Errors</button>
+                </div>
+                
+                <div id="error-yaml" class="error-content active">
+                    <h3>YAML Syntax Errors</h3>
+                    <div class="error-example">
+<pre>ERROR! Syntax Error while loading YAML.
+  mapping values are not allowed in this context
+
+The error appears to be in 'playbook.yml': line 8, column 12</pre>
+                    </div>
+                    <div class="error-solution">
+                        <div class="error-solution-title">Common Causes & Solutions</div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li><strong>Tabs instead of spaces</strong> - YAML requires spaces only</li>
+                            <li><strong>Inconsistent indentation</strong> - Use 2 spaces per level consistently</li>
+                            <li><strong>Missing quotes</strong> - Quote values starting with {{ or containing :</li>
+                            <li><strong>Missing colons</strong> - Every key needs a colon followed by space</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="error-module" class="error-content">
+                    <h3>Module Errors</h3>
+                    <div class="error-example">
+<pre>fatal: [server1]: FAILED! => {"changed": false, 
+"msg": "Unsupported parameters for (copy) module: sources. 
+Supported parameters include: attributes, backup, checksum, 
+content, decrypt, dest, directory_mode..."}</pre>
+                    </div>
+                    <div class="error-solution">
+                        <div class="error-solution-title">Common Causes & Solutions</div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li><strong>Typo in parameter name</strong> - Check spelling (src not sources)</li>
+                            <li><strong>Wrong module</strong> - Verify you're using the correct module</li>
+                            <li><strong>Missing required parameter</strong> - Some modules have required params</li>
+                            <li><strong>Version mismatch</strong> - Parameter may not exist in your Ansible version</li>
+                        </ul>
+                        <p style="margin-top: 12px; color: var(--text-secondary);">Use <code>ansible-doc module_name</code> to see correct parameters.</p>
+                    </div>
+                </div>
+                
+                <div id="error-variable" class="error-content">
+                    <h3>Variable Errors</h3>
+                    <div class="error-example">
+<pre>fatal: [server1]: FAILED! => {"msg": 
+"The task includes an option with an undefined variable. 
+The error was: 'my_variable' is undefined"}</pre>
+                    </div>
+                    <div class="error-solution">
+                        <div class="error-solution-title">Common Causes & Solutions</div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li><strong>Typo in variable name</strong> - Check spelling carefully</li>
+                            <li><strong>Variable not defined</strong> - Define in vars, group_vars, or inventory</li>
+                            <li><strong>Wrong scope</strong> - Variable may be defined in different play/role</li>
+                            <li><strong>Facts not gathered</strong> - ansible_* vars need gather_facts: true</li>
+                        </ul>
+                        <p style="margin-top: 12px; color: var(--text-secondary);">Use <code>{{ my_var | default('fallback') }}</code> for optional variables.</p>
+                    </div>
+                </div>
+                
+                <div id="error-template" class="error-content">
+                    <h3>Template Errors</h3>
+                    <div class="error-example">
+<pre>fatal: [server1]: FAILED! => {"changed": false,
+"msg": "AnsibleError: template error while templating string: 
+expected token 'end of print statement', got 'string'"}</pre>
+                    </div>
+                    <div class="error-solution">
+                        <div class="error-solution-title">Common Causes & Solutions</div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li><strong>Missing quotes in template</strong> - Jinja2 strings need quotes</li>
+                            <li><strong>Syntax error in expression</strong> - Check Jinja2 syntax</li>
+                            <li><strong>Undefined filter</strong> - Verify filter exists</li>
+                            <li><strong>Missing closing braces</strong> - Match {{ with }}</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="error-host" class="error-content">
+                    <h3>Host/Inventory Errors</h3>
+                    <div class="error-example">
+<pre>[WARNING]: Could not match supplied host pattern, ignoring: webservers
+[WARNING]: No hosts matched, nothing to do</pre>
+                    </div>
+                    <div class="error-solution">
+                        <div class="error-solution-title">Common Causes & Solutions</div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li><strong>Typo in hosts pattern</strong> - Check group/host names in inventory</li>
+                            <li><strong>Wrong inventory file</strong> - Specify with <code>-i inventory</code></li>
+                            <li><strong>Empty group</strong> - Group exists but has no hosts</li>
+                            <li><strong>Host pattern syntax</strong> - Use correct pattern syntax</li>
+                        </ul>
+                        <p style="margin-top: 12px; color: var(--text-secondary);">Use <code>ansible-inventory --list</code> to verify inventory contents.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Quick Reference: Error Resolution</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Error Type</th><th>First Step</th><th>Command</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Syntax Error</td>
+                            <td>Validate syntax</td>
+                            <td><code>ansible-playbook --syntax-check</code></td>
+                        </tr>
+                        <tr>
+                            <td>Module Error</td>
+                            <td>Check documentation</td>
+                            <td><code>ansible-doc module_name</code></td>
+                        </tr>
+                        <tr>
+                            <td>Connection Error</td>
+                            <td>Increase verbosity</td>
+                            <td><code>ansible-playbook -vvvv</code></td>
+                        </tr>
+                        <tr>
+                            <td>Variable Error</td>
+                            <td>Debug variables</td>
+                            <td>Add <code>debug: var=varname</code> task</td>
+                        </tr>
+                        <tr>
+                            <td>Host Error</td>
+                            <td>List inventory</td>
+                            <td><code>ansible-inventory --list</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('logging')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Lab Section -->
+        <section id="lab" class="section" aria-labelledby="lab-heading">
+            <h1 id="lab-heading">Hands-on Lab</h1>
+            <p class="lead">Practice troubleshooting techniques with these guided exercises.</p>
+            
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Lab 8.1</span>
+                    <span class="exercise-title">Debug a Failing Playbook</span>
+                </div>
+                <div class="exercise-body">
+                    <p>You have a playbook that fails during execution. Use the troubleshooting techniques learned to identify and fix the issues.</p>
+                    
+                    <div class="exercise-steps">
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">1</div>
+                            <div>
+                                <strong>Create a playbook with intentional errors:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-header"><span class="code-title">broken_playbook.yml</span></div>
+                                    <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Broken playbook example</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-bool">true</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">{{ package_name }}</span>  <span class="yaml-comment"># Missing quotes!</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">2</div>
+                            <div>
+                                <strong>Run syntax check to find the first error:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-content">
+<pre>$ ansible-playbook broken_playbook.yml --syntax-check</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">3</div>
+                            <div>
+                                <strong>Fix the quoting issue and define the variable:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-header"><span class="code-title">fixed_playbook.yml</span></div>
+                                    <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Fixed playbook example</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-bool">true</span>
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">package_name</span>: <span class="yaml-value">httpd</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-string">"{{ package_name }}"</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">4</div>
+                            <div>
+                                <strong>Test with check mode:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-content">
+<pre>$ ansible-playbook fixed_playbook.yml --check --diff -v</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Lab 8.2</span>
+                    <span class="exercise-title">Troubleshoot Connection Issues</span>
+                </div>
+                <div class="exercise-body">
+                    <p>Diagnose and resolve a connection failure to a managed host.</p>
+                    
+                    <div class="exercise-steps">
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">1</div>
+                            <div>
+                                <strong>Create an inventory with connection issues:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-header"><span class="code-title">inventory</span></div>
+                                    <div class="code-content">
+<pre><span class="yaml-value">[webservers]</span>
+serverb.lab.example.com ansible_user=students  <span class="yaml-comment"># Wrong user!</span></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">2</div>
+                            <div>
+                                <strong>Run with high verbosity to identify the issue:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-content">
+<pre>$ ansible webservers -m ping -i inventory -vvvv</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">3</div>
+                            <div>
+                                <strong>Review the verbose output to identify:</strong>
+                                <ul style="margin-top: 8px; margin-left: 20px; color: var(--text-secondary);">
+                                    <li>Which user is being used for connection</li>
+                                    <li>What authentication method is being tried</li>
+                                    <li>The exact error message</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">4</div>
+                            <div>
+                                <strong>Fix the inventory with correct user:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-content">
+<pre><span class="yaml-value">[webservers]</span>
+serverb.lab.example.com ansible_user=devops</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Lab 8.3</span>
+                    <span class="exercise-title">Use Debug Module Effectively</span>
+                </div>
+                <div class="exercise-body">
+                    <p>Add debugging statements to understand variable values and execution flow.</p>
+                    
+                    <div class="exercise-steps">
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">1</div>
+                            <div>
+                                <strong>Create a playbook with debug tasks:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-header"><span class="code-title">debug_example.yml</span></div>
+                                    <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Debug example playbook</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">localhost</span>
+  <span class="yaml-key">gather_facts</span>: <span class="yaml-bool">true</span>
+  
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show OS family</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">var</span>: <span class="yaml-value">ansible_facts['os_family']</span>
+    
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Get disk usage</span>
+      <span class="yaml-module">ansible.builtin.command</span>:
+        <span class="yaml-key">cmd</span>: <span class="yaml-value">df -h /</span>
+      <span class="yaml-key">register</span>: <span class="yaml-value">disk_result</span>
+      <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
+    
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show disk result structure</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">var</span>: <span class="yaml-value">disk_result</span>
+    
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show only stdout lines</span>
+      <span class="yaml-module">ansible.builtin.debug</span>:
+        <span class="yaml-key">var</span>: <span class="yaml-value">disk_result.stdout_lines</span></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="exercise-step">
+                            <div class="exercise-step-number">2</div>
+                            <div>
+                                <strong>Run and observe the output structure:</strong>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <div class="code-content">
+<pre>$ ansible-playbook debug_example.yml</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('common-errors')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Quiz Section -->
+        <section id="quiz" class="section" aria-labelledby="quiz-heading">
+            <h1 id="quiz-heading">Knowledge Check</h1>
+            <p class="lead">Test your understanding of Ansible troubleshooting techniques.</p>
+            
+            <div class="quiz-container" id="quiz-container" role="region" aria-label="Quiz">
+                <!-- Quiz content populated by JavaScript -->
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('lab')"><span aria-hidden="true">←</span> Back to Lab</button>
+                <button class="btn btn-primary" onclick="navigateTo('summary')">View Summary <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        
+        <!-- Summary Section -->
+        <section id="summary" class="section" aria-labelledby="summary-heading">
+            <h1 id="summary-heading">Chapter Summary</h1>
+            <p class="lead">Congratulations! You've learned comprehensive Ansible troubleshooting techniques.</p>
+            
+            <h2>Key Concepts</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📢</div>
+                    <div class="card-title">Verbose Mode</div>
+                    <div class="card-content">Use -v through -vvvv for progressively more detailed output about playbook execution.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔍</div>
+                    <div class="card-title">Debug Module</div>
+                    <div class="card-content">Use ansible.builtin.debug to display variables, messages, and inspect registered output.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">✅</div>
+                    <div class="card-title">Syntax Checking</div>
+                    <div class="card-content">Always validate with --syntax-check and ansible-lint before running playbooks.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🧪</div>
+                    <div class="card-title">Check Mode</div>
+                    <div class="card-content">Preview changes with --check --diff without actually modifying systems.</div>
+                </div>
+            </div>
+            
+            <h2>Command Reference</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ansible-playbook -v/-vvvv</code></td><td>Verbose output (1-4 levels)</td></tr>
+                        <tr><td><code>--syntax-check</code></td><td>Validate YAML and Ansible syntax</td></tr>
+                        <tr><td><code>--check --diff</code></td><td>Dry run with change preview</td></tr>
+                        <tr><td><code>--start-at-task</code></td><td>Start from specific task</td></tr>
+                        <tr><td><code>--step</code></td><td>Interactive step-through mode</td></tr>
+                        <tr><td><code>--list-tasks</code></td><td>List all tasks in playbook</td></tr>
+                        <tr><td><code>ansible-lint</code></td><td>Best practices validation</td></tr>
+                        <tr><td><code>ansible-doc module</code></td><td>View module documentation</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Key Takeaways</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>Start troubleshooting with <code>--syntax-check</code>, then increase verbosity as needed</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>Use <code>-vvvv</code> for connection issues, <code>-v</code> for task result details</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>The debug module with <code>var:</code> parameter takes a variable name without quotes or braces</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>Check mode doesn't guarantee safety - some tasks may still execute</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>Connection issues often stem from incorrect remote_user or ansible_host settings</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>Enable persistent logging with log_path in ansible.cfg for audit trails</div>
+                </div>
+            </div>
+            
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Next Steps</div>
+                <p>Continue with Chapter 9 to learn about automating Linux administration tasks with Ansible, including user management, package management, and service configuration.</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('quiz')"><span aria-hidden="true">←</span> Back to Quiz</button>
+                <button class="btn btn-primary" onclick="navigateTo('welcome')">Review Chapter <span aria-hidden="true">↺</span></button>
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                question: "Which verbosity level shows SSH connection details?",
+                options: ["-v (Level 1)", "-vv (Level 2)", "-vvv (Level 3)", "-vvvv (Level 4)"],
+                correct: 2,
+                explanation: "Level 3 (-vvv) shows connection details including SSH commands and file paths. Level 4 adds extra debugging for connection plugins."
+            },
+            {
+                question: "What parameter does the debug module use to display a variable without quotes?",
+                options: ["msg", "var", "display", "show"],
+                correct: 1,
+                explanation: "The 'var' parameter takes a variable name directly without quotes or braces. Using 'msg' requires {{ variable }} syntax."
+            },
+            {
+                question: "Which command validates playbook syntax without executing any tasks?",
+                options: ["--check", "--syntax-check", "--validate", "--test"],
+                correct: 1,
+                explanation: "The --syntax-check option validates YAML structure and Ansible syntax without connecting to hosts or executing tasks."
+            },
+            {
+                question: "What does the --check --diff combination do?",
+                options: [
+                    "Checks syntax and shows differences",
+                    "Runs playbook and shows file changes",
+                    "Dry run showing what would change",
+                    "Compares two playbooks"
+                ],
+                correct: 2,
+                explanation: "The --check option performs a dry run without making changes, and --diff shows what file contents would change."
+            },
+            {
+                question: "Which ansible.cfg setting enables persistent logging?",
+                options: ["enable_log", "log_file", "log_path", "logging"],
+                correct: 2,
+                explanation: "Set log_path in the [defaults] section of ansible.cfg to enable logging to a file."
+            },
+            {
+                question: "What causes the error 'mapping values are not allowed in this context'?",
+                options: [
+                    "Missing module name",
+                    "Indentation or quoting issues in YAML",
+                    "Invalid variable reference",
+                    "Connection timeout"
+                ],
+                correct: 1,
+                explanation: "This YAML syntax error typically occurs due to incorrect indentation, using tabs instead of spaces, or missing quotes around values."
+            },
+            {
+                question: "How do you force a task to run even in check mode?",
+                options: [
+                    "always_run: true",
+                    "check_mode: false",
+                    "force: true",
+                    "run_always: true"
+                ],
+                correct: 1,
+                explanation: "Setting check_mode: false on a task forces it to run even when the playbook is executed with --check."
+            },
+            {
+                question: "Which variable indicates the playbook is running in check mode?",
+                options: [
+                    "ansible_dry_run",
+                    "ansible_check_mode",
+                    "check_mode",
+                    "dry_run_mode"
+                ],
+                correct: 1,
+                explanation: "The ansible_check_mode variable is true when the playbook runs with --check, allowing conditional logic based on check mode."
+            },
+            {
+                question: "What is the recommended first step when troubleshooting an UNREACHABLE error?",
+                options: [
+                    "Reinstall Ansible",
+                    "Test SSH connection manually",
+                    "Reboot the managed host",
+                    "Delete the inventory file"
+                ],
+                correct: 1,
+                explanation: "First verify basic connectivity by testing SSH manually: 'ssh user@hostname'. This confirms whether the issue is Ansible-specific or a general connectivity problem."
+            },
+            {
+                question: "What command lists all available modules?",
+                options: [
+                    "ansible-doc --list",
+                    "ansible-doc -l",
+                    "ansible --modules",
+                    "ansible-galaxy list"
+                ],
+                correct: 1,
+                explanation: "Use 'ansible-doc -l' to list all available modules. Use 'ansible-doc module_name' to see detailed documentation for a specific module."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = quizQuestions[currentQuestion];
+            answered = false;
+            
+            container.innerHTML = `
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" style="width: ${(currentQuestion / quizQuestions.length) * 100}%"></div>
+                    </div>
+                    <div class="quiz-progress-text">Question ${currentQuestion + 1} of ${quizQuestions.length}</div>
+                </div>
+                <div class="quiz-question">${q.question}</div>
+                <div class="quiz-options">
+                    ${q.options.map((opt, i) => `
+                        <div class="quiz-option" onclick="selectOption(${i})" tabindex="0" role="button" aria-pressed="false">
+                            <div class="quiz-option-letter">${String.fromCharCode(65 + i)}</div>
+                            <div>${opt}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="quiz-explanation" id="quiz-explanation">
+                    <div class="quiz-explanation-title" id="explanation-title"></div>
+                    <p>${q.explanation}</p>
+                </div>
+                <button class="quiz-btn" id="quiz-btn" onclick="nextQuestion()" disabled>
+                    ${currentQuestion < quizQuestions.length - 1 ? 'Next Question' : 'See Results'}
+                </button>
+            `;
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+            
+            const options = document.querySelectorAll('.quiz-option');
+            const correct = quizQuestions[currentQuestion].correct;
+            
+            options.forEach((opt, i) => {
+                opt.style.pointerEvents = 'none';
+                if (i === correct) {
+                    opt.classList.add('correct');
+                } else if (i === index && i !== correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            const explanation = document.getElementById('quiz-explanation');
+            const explanationTitle = document.getElementById('explanation-title');
+            
+            if (index === correct) {
+                score++;
+                explanationTitle.className = 'quiz-explanation-title correct';
+                explanationTitle.innerHTML = '✓ Correct!';
+            } else {
+                explanationTitle.className = 'quiz-explanation-title incorrect';
+                explanationTitle.innerHTML = '✗ Incorrect';
+            }
+            
+            explanation.classList.add('show');
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizQuestions.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const container = document.getElementById('quiz-container');
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 0;">
+                    <div style="font-size: 64px; margin-bottom: 24px;">${percentage >= 70 ? '🎉' : '📚'}</div>
+                    <h2 style="margin-bottom: 16px;">Quiz Complete!</h2>
+                    <p style="font-size: 24px; margin-bottom: 8px;">Your Score: <strong>${score}/${quizQuestions.length}</strong></p>
+                    <p style="color: var(--text-muted); margin-bottom: 32px;">${percentage}% correct</p>
+                    <p style="margin-bottom: 32px;">
+                        ${percentage >= 70 
+                            ? "Great job! You have a solid understanding of Ansible troubleshooting techniques." 
+                            : "Review the chapter material and try again to improve your troubleshooting skills."}
+                    </p>
+                    <button class="btn btn-primary" onclick="initQuiz()">Retake Quiz</button>
+                </div>
+            `;
+            updateProgress();
+        }
+
+        // Navigation
+        let currentSection = 'welcome';
+        const sections = ['welcome', 'objectives', 'verbose', 'debug-module', 'syntax-check', 'check-mode', 'connection-issues', 'privilege', 'logging', 'common-errors', 'lab', 'quiz', 'summary'];
+        let completedSections = new Set();
+
+        function navigateTo(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+                currentSection = sectionId;
+                
+                const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+                if (navItem) navItem.classList.add('active');
+                
+                completedSections.add(sectionId);
+                updateProgress();
+                
+                window.scrollTo(0, 0);
+                
+                if (sectionId === 'quiz') {
+                    initQuiz();
+                }
+                if (sectionId === 'verbose') {
+                    setVerbosity(0);
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progress = (completedSections.size / sections.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
+            
+            completedSections.forEach(id => {
+                const navItem = document.querySelector(`.nav-item[data-section="${id}"]`);
+                if (navItem && id !== currentSection) {
+                    navItem.classList.add('completed');
+                }
+            });
+        }
+
+        function toggleNav() {
+            document.getElementById('nav').classList.toggle('open');
+        }
+
+        function toggleObjective(el) {
+            el.classList.toggle('checked');
+            el.setAttribute('aria-checked', el.classList.contains('checked'));
+        }
+
+        function toggleCheck(el) {
+            el.classList.toggle('checked');
+        }
+
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const wasOpen = item.classList.contains('open');
+            
+            // Close all accordions in the same container
+            header.closest('.accordion').querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('open');
+            });
+            
+            // Open clicked one if it was closed
+            if (!wasOpen) {
+                item.classList.add('open');
+            }
+            
+            header.setAttribute('aria-expanded', !wasOpen);
+        }
+
+        // Verbose Mode Simulator
+        const verboseOutputs = {
+            0: [
+                { text: 'PLAY [Configure web server] ****************************', cls: 'v-task' },
+                { text: '' },
+                { text: 'TASK [Gathering Facts] *********************************', cls: 'v-task' },
+                { text: 'ok: [server1.example.com]', cls: 'v-ok' },
+                { text: '' },
+                { text: 'TASK [Install httpd] ***********************************', cls: 'v-task' },
+                { text: 'changed: [server1.example.com]', cls: 'v-changed' },
+                { text: '' },
+                { text: 'PLAY RECAP *********************************************', cls: 'v-task' },
+                { text: 'server1.example.com : ok=2 changed=1 unreachable=0 failed=0', cls: 'v-ok' }
+            ],
+            1: [
+                { text: 'PLAY [Configure web server] ****************************', cls: 'v-task' },
+                { text: '' },
+                { text: 'TASK [Gathering Facts] *********************************', cls: 'v-task' },
+                { text: 'ok: [server1.example.com]', cls: 'v-ok' },
+                { text: '' },
+                { text: 'TASK [Install httpd] ***********************************', cls: 'v-task' },
+                { text: 'changed: [server1.example.com] => {"changed": true,', cls: 'v-changed' },
+                { text: '    "msg": "installed: httpd-2.4.57",', cls: 'v-result' },
+                { text: '    "rc": 0}', cls: 'v-result' },
+                { text: '' },
+                { text: 'PLAY RECAP *********************************************', cls: 'v-task' },
+                { text: 'server1.example.com : ok=2 changed=1 unreachable=0 failed=0', cls: 'v-ok' }
+            ],
+            2: [
+                { text: 'PLAY [Configure web server] ****************************', cls: 'v-task' },
+                { text: '' },
+                { text: 'TASK [Gathering Facts] *********************************', cls: 'v-task' },
+                { text: 'task path: /home/student/playbook.yml:5', cls: 'v-debug' },
+                { text: 'ok: [server1.example.com]', cls: 'v-ok' },
+                { text: '' },
+                { text: 'TASK [Install httpd] ***********************************', cls: 'v-task' },
+                { text: 'task path: /home/student/playbook.yml:8', cls: 'v-debug' },
+                { text: 'ARGS: {"name": "httpd", "state": "present"}', cls: 'v-debug' },
+                { text: 'changed: [server1.example.com] => {"changed": true,', cls: 'v-changed' },
+                { text: '    "msg": "installed: httpd-2.4.57"}', cls: 'v-result' },
+                { text: '' },
+                { text: 'PLAY RECAP *********************************************', cls: 'v-task' },
+                { text: 'server1.example.com : ok=2 changed=1 unreachable=0 failed=0', cls: 'v-ok' }
+            ],
+            3: [
+                { text: 'PLAY [Configure web server] ****************************', cls: 'v-task' },
+                { text: '' },
+                { text: 'TASK [Gathering Facts] *********************************', cls: 'v-task' },
+                { text: 'task path: /home/student/playbook.yml:5', cls: 'v-debug' },
+                { text: '<server1.example.com> SSH: EXEC ssh -C -o ControlMaster=auto', cls: 'v-ssh' },
+                { text: '    -o ControlPersist=60s -o StrictHostKeyChecking=no', cls: 'v-ssh' },
+                { text: '    -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10', cls: 'v-ssh' },
+                { text: '    server1.example.com /bin/sh -c \'echo ~student\'', cls: 'v-ssh' },
+                { text: '<server1.example.com> (0, b\'/home/student\\n\', b\'\')', cls: 'v-ssh' },
+                { text: 'ok: [server1.example.com]', cls: 'v-ok' },
+                { text: '' },
+                { text: 'TASK [Install httpd] ***********************************', cls: 'v-task' },
+                { text: 'task path: /home/student/playbook.yml:8', cls: 'v-debug' },
+                { text: '<server1.example.com> EXEC /usr/bin/python3', cls: 'v-ssh' },
+                { text: 'changed: [server1.example.com]', cls: 'v-changed' }
+            ],
+            4: [
+                { text: 'PLAY [Configure web server] ****************************', cls: 'v-task' },
+                { text: '' },
+                { text: 'Loading callback plugin default', cls: 'v-debug' },
+                { text: 'LOADER: loading module: ansible.builtin.setup', cls: 'v-debug' },
+                { text: '' },
+                { text: 'TASK [Gathering Facts] *********************************', cls: 'v-task' },
+                { text: 'task path: /home/student/playbook.yml:5', cls: 'v-debug' },
+                { text: '<server1.example.com> ESTABLISH SSH CONNECTION FOR USER: student', cls: 'v-ssh' },
+                { text: '<server1.example.com> SSH: EXEC ssh -vvv -C -o ControlMaster=auto', cls: 'v-ssh' },
+                { text: '    -o ControlPersist=60s -o KbdInteractiveAuthentication=no', cls: 'v-ssh' },
+                { text: '    -o PreferredAuthentications=gssapi-with-mic,publickey', cls: 'v-ssh' },
+                { text: '    -o PasswordAuthentication=no -o ConnectTimeout=10', cls: 'v-ssh' },
+                { text: '    -o \'ControlPath=/home/student/.ansible/cp/%h-%p-%r\'', cls: 'v-ssh' },
+                { text: '    server1.example.com /bin/sh -c \'echo ~student\'', cls: 'v-ssh' },
+                { text: 'debug1: Connecting to server1.example.com [192.168.1.100] port 22.', cls: 'v-ssh' },
+                { text: 'debug1: Connection established.', cls: 'v-ssh' },
+                { text: '<server1.example.com> (0, b\'/home/student\\n\', b\'\')', cls: 'v-ssh' },
+                { text: 'ok: [server1.example.com]', cls: 'v-ok' }
+            ]
+        };
+
+        function setVerbosity(level) {
+            // Update buttons
+            document.querySelectorAll('.verbose-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === level);
+                btn.setAttribute('aria-pressed', i === level);
+            });
+            
+            // Update output
+            const output = document.getElementById('verbose-output');
+            output.innerHTML = verboseOutputs[level].map(line => 
+                `<div class="${line.cls || ''}">${line.text}</div>`
+            ).join('');
+        }
+
+        // Debug Output Simulator
+        const debugOutputs = {
+            msg: `<span class="v-task">TASK [Show greeting message] *****************************</span>
+<span class="v-ok">ok: [server1.example.com] => {</span>
+<span class="v-result">    "msg": "Hello from server1.example.com"</span>
+<span class="v-ok">}</span>`,
+            var: `<span class="v-task">TASK [Show OS family] ************************************</span>
+<span class="v-ok">ok: [server1.example.com] => {</span>
+<span class="v-result">    "ansible_facts['os_family']": "RedHat"</span>
+<span class="v-ok">}</span>`,
+            register: `<span class="v-task">TASK [Show full result structure] ************************</span>
+<span class="v-ok">ok: [server1.example.com] => {</span>
+<span class="v-result">    "service_result": {</span>
+<span class="v-result">        "changed": false,</span>
+<span class="v-result">        "cmd": ["systemctl", "status", "httpd"],</span>
+<span class="v-result">        "delta": "0:00:00.023456",</span>
+<span class="v-result">        "end": "2024-01-15 10:30:45.123456",</span>
+<span class="v-result">        "rc": 0,</span>
+<span class="v-result">        "start": "2024-01-15 10:30:45.100000",</span>
+<span class="v-result">        "stderr": "",</span>
+<span class="v-result">        "stdout": "● httpd.service - The Apache HTTP Server\\n   Active: active (running)",</span>
+<span class="v-result">        "stdout_lines": [</span>
+<span class="v-result">            "● httpd.service - The Apache HTTP Server",</span>
+<span class="v-result">            "   Active: active (running)"</span>
+<span class="v-result">        ]</span>
+<span class="v-result">    }</span>
+<span class="v-ok">}</span>`,
+            facts: `<span class="v-task">TASK [Show ansible facts] ********************************</span>
+<span class="v-ok">ok: [server1.example.com] => {</span>
+<span class="v-result">    "ansible_facts": {</span>
+<span class="v-result">        "os_family": "RedHat",</span>
+<span class="v-result">        "distribution": "Red Hat Enterprise Linux",</span>
+<span class="v-result">        "distribution_major_version": "9",</span>
+<span class="v-result">        "hostname": "server1",</span>
+<span class="v-result">        "fqdn": "server1.example.com",</span>
+<span class="v-result">        "default_ipv4": {</span>
+<span class="v-result">            "address": "192.168.1.100",</span>
+<span class="v-result">            "interface": "eth0"</span>
+<span class="v-result">        }</span>
+<span class="v-result">    }</span>
+<span class="v-ok">}</span>`
+        };
+
+        function updateDebugOutput() {
+            document.getElementById('debug-output').innerHTML = 
+                '<span style="color: var(--text-muted);">Click "Run Task" to see output...</span>';
+        }
+
+        function runDebugDemo() {
+            const type = document.getElementById('debug-type').value;
+            document.getElementById('debug-output').innerHTML = debugOutputs[type];
+        }
+
+        // Error Analyzer
+        function showError(type) {
+            document.querySelectorAll('.error-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-pressed', 'false');
+            });
+            document.querySelectorAll('.error-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            event.target.setAttribute('aria-pressed', 'true');
+            document.getElementById('error-' + type).classList.add('active');
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = item.getAttribute('data-section');
+                navigateTo(section);
+                
+                // Close mobile nav
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('nav').classList.remove('open');
+                }
+            });
+            item.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const section = item.getAttribute('data-section');
+                    navigateTo(section);
+                }
+            });
+        });
+
+        // Keyboard navigation for quiz
+        document.addEventListener('keypress', (e) => {
+            if (currentSection === 'quiz' && !answered) {
+                const key = e.key.toUpperCase();
+                const index = key.charCodeAt(0) - 65;
+                if (index >= 0 && index < 4) {
+                    selectOption(index);
+                }
+            }
+        });
+
+        // Handle accordion keyboard navigation
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleAccordion(header);
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProgress();
+            setVerbosity(0);
+        });
+    </script>
+</body>
+</html>

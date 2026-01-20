@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHA 294 - Red Hat Enterprise Linux Automation with Ansible</title>
+    <meta name="description" content="Interactive training course for Red Hat Enterprise Linux Automation with Ansible (RHA 294). Learn Ansible automation from fundamentals to advanced topics.">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Web-safe, ADA compliant color palette */
+            --rh-red: #CC0000;
+            --rh-red-dark: #A30000;
+            --rh-red-light: #FF6666;
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #2D2D2D;
+            --bg-tertiary: #3D3D3D;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E0E0E0;
+            --text-muted: #B0B0B0;
+            --accent-blue: #0066CC;
+            --accent-green: #009933;
+            --accent-yellow: #FFCC00;
+            --accent-orange: #FF6600;
+            --border-color: #4D4D4D;
+            --success: #00CC66;
+            --error: #FF3333;
+            --code-bg: #0D0D0D;
+            --tooltip-bg: #FFFFCC;
+            --tooltip-text: #1A1A1A;
+            --focus-outline: #FFCC00;
+            --card-hover: #363636;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 17px;
+            min-height: 100vh;
+        }
+
+        /* Skip to main content link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--rh-red);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 10000;
+            font-weight: 600;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        /* Focus styles for accessibility */
+        :focus {
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        :focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 3px solid var(--rh-red);
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: var(--rh-red);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-code {
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            color: var(--rh-red);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .course-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 64px 32px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .hero h1 span {
+            color: var(--rh-red);
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .hero-feature-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--rh-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .section-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-badge {
+            background: var(--bg-tertiary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Chapter Grid */
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        /* Chapter Cards */
+        .chapter-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--rh-red);
+        }
+
+        .chapter-card:focus-within {
+            border-color: var(--focus-outline);
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.3);
+        }
+
+        .chapter-header {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .chapter-number {
+            width: 48px;
+            height: 48px;
+            background: var(--rh-red);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .chapter-meta {
+            flex: 1;
+        }
+
+        .chapter-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .chapter-name {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .chapter-body {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chapter-description {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .chapter-topics {
+            margin-bottom: 20px;
+        }
+
+        .chapter-topics-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Red Hat Mono', monospace;
+        }
+
+        .chapter-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chapter-duration {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .duration-icon {
+            font-size: 16px;
+        }
+
+        .chapter-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--rh-red);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .chapter-link:hover {
+            background: var(--rh-red-dark);
+            transform: translateX(4px);
+        }
+
+        .chapter-link:focus {
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+        }
+
+        .link-arrow {
+            transition: transform 0.2s;
+        }
+
+        .chapter-link:hover .link-arrow {
+            transform: translateX(4px);
+        }
+
+        /* Tooltips */
+        .term {
+            color: var(--accent-blue);
+            border-bottom: 2px dotted var(--accent-blue);
+            cursor: help;
+            position: relative;
+            display: inline;
+            font-weight: 500;
+        }
+
+        .term .tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 280px;
+            max-width: 90vw;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            font-weight: 400;
+            pointer-events: none;
+        }
+
+        .term .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--tooltip-bg);
+        }
+
+        .term:hover .tooltip,
+        .term:focus .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Tooltip positioning adjustments */
+        .term.tooltip-left .tooltip {
+            left: 0;
+            transform: translateX(0);
+        }
+
+        .term.tooltip-left .tooltip::after {
+            left: 20px;
+        }
+
+        .term.tooltip-right .tooltip {
+            left: auto;
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .term.tooltip-right .tooltip::after {
+            left: auto;
+            right: 20px;
+        }
+
+        .term.tooltip-bottom .tooltip {
+            bottom: auto;
+            top: calc(100% + 10px);
+        }
+
+        .term.tooltip-bottom .tooltip::after {
+            top: auto;
+            bottom: 100%;
+            border: 8px solid transparent;
+            border-bottom-color: var(--tooltip-bg);
+        }
+
+        /* Course Overview Section */
+        .course-overview {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .overview-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .overview-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .overview-item {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .overview-item-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--rh-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+        }
+
+        .overview-item-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .overview-item-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Prerequisites Section */
+        .prerequisites {
+            background: linear-gradient(135deg, rgba(204, 0, 0, 0.1) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--rh-red);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .prerequisites-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prerequisites-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--rh-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .prerequisites-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .prerequisites-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .prereq-check {
+            color: var(--success);
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 32px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .footer-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--rh-red);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 900;
+            font-size: 16px;
+            color: white;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--rh-red);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .chapters-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 16px 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-brand {
+                flex-direction: column;
+            }
+
+            .course-title {
+                font-size: 18px;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .hero-features {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
+
+            main {
+                padding: 32px 20px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .chapters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chapter-header {
+                padding: 16px;
+            }
+
+            .chapter-body {
+                padding: 20px;
+            }
+
+            .course-overview,
+            .prerequisites {
+                padding: 24px;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chapter-footer {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .chapter-link {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            header, footer {
+                position: static;
+            }
+
+            .chapter-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .chapter-link {
+                color: var(--rh-red);
+                background: none;
+            }
+        }
+
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: #FFFFFF;
+                --text-muted: #CCCCCC;
+            }
+
+            .chapter-card {
+                border-width: 2px;
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+
+            html {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="header-content">
+            <div class="header-brand">
+                <div class="logo" aria-hidden="true">A</div>
+                <div class="brand-text">
+                    <span class="course-code">RHA 294</span>
+                    <span class="course-title">Red Hat Enterprise Linux Automation with Ansible</span>
+                </div>
+            </div>
+            <div class="header-stats" aria-label="Course statistics">
+                <div class="stat-item">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Chapters</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">20+</div>
+                    <div class="stat-label">Hours</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">50+</div>
+                    <div class="stat-label">Labs</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-content">
+            <h1 id="hero-title">Master <span>Ansible Automation</span></h1>
+            <p class="hero-subtitle">
+                Learn to automate enterprise Linux administration using Red Hat Ansible Automation Platform. 
+                From writing your first playbook to managing complex multi-tier deployments, this comprehensive 
+                course covers everything you need to become an Ansible expert.
+            </p>
+            <div class="hero-features" role="list" aria-label="Course features">
+                <div class="hero-feature" role="listitem">
+                    <div class="hero-feature-icon" aria-hidden="true">✓</div>
+                    <span>Interactive Simulators</span>
+                </div>
+                <div class="hero-feature" role="listitem">
+                    <div class="hero-feature-icon" aria-hidden="true">✓</div>
+                    <span>Hands-on Labs</span>
+                </div>
+                <div class="hero-feature" role="listitem">
+                    <div class="hero-feature-icon" aria-hidden="true">✓</div>
+                    <span>Knowledge Checks</span>
+                </div>
+                <div class="hero-feature" role="listitem">
+                    <div class="hero-feature-icon" aria-hidden="true">✓</div>
+                    <span>Real-World Examples</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <!-- Course Overview -->
+        <section class="course-overview" aria-labelledby="overview-title">
+            <h2 id="overview-title" class="overview-title">Course Overview</h2>
+            <p class="overview-text">
+                This course is designed for Linux system administrators, DevOps engineers, and IT professionals 
+                who want to automate routine tasks, manage configurations at scale, and implement infrastructure 
+                as code practices using <span class="term" tabindex="0">Ansible<span class="tooltip" role="tooltip">Ansible is an open-source automation tool that automates software provisioning, configuration management, and application deployment using human-readable YAML syntax.</span></span>. 
+                You'll learn to write effective <span class="term" tabindex="0">playbooks<span class="tooltip" role="tooltip">Playbooks are YAML files that define a series of tasks to be executed on managed hosts. They are the configuration, deployment, and orchestration language of Ansible.</span></span>, 
+                manage <span class="term" tabindex="0">inventory<span class="tooltip" role="tooltip">Inventory is a list of managed nodes or hosts that Ansible can connect to and manage. It can be a simple static file or dynamically generated.</span></span>, 
+                use <span class="term" tabindex="0">roles<span class="tooltip" role="tooltip">Roles are a way of organizing playbooks and related files into a defined structure that allows for reuse and sharing of Ansible content.</span></span> 
+                for code reuse, and troubleshoot complex automation scenarios.
+            </p>
+            <div class="overview-grid" role="list" aria-label="Course highlights">
+                <div class="overview-item" role="listitem">
+                    <div class="overview-item-icon" aria-hidden="true">📚</div>
+                    <div class="overview-item-title">Comprehensive Content</div>
+                    <div class="overview-item-text">2-3 hours per chapter</div>
+                </div>
+                <div class="overview-item" role="listitem">
+                    <div class="overview-item-icon" aria-hidden="true">🖥️</div>
+                    <div class="overview-item-title">Interactive Learning</div>
+                    <div class="overview-item-text">Simulators &amp; exercises</div>
+                </div>
+                <div class="overview-item" role="listitem">
+                    <div class="overview-item-icon" aria-hidden="true">✅</div>
+                    <div class="overview-item-title">Knowledge Checks</div>
+                    <div class="overview-item-text">10 questions per chapter</div>
+                </div>
+                <div class="overview-item" role="listitem">
+                    <div class="overview-item-icon" aria-hidden="true">🏆</div>
+                    <div class="overview-item-title">Certification Prep</div>
+                    <div class="overview-item-text">EX294 exam aligned</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prerequisites -->
+        <section class="prerequisites" aria-labelledby="prereq-title">
+            <h2 id="prereq-title" class="prerequisites-title">
+                <span class="prerequisites-icon" aria-hidden="true">📋</span>
+                Prerequisites
+            </h2>
+            <ul class="prerequisites-list">
+                <li>
+                    <span class="prereq-check" aria-hidden="true">✓</span>
+                    <span>Basic Linux command line experience (RHCSA level or equivalent)</span>
+                </li>
+                <li>
+                    <span class="prereq-check" aria-hidden="true">✓</span>
+                    <span>Understanding of SSH and remote system management</span>
+                </li>
+                <li>
+                    <span class="prereq-check" aria-hidden="true">✓</span>
+                    <span>Familiarity with text editors (vim, nano, or similar)</span>
+                </li>
+                <li>
+                    <span class="prereq-check" aria-hidden="true">✓</span>
+                    <span>Basic understanding of YAML syntax is helpful but not required</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Chapters Section -->
+        <section aria-labelledby="chapters-title">
+            <div class="section-header">
+                <h2 id="chapters-title" class="section-title">Course Chapters</h2>
+                <span class="section-badge">9 Chapters Available</span>
+            </div>
+
+            <div class="chapters-grid">
+                <!-- Chapter 1 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">1</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 1</div>
+                            <h3 class="chapter-name">Introducing Ansible</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Begin your automation journey by understanding what Ansible is, its architecture, 
+                            and how it simplifies IT automation. Learn about control nodes, managed hosts, 
+                            and the agentless approach.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">Architecture</span>
+                                <span class="topic-tag">Installation</span>
+                                <span class="topic-tag">Configuration</span>
+                                <span class="topic-tag">Ad-hoc Commands</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter1.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 1: Introducing Ansible (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 2 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">2</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 2</div>
+                            <h3 class="chapter-name">Implementing Playbooks</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Learn to write Ansible playbooks using YAML syntax. Understand plays, tasks, 
+                            modules, and how to structure automation code for maintainability and reuse.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">YAML Syntax</span>
+                                <span class="topic-tag">Plays &amp; Tasks</span>
+                                <span class="topic-tag">Modules</span>
+                                <span class="topic-tag">Idempotency</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter2.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 2: Implementing Playbooks (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 3 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">3</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 3</div>
+                            <h3 class="chapter-name">Managing Variables and Facts</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Master variable management in Ansible. Learn about variable precedence, 
+                            facts gathering, magic variables, and how to use Jinja2 filters for 
+                            data manipulation.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">Variables</span>
+                                <span class="topic-tag">Facts</span>
+                                <span class="topic-tag">Jinja2 Filters</span>
+                                <span class="topic-tag">Vault Encryption</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter3.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 3: Managing Variables and Facts (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 4 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">4</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 4</div>
+                            <h3 class="chapter-name">Implementing Task Control</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Control task execution with loops, conditionals, handlers, and error handling. 
+                            Learn to create flexible playbooks that adapt to different scenarios and 
+                            recover from failures.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">Loops</span>
+                                <span class="topic-tag">Conditionals</span>
+                                <span class="topic-tag">Handlers</span>
+                                <span class="topic-tag">Error Handling</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter4.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 4: Implementing Task Control (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 5 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">5</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 5</div>
+                            <h3 class="chapter-name">Deploying Files to Managed Hosts</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Learn file management with Ansible including copying files, managing templates 
+                            with Jinja2, synchronizing directories, and managing file permissions and ownership.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">File Modules</span>
+                                <span class="topic-tag">Jinja2 Templates</span>
+                                <span class="topic-tag">Synchronize</span>
+                                <span class="topic-tag">Permissions</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter5.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 5: Deploying Files to Managed Hosts (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 6 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">6</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 6</div>
+                            <h3 class="chapter-name">Managing Complex Playbooks</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Scale your automation with techniques for managing complex playbooks. Learn about 
+                            includes, imports, tags, and strategies for organizing large automation projects.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">Includes</span>
+                                <span class="topic-tag">Imports</span>
+                                <span class="topic-tag">Tags</span>
+                                <span class="topic-tag">Organization</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter6.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 6: Managing Complex Playbooks (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 7 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">7</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 7</div>
+                            <h3 class="chapter-name">Simplifying Playbooks with Roles</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Organize your automation code using Ansible roles. Learn role structure, 
+                            creating reusable roles, using Ansible Galaxy, and working with content 
+                            collections.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">Role Structure</span>
+                                <span class="topic-tag">Ansible Galaxy</span>
+                                <span class="topic-tag">Collections</span>
+                                <span class="topic-tag">Best Practices</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter7.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 7: Simplifying Playbooks with Roles (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 8 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">8</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 8</div>
+                            <h3 class="chapter-name">Troubleshooting Ansible</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Develop debugging and troubleshooting skills for Ansible automation. Learn to 
+                            use verbose mode, debug module, check mode, and systematic approaches to 
+                            identifying and resolving issues.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">Debugging</span>
+                                <span class="topic-tag">Verbose Mode</span>
+                                <span class="topic-tag">Check Mode</span>
+                                <span class="topic-tag">Log Analysis</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~2.5 hours</span>
+                            </div>
+                            <a href="rha294-chapter8.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 8: Troubleshooting Ansible (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Chapter 9 -->
+                <article class="chapter-card">
+                    <div class="chapter-header">
+                        <div class="chapter-number" aria-hidden="true">9</div>
+                        <div class="chapter-meta">
+                            <div class="chapter-label">Chapter 9</div>
+                            <h3 class="chapter-name">Automating Linux Administration</h3>
+                        </div>
+                    </div>
+                    <div class="chapter-body">
+                        <p class="chapter-description">
+                            Apply your Ansible skills to common Linux administration tasks. Automate 
+                            user management, package installation, service configuration, storage, 
+                            and network management.
+                        </p>
+                        <div class="chapter-topics">
+                            <div class="chapter-topics-title">Key Topics</div>
+                            <div class="topics-list">
+                                <span class="topic-tag">User Management</span>
+                                <span class="topic-tag">Packages</span>
+                                <span class="topic-tag">Services</span>
+                                <span class="topic-tag">Networking</span>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="chapter-duration">
+                                <span class="duration-icon" aria-hidden="true">⏱️</span>
+                                <span>~3 hours</span>
+                            </div>
+                            <a href="rha294-chapter9.html" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="chapter-link"
+                               aria-label="Start Chapter 9: Automating Linux Administration (opens in new tab)">
+                                Start Chapter
+                                <span class="link-arrow" aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo" aria-hidden="true">A</div>
+                <span class="footer-text">RHA 294 - Red Hat Enterprise Linux Automation with Ansible</span>
+            </div>
+            <p class="footer-text">
+                Interactive training materials designed for comprehensive Ansible automation education.
+            </p>
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="#main-content" class="footer-link">Back to Top</a>
+                <a href="https://www.redhat.com/en/services/training/rh294-red-hat-linux-automation-with-ansible" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="footer-link">Official RH294 Course</a>
+                <a href="https://docs.ansible.com/" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="footer-link">Ansible Documentation</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Tooltip Positioning Script -->
+    <script>
+        // Dynamic tooltip positioning to prevent screen edge overflow
+        document.addEventListener('DOMContentLoaded', function() {
+            const terms = document.querySelectorAll('.term');
+            
+            terms.forEach(term => {
+                const tooltip = term.querySelector('.tooltip');
+                if (!tooltip) return;
+
+                function positionTooltip() {
+                    // Reset positioning classes
+                    term.classList.remove('tooltip-left', 'tooltip-right', 'tooltip-bottom');
+                    
+                    const termRect = term.getBoundingClientRect();
+                    const tooltipWidth = 280; // Match CSS width
+                    const padding = 16;
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+                    
+                    // Check horizontal positioning
+                    const tooltipLeft = termRect.left + (termRect.width / 2) - (tooltipWidth / 2);
+                    const tooltipRight = tooltipLeft + tooltipWidth;
+                    
+                    if (tooltipLeft < padding) {
+                        term.classList.add('tooltip-left');
+                    } else if (tooltipRight > viewportWidth - padding) {
+                        term.classList.add('tooltip-right');
+                    }
+                    
+                    // Check vertical positioning
+                    if (termRect.top < 120) {
+                        term.classList.add('tooltip-bottom');
+                    }
+                }
+
+                term.addEventListener('mouseenter', positionTooltip);
+                term.addEventListener('focus', positionTooltip);
+            });
+
+            // Handle keyboard navigation for tooltips
+            terms.forEach(term => {
+                term.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        term.blur();
+                    }
+                });
+            });
+        });
+
+        // Announce page load for screen readers
+        window.addEventListener('load', function() {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.className = 'sr-only';
+            announcement.style.cssText = 'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;';
+            announcement.textContent = 'RHA 294 course page loaded. 9 chapters available.';
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => announcement.remove(), 1000);
+        });
+    </script>
+</body>
+</html>
