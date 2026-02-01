@@ -231,6 +231,116 @@
             margin-left: -8px;
         }
 
+        .nav-item.pause-point {
+            background: linear-gradient(135deg, var(--rh-red), #a00);
+            color: white;
+            font-weight: 600;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .nav-item.pause-point:hover {
+            background: linear-gradient(135deg, #e00, var(--rh-red));
+        }
+
+        .nav-item.pause-point::before {
+            content: '⏸';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            margin-right: -32px;
+            margin-left: -8px;
+        }
+
+        /* Pause Point Section Styling */
+        .pause-banner {
+            background: linear-gradient(135deg, var(--rh-red), #a00);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 8px 32px rgba(204, 0, 0, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .pause-banner h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .pause-banner h2::before {
+            content: '⏸';
+            font-size: 2.5rem;
+        }
+
+        .pause-banner .exercise-title {
+            color: #ffcccc;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .pause-banner p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+        .pause-banner .time-estimate {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .pause-banner .exercise-objectives {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .pause-banner .exercise-objectives h4 {
+            color: #ffcccc;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .pause-banner .exercise-objectives ul {
+            margin: 0;
+            padding-left: 20px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .pause-banner .exercise-objectives li {
+            margin-bottom: 8px;
+        }
+
+        .pause-banner .continue-note {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
         .nav-icon {
             width: 24px;
             height: 24px;
@@ -1359,6 +1469,11 @@
                 Synchronize
                 <span class="nav-time">15 min</span>
             </div>
+            <div class="nav-item pause-point" onclick="navigateTo('pause1')" tabindex="0" role="button">
+                <span class="nav-icon" aria-hidden="true">⏸</span>
+                Guided Exercise 1
+                <span class="nav-time">30 min</span>
+            </div>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">Jinja2 Templates</div>
@@ -1382,15 +1497,15 @@
                 Jinja2 Filters
                 <span class="nav-time">15 min</span>
             </div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">Practice</div>
-            <div class="nav-item" onclick="navigateTo('exercise')" tabindex="0" role="button">
-                <span class="nav-icon" aria-hidden="true">💻</span>
-                Guided Exercise
+            <div class="nav-item pause-point" onclick="navigateTo('pause2')" tabindex="0" role="button">
+                <span class="nav-icon" aria-hidden="true">⏸</span>
+                Guided Exercise 2
                 <span class="nav-time">30 min</span>
             </div>
-            <div class="nav-item" onclick="navigateTo('lab')" tabindex="0" role="button">
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Lab & Assessment</div>
+            <div class="nav-item pause-point" onclick="navigateTo('lab')" tabindex="0" role="button">
                 <span class="nav-icon" aria-hidden="true">🔬</span>
                 Lab Exercise
                 <span class="nav-time">45 min</span>
@@ -2031,6 +2146,57 @@
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('lineinfile')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause1')">Continue to Guided Exercise <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- PAUSE POINT 1: Guided Exercise - Modifying and Copying Files -->
+        <section id="section-pause1" class="section" aria-labelledby="pause1-heading">
+            <div class="pause-banner">
+                <h2 id="pause1-heading">Pause for Hands-On Exercise</h2>
+                <div class="exercise-title">Guided Exercise: Modifying and Copying Files to Hosts</div>
+                <p>Now it's time to apply what you've learned about file management modules in a hands-on exercise.</p>
+                
+                <div class="time-estimate">
+                    <span aria-hidden="true">⏱️</span> Estimated time: 30 minutes
+                </div>
+
+                <div class="exercise-objectives">
+                    <h4>In this exercise, you will:</h4>
+                    <ul>
+                        <li>Use the <code>copy</code> module to deploy files to managed hosts</li>
+                        <li>Use the <code>file</code> module to ensure correct permissions and ownership</li>
+                        <li>Use <code>lineinfile</code> and <code>blockinfile</code> to modify configuration files</li>
+                        <li>Use the <code>fetch</code> module to retrieve files from managed hosts</li>
+                    </ul>
+                </div>
+
+                <p class="continue-note">After completing the guided exercise, click "Continue" to proceed to Jinja2 Templates content.</p>
+            </div>
+
+            <div class="note" style="margin-top: 30px;">
+                <h4>📋 Exercise Preparation</h4>
+                <p>Before starting the exercise, ensure you have:</p>
+                <ul>
+                    <li>Access to your lab environment with control node and managed hosts</li>
+                    <li>Your Ansible inventory configured correctly</li>
+                    <li>Sample files ready for deployment as specified in your lab guide</li>
+                </ul>
+            </div>
+
+            <div class="tip" style="margin-top: 20px;">
+                <h4>💡 Key Concepts to Apply</h4>
+                <p>As you work through this exercise, remember:</p>
+                <ul>
+                    <li>The <code>copy</code> module's <code>content</code> parameter lets you create files without a source file</li>
+                    <li>Use <code>backup: yes</code> when modifying existing configuration files</li>
+                    <li>The <code>file</code> module can create directories recursively with <code>state: directory</code></li>
+                    <li>With <code>lineinfile</code>, the <code>regexp</code> parameter finds the line; <code>line</code> is the replacement</li>
+                </ul>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('synchronize')"><span aria-hidden="true">←</span> Back to Content</button>
                 <button class="btn btn-primary" onclick="navigateTo('template-basics')">Continue to Templates <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -2125,7 +2291,7 @@
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('synchronize')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause1')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('jinja-syntax')">Continue to Jinja2 Syntax <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -2563,186 +2729,175 @@ bind-address = <span class="jinja-var">{{ mysql_bind_addresses | default(['127.0
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('control-structures')"><span aria-hidden="true">←</span> Previous</button>
-                <button class="btn btn-primary" onclick="navigateTo('exercise')">Continue to Exercise <span aria-hidden="true">→</span></button>
+                <button class="btn btn-primary" onclick="navigateTo('pause2')">Continue to Guided Exercise <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
-        <!-- Guided Exercise Section -->
-        <section id="section-exercise" class="section" aria-labelledby="exercise-heading">
-            <h1 id="exercise-heading">Guided Exercise</h1>
-            <p class="lead">Practice deploying files and templates to managed hosts.</p>
-
-            <div class="exercise-container">
-                <div class="exercise-header">
-                    <div class="exercise-title">Exercise: Deploy Web Server Configuration</div>
-                    <div class="exercise-subtitle">Estimated time: 30 minutes</div>
+        <!-- PAUSE POINT 2: Guided Exercise - Deploying Custom Files with Jinja2 Templates -->
+        <section id="section-pause2" class="section" aria-labelledby="pause2-heading">
+            <div class="pause-banner">
+                <h2 id="pause2-heading">Pause for Hands-On Exercise</h2>
+                <div class="exercise-title">Guided Exercise: Deploying Custom Files with Jinja2 Templates</div>
+                <p>Now it's time to apply your Jinja2 templating knowledge in a hands-on exercise.</p>
+                
+                <div class="time-estimate">
+                    <span aria-hidden="true">⏱️</span> Estimated time: 30 minutes
                 </div>
-                <div class="exercise-steps">
-                    <div class="exercise-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Create project structure</h4>
-                            <p>Set up your working directory with the proper structure:</p>
-                            <div class="code-block">
-                                <div class="code-content">
-<pre>mkdir -p ~/deploy-files/{files,templates}
-cd ~/deploy-files</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="exercise-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>Create the template file</h4>
-                            <p>Create <code>templates/httpd.conf.j2</code>:</p>
-                            <div class="code-block">
-                                <div class="code-content">
-<pre><span class="jinja-comment">{# Apache configuration template #}</span>
-ServerRoot "/etc/httpd"
-Listen <span class="jinja-var">{{ http_port | default(80) }}</span>
-
-ServerAdmin <span class="jinja-var">{{ server_admin | default('root@localhost') }}</span>
-ServerName <span class="jinja-var">{{ ansible_fqdn }}</span>:<span class="jinja-var">{{ http_port | default(80) }}</span>
-
-DocumentRoot "/var/www/html"
-
-<span class="jinja-tag">{% if ansible_memtotal_mb > 2048 %}</span>
-<span class="jinja-comment"># High memory configuration</span>
-MaxRequestWorkers 400
-ServerLimit 400
-<span class="jinja-tag">{% else %}</span>
-<span class="jinja-comment"># Standard memory configuration</span>
-MaxRequestWorkers 150
-ServerLimit 150
-<span class="jinja-tag">{% endif %}</span></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="exercise-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Create the playbook</h4>
-                            <p>Create <code>deploy-webserver.yml</code>:</p>
-                            <div class="code-block">
-                                <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy web server configuration</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
-  <span class="yaml-key">become</span>: <span class="yaml-bool">true</span>
-  <span class="yaml-key">vars</span>:
-    <span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
-    <span class="yaml-key">server_admin</span>: <span class="yaml-string">"admin@example.com"</span>
-
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Ensure httpd is installed</span>
-      <span class="yaml-module">ansible.builtin.dnf</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy httpd.conf from template</span>
-      <span class="yaml-module">ansible.builtin.template</span>:
-        <span class="yaml-key">src</span>: <span class="yaml-value">templates/httpd.conf.j2</span>
-        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
-        <span class="yaml-key">owner</span>: <span class="yaml-value">root</span>
-        <span class="yaml-key">group</span>: <span class="yaml-value">root</span>
-        <span class="yaml-key">mode</span>: <span class="yaml-string">'0644'</span>
-      <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Ensure httpd is started</span>
-      <span class="yaml-module">ansible.builtin.service</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-        <span class="yaml-key">enabled</span>: <span class="yaml-bool">true</span>
-
-  <span class="yaml-key">handlers</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart httpd</span>
-      <span class="yaml-module">ansible.builtin.service</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="exercise-step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h4>Run the playbook</h4>
-                            <p>Execute and verify:</p>
-                            <div class="code-block">
-                                <div class="code-content">
-<pre>ansible-playbook deploy-webserver.yml
-
-<span class="yaml-comment"># Verify the deployment</span>
-ansible webservers -m command -a "head -20 /etc/httpd/conf/httpd.conf"</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="exercise-objectives">
+                    <h4>In this exercise, you will:</h4>
+                    <ul>
+                        <li>Create Jinja2 templates with variable substitution</li>
+                        <li>Use control structures (loops and conditionals) in templates</li>
+                        <li>Apply filters to transform variable values</li>
+                        <li>Deploy templated configuration files to managed hosts</li>
+                        <li>Validate deployed configurations</li>
+                    </ul>
                 </div>
+
+                <p class="continue-note">After completing the guided exercise, click "Continue" to proceed to the Lab Exercise.</p>
+            </div>
+
+            <div class="note" style="margin-top: 30px;">
+                <h4>📋 Exercise Preparation</h4>
+                <p>Before starting the exercise, ensure you have:</p>
+                <ul>
+                    <li>Completed the previous Guided Exercise on file modules</li>
+                    <li>Created a <code>templates/</code> directory in your project</li>
+                    <li>Host variables or group variables ready for your managed hosts</li>
+                </ul>
+            </div>
+
+            <div class="tip" style="margin-top: 20px;">
+                <h4>💡 Key Concepts to Apply</h4>
+                <p>As you work through this exercise, remember:</p>
+                <ul>
+                    <li>Template files should use the <code>.j2</code> extension by convention</li>
+                    <li>Use <code>{{ ansible_facts['hostname'] }}</code> to include host-specific values</li>
+                    <li>The <code>default()</code> filter prevents errors when variables are undefined</li>
+                    <li>Use <code>validate</code> parameter to check configuration syntax before deployment</li>
+                    <li>Comments with <code>{# #}</code> don't appear in the final output</li>
+                </ul>
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('filters')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('filters')"><span aria-hidden="true">←</span> Back to Content</button>
                 <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
-        <!-- Lab Exercise Section -->
+        <!-- PAUSE POINT 3: Lab Exercise - Deploying Files to Managed Hosts -->
         <section id="section-lab" class="section" aria-labelledby="lab-heading">
-            <h1 id="lab-heading">Lab: Deploying Files to Managed Hosts</h1>
-            <p class="lead">Apply your knowledge to complete this comprehensive lab exercise.</p>
-
-            <div class="exercise-container">
-                <div class="exercise-header">
-                    <div class="exercise-title">Lab Challenge</div>
-                    <div class="exercise-subtitle">Estimated time: 45 minutes</div>
+            <div class="pause-banner">
+                <h2 id="lab-heading">Pause for Lab Exercise</h2>
+                <div class="exercise-title">Lab: Deploying Files to Managed Hosts</div>
+                <p>This comprehensive lab allows you to demonstrate your mastery of all file deployment concepts covered in this chapter.</p>
+                
+                <div class="time-estimate">
+                    <span aria-hidden="true">⏱️</span> Estimated time: 45 minutes
                 </div>
-                <div class="exercise-steps">
-                    <h3 style="padding: 0 24px; padding-top: 24px; margin-top: 0;">Objectives</h3>
-                    <p style="padding: 0 24px;">In this lab, you will:</p>
-                    <ul style="padding: 0 24px 24px 48px;">
-                        <li>Deploy a Message of the Day (MOTD) using templates</li>
-                        <li>Configure SSH daemon settings using lineinfile</li>
-                        <li>Deploy an application configuration with multiple files</li>
-                        <li>Use facts and variables to customize deployments</li>
+
+                <div class="exercise-objectives">
+                    <h4>In this lab, you will:</h4>
+                    <ul>
+                        <li>Deploy a Message of the Day (MOTD) using templates with system facts</li>
+                        <li>Configure SSH daemon settings using <code>lineinfile</code></li>
+                        <li>Deploy an application configuration with multiple files and directories</li>
+                        <li>Use facts and variables to customize deployments per host</li>
+                        <li>Manage file permissions, ownership, and directory structures</li>
                     </ul>
                 </div>
+
+                <p class="continue-note">After completing the lab, click "Continue" to take the Knowledge Check quiz and complete this chapter.</p>
             </div>
 
-            <h2>Lab Tasks</h2>
+            <div class="important" style="margin-top: 30px;">
+                <h4>⚠️ Lab Requirements</h4>
+                <p>This is a comprehensive lab exercise. Before starting, ensure you have:</p>
+                <ul>
+                    <li>Successfully completed both guided exercises</li>
+                    <li>Your lab environment is fully operational</li>
+                    <li>You have read and understand all lab objectives in your lab guide</li>
+                    <li>Allocated sufficient time (45 minutes) to complete the lab</li>
+                </ul>
+            </div>
+
+            <h2 style="margin-top: 30px;">Lab Task Overview</h2>
 
             <h3>Task 1: MOTD Template</h3>
-            <p>Create a template that displays system information when users log in. Include hostname, IP address, OS version, and last Ansible run time.</p>
+            <p>Create a Jinja2 template that displays system information when users log in. Include:</p>
+            <ul>
+                <li>Hostname and fully qualified domain name</li>
+                <li>IP address(es) from Ansible facts</li>
+                <li>Operating system version</li>
+                <li>Last Ansible run timestamp</li>
+            </ul>
 
             <h3>Task 2: SSH Configuration</h3>
-            <p>Use <code>lineinfile</code> to ensure the following SSH settings:</p>
+            <p>Use <code>lineinfile</code> to ensure the following SSH security settings:</p>
             <ul>
                 <li>Disable root login (<code>PermitRootLogin no</code>)</li>
                 <li>Disable password authentication (<code>PasswordAuthentication no</code>)</li>
                 <li>Set max authentication tries to 3</li>
             </ul>
+            <div class="warning" style="margin: 15px 0;">
+                <h4>⚠️ Important</h4>
+                <p>Use a handler to restart the SSH service only when configuration changes!</p>
+            </div>
 
-            <h3>Task 3: Application Config</h3>
+            <h3>Task 3: Application Configuration</h3>
             <p>Create a complete configuration directory structure:</p>
             <ul>
-                <li>Create <code>/opt/myapp/config/</code> directory</li>
-                <li>Deploy <code>app.conf</code> from a template</li>
+                <li>Create <code>/opt/myapp/config/</code> directory structure</li>
+                <li>Deploy <code>app.conf</code> from a Jinja2 template</li>
                 <li>Copy a static <code>logging.conf</code> file</li>
-                <li>Set proper permissions (750 for dirs, 640 for files)</li>
+                <li>Set proper permissions (750 for directories, 640 for files)</li>
             </ul>
 
-            <div class="info-box tip">
-                <div class="info-box-title"><span aria-hidden="true">💡</span> Hints</div>
-                <p>Remember to use handlers to restart services when configurations change. Use <code>ansible.builtin.file</code> with <code>recurse: yes</code> to set permissions on entire directory trees.</p>
+            <div class="tip" style="margin-top: 20px;">
+                <h4>💡 Lab Success Tips</h4>
+                <ul>
+                    <li>Plan your playbook structure before writing code</li>
+                    <li>Test incrementally - don't write everything at once</li>
+                    <li>Use <code>--check</code> mode to verify changes before applying</li>
+                    <li>Remember to use <code>backup: yes</code> for modified system files</li>
+                    <li>Use <code>--diff</code> to see exactly what changes are made</li>
+                    <li>Verify your results using ad-hoc commands or additional tasks</li>
+                </ul>
+            </div>
+
+            <div class="note" style="margin-top: 20px;">
+                <h4>📋 Modules You May Need</h4>
+                <table class="module-table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ansible.builtin.copy</code></td>
+                            <td>Copy static files from control node</td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible.builtin.template</code></td>
+                            <td>Deploy Jinja2 templates with variable substitution</td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible.builtin.file</code></td>
+                            <td>Create directories and manage permissions</td>
+                        </tr>
+                        <tr>
+                            <td><code>ansible.builtin.lineinfile</code></td>
+                            <td>Modify SSH configuration lines</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('exercise')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause2')"><span aria-hidden="true">←</span> Back to Guided Exercise 2</button>
                 <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -2875,12 +3030,13 @@ ansible webservers -m command -a "head -20 /etc/httpd/conf/httpd.conf"</pre>
             'file-module': 'File Module',
             'lineinfile': 'Lineinfile',
             'synchronize': 'Synchronize',
+            'pause1': 'Guided Exercise 1',
             'template-basics': 'Template Basics',
             'jinja-syntax': 'Jinja2 Syntax',
             'control-structures': 'Control Structures',
             'filters': 'Filters',
-            'exercise': 'Exercise',
-            'lab': 'Lab',
+            'pause2': 'Guided Exercise 2',
+            'lab': 'Lab Exercise',
             'quiz': 'Quiz',
             'summary': 'Summary'
         };
