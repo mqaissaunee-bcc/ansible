@@ -299,6 +299,7 @@
             <a href="#" class="nav-item" data-section="var-scope" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🎚️</span>Variable Scope</a>
             <a href="#" class="nav-item" data-section="var-precedence" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📊</span>Variable Precedence</a>
             <a href="#" class="nav-item" data-section="var-files" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📁</span>Managing Variable Files</a>
+            <a href="#" class="nav-item" data-section="secrets" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔐</span>Managing Secrets</a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">Facts</div>
@@ -307,7 +308,14 @@
             <a href="#" class="nav-item" data-section="magic-vars" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">✨</span>Magic Variables</a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Practice</div>
+            <div class="nav-section-title">Exercises</div>
+            <a href="#" class="nav-item" data-section="pause1" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⏸️</span>Exercise: Variables</a>
+            <a href="#" class="nav-item" data-section="pause2" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⏸️</span>Exercise: Secrets</a>
+            <a href="#" class="nav-item" data-section="pause3" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⏸️</span>Exercise: Facts</a>
+            <a href="#" class="nav-item" data-section="pause4" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🧪</span>Lab: Comprehensive</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Review</div>
             <a href="#" class="nav-item" data-section="lab" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">💻</span>Hands-On Lab</a>
             <a href="#" class="nav-item" data-section="quiz" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📋</span>Knowledge Check</a>
             <a href="#" class="nav-item" data-section="summary" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📚</span>Summary</a>
@@ -825,7 +833,257 @@ $ ansible-playbook site.yml -e @vars/staging.yml</pre>
             </div>
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('var-precedence')"><span aria-hidden="true">←</span> Previous</button>
-                <button class="btn btn-primary" onclick="navigateTo('facts-intro')">Continue to Facts <span aria-hidden="true">→</span></button>
+                <button class="btn btn-primary" onclick="navigateTo('pause1')">Exercise: Managing Variables <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Pause Point 1: Managing Variables -->
+        <section id="section-pause1" class="section" aria-labelledby="pause1-heading">
+            <div style="background: linear-gradient(135deg, #FF6600 0%, #CC0000 100%); padding: 32px; border-radius: 16px; margin-bottom: 32px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 16px;">⏸️</div>
+                <h1 id="pause1-heading" style="margin: 0; border: none; padding: 0; color: white;">Guided Exercise: Managing Variables</h1>
+                <p style="color: rgba(255,255,255,0.9); font-size: 20px; margin-top: 16px;">Time to practice what you've learned about variables!</p>
+            </div>
+            <div class="info-box" style="border-left-color: var(--accent-orange);">
+                <div class="info-box-title" style="color: var(--accent-orange);"><span aria-hidden="true">👨‍🏫</span> Instructor Note</div>
+                <p>This is a pause point for the <strong>Guided Exercise: Managing Variables</strong>. Students should now complete the hands-on exercise in the lab environment.</p>
+            </div>
+            <h2>Skills to Practice</h2>
+            <div class="checklist">
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Define variables in playbooks using the <code>vars</code> keyword</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Use external variable files with <code>vars_files</code></div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Organize variables in <code>group_vars</code> and <code>host_vars</code> directories</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Override variables using command-line extra vars (<code>-e</code>)</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Understand variable precedence rules</div></div>
+            </div>
+            <h2>Key Commands Reference</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Commands for the exercise</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Run playbook with variables</span>
+$ ansible-playbook site.yml
+
+<span class="yaml-comment"># Override variables from command line</span>
+$ ansible-playbook site.yml -e "http_port=8080"
+
+<span class="yaml-comment"># Use external variable file</span>
+$ ansible-playbook site.yml -e @vars/custom.yml</pre>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('var-files')"><span aria-hidden="true">←</span> Review Variable Files</button>
+                <button class="btn btn-primary" onclick="navigateTo('secrets')">Continue to Secrets <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Managing Secrets Section -->
+        <section id="section-secrets" class="section" aria-labelledby="secrets-heading">
+            <h1 id="secrets-heading">Managing Secrets with Ansible Vault</h1>
+            <p class="lead">Protect sensitive data like passwords, API keys, and certificates using Ansible Vault encryption.</p>
+            <h2>What is <span class="term" tabindex="0">Ansible Vault<span class="tooltip" role="tooltip">A feature that encrypts sensitive data such as passwords and keys. Encrypted files can be used in playbooks just like regular variable files.</span></span>?</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔐</div>
+                    <div class="card-title">Encryption</div>
+                    <div class="card-content">Encrypt entire files or individual variables using AES256 encryption.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔑</div>
+                    <div class="card-title">Password Protected</div>
+                    <div class="card-content">Encrypted content requires a vault password to decrypt during playbook execution.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📝</div>
+                    <div class="card-title">Version Control Safe</div>
+                    <div class="card-content">Safely commit encrypted files to Git without exposing secrets.</div>
+                </div>
+            </div>
+            <h2>Creating Encrypted Files</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">ansible-vault create command</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Create a new encrypted file</span>
+$ ansible-vault create secret.yml
+New Vault password: 
+Confirm New Vault password:
+
+<span class="yaml-comment"># Editor opens - add your secrets</span>
+db_password: SuperSecret123!
+api_key: abc123xyz789</pre>
+                </div>
+            </div>
+            <h2>Vault Commands Reference</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ansible-vault create</code></td><td>Create a new encrypted file</td></tr>
+                        <tr><td><code>ansible-vault view</code></td><td>View encrypted file contents (read-only)</td></tr>
+                        <tr><td><code>ansible-vault edit</code></td><td>Edit an encrypted file</td></tr>
+                        <tr><td><code>ansible-vault encrypt</code></td><td>Encrypt an existing plaintext file</td></tr>
+                        <tr><td><code>ansible-vault decrypt</code></td><td>Decrypt a file to plaintext</td></tr>
+                        <tr><td><code>ansible-vault rekey</code></td><td>Change the vault password</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h2>Encrypting Existing Files</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Encrypt and decrypt operations</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Encrypt an existing file</span>
+$ ansible-vault encrypt vars/passwords.yml
+New Vault password:
+Confirm New Vault password:
+Encryption successful
+
+<span class="yaml-comment"># View encrypted file</span>
+$ ansible-vault view vars/passwords.yml
+Vault password:
+
+<span class="yaml-comment"># Edit encrypted file</span>
+$ ansible-vault edit vars/passwords.yml
+Vault password:
+
+<span class="yaml-comment"># Decrypt file (remove encryption)</span>
+$ ansible-vault decrypt vars/passwords.yml
+Vault password:
+Decryption successful</pre>
+                </div>
+            </div>
+            <h2>Running Playbooks with Vault</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Playbook execution options</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Prompt for vault password</span>
+$ ansible-playbook site.yml --ask-vault-pass
+Vault password:
+
+<span class="yaml-comment"># Use password file (for automation)</span>
+$ ansible-playbook site.yml --vault-password-file=~/.vault_pass
+
+<span class="yaml-comment"># Multiple vault IDs for different passwords</span>
+$ ansible-playbook site.yml --vault-id dev@prompt --vault-id prod@~/.prod_vault</pre>
+                </div>
+            </div>
+            <h2>Encrypting Individual Variables</h2>
+            <p>Use <code>ansible-vault encrypt_string</code> to encrypt single values:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Encrypting a string value</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Encrypt a single variable value</span>
+$ ansible-vault encrypt_string 'SuperSecret123!' --name 'db_password'
+New Vault password:
+Confirm New Vault password:
+db_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61626364656667686970...
+          ...truncated...</pre>
+                </div>
+            </div>
+            <h3>Using Encrypted Variables in Playbooks</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">vars/secrets.yml</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-comment"># Regular variable</span>
+<span class="yaml-key">db_user</span>: <span class="yaml-string">admin</span>
+
+<span class="yaml-comment"># Encrypted variable (inline)</span>
+<span class="yaml-key">db_password</span>: <span class="yaml-value">!vault |</span>
+          <span class="yaml-string">$ANSIBLE_VAULT;1.1;AES256</span>
+          <span class="yaml-string">61626364656667686970...</span></pre>
+                </div>
+            </div>
+            <h2>Password File Best Practices</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Setting up vault password file</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Create password file with restricted permissions</span>
+$ echo 'MyVaultPassword' > ~/.vault_pass
+$ chmod 600 ~/.vault_pass
+
+<span class="yaml-comment"># Configure in ansible.cfg</span>
+[defaults]
+vault_password_file = ~/.vault_pass</pre>
+                </div>
+            </div>
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Security Best Practices</div>
+                <ul style="margin: 12px 0 0 20px; color: var(--text-secondary);">
+                    <li>Never commit vault password files to version control</li>
+                    <li>Add <code>.vault_pass</code> to <code>.gitignore</code></li>
+                    <li>Use different vault passwords for different environments</li>
+                    <li>Restrict file permissions on password files (<code>chmod 600</code>)</li>
+                </ul>
+            </div>
+            <h2>Recommended Directory Structure</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Separating secrets from regular variables</span></div>
+                <div class="code-content">
+<pre>project/
+├── group_vars/
+│   ├── webservers/
+│   │   ├── vars.yml          <span class="yaml-comment"># Regular variables</span>
+│   │   └── vault.yml         <span class="yaml-comment"># Encrypted secrets</span>
+│   └── dbservers/
+│       ├── vars.yml
+│       └── vault.yml
+├── inventory/
+└── playbooks/</pre>
+                </div>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Pro Tip</div>
+                <p>Name your encrypted files <code>vault.yml</code> or prefix them with <code>vault_</code> to easily identify which files are encrypted when browsing your project.</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('pause1')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause2')">Exercise: Managing Secrets <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Pause Point 2: Managing Secrets -->
+        <section id="section-pause2" class="section" aria-labelledby="pause2-heading">
+            <div style="background: linear-gradient(135deg, #FF6600 0%, #CC0000 100%); padding: 32px; border-radius: 16px; margin-bottom: 32px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 16px;">⏸️</div>
+                <h1 id="pause2-heading" style="margin: 0; border: none; padding: 0; color: white;">Guided Exercise: Managing Secrets</h1>
+                <p style="color: rgba(255,255,255,0.9); font-size: 20px; margin-top: 16px;">Time to practice encrypting and using secrets with Ansible Vault!</p>
+            </div>
+            <div class="info-box" style="border-left-color: var(--accent-orange);">
+                <div class="info-box-title" style="color: var(--accent-orange);"><span aria-hidden="true">👨‍🏫</span> Instructor Note</div>
+                <p>This is a pause point for the <strong>Guided Exercise: Managing Secrets</strong>. Students should now complete the hands-on exercise in the lab environment.</p>
+            </div>
+            <h2>Skills to Practice</h2>
+            <div class="checklist">
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Create encrypted files with <code>ansible-vault create</code></div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>View and edit encrypted files</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Encrypt existing plaintext files</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Run playbooks with vault passwords</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Use vault password files for automation</div></div>
+            </div>
+            <h2>Key Commands Reference</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Vault commands for the exercise</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Create encrypted file</span>
+$ ansible-vault create vars/secret.yml
+
+<span class="yaml-comment"># View encrypted file</span>
+$ ansible-vault view vars/secret.yml
+
+<span class="yaml-comment"># Edit encrypted file</span>
+$ ansible-vault edit vars/secret.yml
+
+<span class="yaml-comment"># Run playbook with vault</span>
+$ ansible-playbook site.yml --ask-vault-pass
+
+<span class="yaml-comment"># Change vault password</span>
+$ ansible-vault rekey vars/secret.yml</pre>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('secrets')"><span aria-hidden="true">←</span> Review Secrets</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause1')">Exercise: Managing Variables <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
@@ -1094,6 +1352,45 @@ EOF</pre>
             </div>
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('facts-intro')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause3')">Exercise: Managing Facts <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Pause Point 3: Managing Facts -->
+        <section id="section-pause3" class="section" aria-labelledby="pause3-heading">
+            <div style="background: linear-gradient(135deg, #FF6600 0%, #CC0000 100%); padding: 32px; border-radius: 16px; margin-bottom: 32px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 16px;">⏸️</div>
+                <h1 id="pause3-heading" style="margin: 0; border: none; padding: 0; color: white;">Guided Exercise: Managing Facts</h1>
+                <p style="color: rgba(255,255,255,0.9); font-size: 20px; margin-top: 16px;">Time to practice working with Ansible facts and custom facts!</p>
+            </div>
+            <div class="info-box" style="border-left-color: var(--accent-orange);">
+                <div class="info-box-title" style="color: var(--accent-orange);"><span aria-hidden="true">👨‍🏫</span> Instructor Note</div>
+                <p>This is a pause point for the <strong>Guided Exercise: Managing Facts</strong>. Students should now complete the hands-on exercise in the lab environment.</p>
+            </div>
+            <h2>Skills to Practice</h2>
+            <div class="checklist">
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Gather and display facts using the <code>setup</code> module</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Access facts using <code>ansible_facts</code> dictionary</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Create custom facts in <code>/etc/ansible/facts.d/</code></div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Use facts in conditionals and templates</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Control fact gathering with <code>gather_facts</code></div></div>
+            </div>
+            <h2>Key Commands Reference</h2>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Fact-related commands for the exercise</span></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># View all facts for a host</span>
+$ ansible hostname -m ansible.builtin.setup
+
+<span class="yaml-comment"># Filter specific facts</span>
+$ ansible hostname -m setup -a "filter=ansible_distribution*"
+
+<span class="yaml-comment"># View custom local facts</span>
+$ ansible hostname -m setup -a "filter=ansible_local"</pre>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('facts-custom')"><span aria-hidden="true">←</span> Review Custom Facts</button>
                 <button class="btn btn-primary" onclick="navigateTo('magic-vars')">Continue to Magic Variables <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -1200,7 +1497,60 @@ EOF</pre>
             </div>
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('facts-custom')"><span aria-hidden="true">←</span> Previous</button>
-                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab <span aria-hidden="true">→</span></button>
+                <button class="btn btn-primary" onclick="navigateTo('pause4')">Lab: Variables and Facts <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Pause Point 4: Comprehensive Lab -->
+        <section id="section-pause4" class="section" aria-labelledby="pause4-heading">
+            <div style="background: linear-gradient(135deg, #9933CC 0%, #CC0000 100%); padding: 32px; border-radius: 16px; margin-bottom: 32px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 16px;">🧪</div>
+                <h1 id="pause4-heading" style="margin: 0; border: none; padding: 0; color: white;">Lab: Managing Variables and Facts</h1>
+                <p style="color: rgba(255,255,255,0.9); font-size: 20px; margin-top: 16px;">Comprehensive hands-on lab combining all chapter concepts!</p>
+            </div>
+            <div class="info-box" style="border-left-color: #9933CC; background: rgba(153, 51, 204, 0.1);">
+                <div class="info-box-title" style="color: #9933CC;"><span aria-hidden="true">👨‍🏫</span> Instructor Note</div>
+                <p>This is a pause point for the <strong>Lab: Managing Variables and Facts</strong>. This comprehensive lab combines all concepts from the chapter. Students should complete this lab independently.</p>
+            </div>
+            <h2>Lab Objectives</h2>
+            <div class="checklist">
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Create a project with properly organized variable files</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Use group_vars and host_vars directories effectively</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Encrypt sensitive data using Ansible Vault</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Deploy and use custom facts on managed hosts</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Use magic variables for dynamic configuration</div></div>
+                <div class="checklist-item"><div class="checklist-check" role="checkbox" tabindex="0">✓</div><div>Demonstrate understanding of variable precedence</div></div>
+            </div>
+            <h2>Concepts Covered in This Lab</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Variables</div>
+                    <div class="card-content">Defining, organizing, and referencing variables at multiple levels.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔐</div>
+                    <div class="card-title">Secrets</div>
+                    <div class="card-content">Encrypting sensitive data with Ansible Vault.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔍</div>
+                    <div class="card-title">Facts</div>
+                    <div class="card-content">Gathering, using, and creating custom facts.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">✨</div>
+                    <div class="card-title">Magic Variables</div>
+                    <div class="card-content">Using hostvars, groups, and inventory_hostname.</div>
+                </div>
+            </div>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">⏱️</span> Estimated Time</div>
+                <p>This comprehensive lab typically takes <strong>30-45 minutes</strong> to complete.</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('magic-vars')"><span aria-hidden="true">←</span> Review Magic Variables</button>
+                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
@@ -1357,13 +1707,13 @@ http_port: 8080</pre></div></div></div></div>
         const quizQuestions = [
             { question: "Which variable naming convention is valid in Ansible?", options: ["server-name", "server_name", "1server", "server name"], correct: 1, explanation: "Variable names must start with a letter and can only contain letters, numbers, and underscores." },
             { question: "What is the highest precedence for variable definitions?", options: ["Play vars", "group_vars", "Extra vars (-e)", "Role defaults"], correct: 2, explanation: "Extra vars passed via -e on the command line have the highest precedence." },
+            { question: "Which command creates a new encrypted file with Ansible Vault?", options: ["ansible-vault new", "ansible-vault create", "ansible-vault encrypt", "ansible-vault init"], correct: 1, explanation: "ansible-vault create creates a new encrypted file. ansible-vault encrypt is used to encrypt existing files." },
+            { question: "How do you run a playbook that uses vault-encrypted files?", options: ["ansible-playbook --vault", "ansible-playbook --ask-vault-pass", "ansible-playbook --decrypt", "ansible-playbook --secret"], correct: 1, explanation: "Use --ask-vault-pass to prompt for the vault password, or --vault-password-file to specify a password file." },
             { question: "Where are custom facts stored on managed hosts?", options: ["/etc/facts.d/", "/etc/ansible/facts.d/", "/var/ansible/facts/", "~/.ansible/facts/"], correct: 1, explanation: "Custom facts are stored in /etc/ansible/facts.d/ with .fact extension." },
             { question: "How do you access custom facts in a playbook?", options: ["ansible_facts['custom']", "ansible_local.filename.section", "custom_facts['name']", "local_facts.name"], correct: 1, explanation: "Custom facts are accessed via ansible_local using pattern: ansible_local.filename.section.key" },
             { question: "Which magic variable provides access to all hosts' variables?", options: ["all_vars", "host_variables", "hostvars", "inventory_vars"], correct: 2, explanation: "hostvars is a dictionary containing all hosts' variables, accessed via hostvars['hostname']['variable']." },
             { question: "What happens when a value starts with {{ in YAML?", options: ["It works fine", "YAML syntax error", "Variable is ignored", "Template error"], correct: 1, explanation: "Values starting with {{ cause syntax errors. Quote the entire value: \"{{ variable }}\"" },
-            { question: "Which keyword loads variables from external files in a play?", options: ["var_files", "vars_files", "include_vars", "load_vars"], correct: 1, explanation: "vars_files at play level loads external YAML files. include_vars is a module for dynamic loading." },
-            { question: "How do you disable automatic fact gathering in a play?", options: ["facts: false", "gather_facts: false", "no_facts: true", "skip_facts: true"], correct: 1, explanation: "Set gather_facts: false at play level to disable automatic fact gathering." },
-            { question: "Which magic variable lists groups the current host belongs to?", options: ["host_groups", "member_groups", "group_names", "groups_list"], correct: 2, explanation: "group_names is a list of all groups the current host is a member of." },
+            { question: "Which command changes the password on an encrypted vault file?", options: ["ansible-vault password", "ansible-vault rekey", "ansible-vault change", "ansible-vault update"], correct: 1, explanation: "ansible-vault rekey changes the vault password on encrypted files." },
             { question: "What is the correct precedence order (highest to lowest)?", options: ["Extra vars > Play vars > group_vars > Role defaults", "Play vars > Extra vars > host_vars > group_vars", "Role defaults > group_vars > host_vars > Extra vars", "group_vars > host_vars > Play vars > Extra vars"], correct: 0, explanation: "Correct order: Extra vars (-e) > Play vars > host_vars > group_vars > Role defaults." }
         ];
 
