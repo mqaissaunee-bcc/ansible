@@ -1083,7 +1083,7 @@ $ ansible-vault rekey vars/secret.yml</pre>
             </div>
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('secrets')"><span aria-hidden="true">←</span> Review Secrets</button>
-                <button class="btn btn-primary" onclick="navigateTo('pause1')">Exercise: Managing Variables <span aria-hidden="true">→</span></button>
+                <button class="btn btn-primary" onclick="navigateTo('facts-intro')">Continue to Facts <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
@@ -1218,7 +1218,7 @@ $ ansible web1.example.com -m ansible.builtin.setup -a "filter=ansible_*_ipv4"</
                 <p>Fact gathering takes time, especially with many hosts. If you don't need facts, disable gathering with <code>gather_facts: false</code> to speed up playbook execution.</p>
             </div>
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('var-files')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause2')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('facts-custom')">Continue to Custom Facts <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -1496,7 +1496,7 @@ $ ansible hostname -m setup -a "filter=ansible_local"</pre>
                 <p>When accessing another host's facts via <code>hostvars</code>, those facts must have been gathered first. Either run a play against those hosts first, or use <code>delegate_to</code>.</p>
             </div>
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('facts-custom')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause3')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('pause4')">Lab: Variables and Facts <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -1550,7 +1550,7 @@ $ ansible hostname -m setup -a "filter=ansible_local"</pre>
             </div>
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('magic-vars')"><span aria-hidden="true">←</span> Review Magic Variables</button>
-                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
+                <button class="btn btn-primary" onclick="navigateTo('lab')">Start Lab Exercises <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
@@ -1620,7 +1620,7 @@ http_port: 8080</pre></div></div></div></div>
                 </div>
             </div>
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('magic-vars')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause4')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
             </div>
         </section>
