@@ -56,6 +56,10 @@
         .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
         .nav-item.active { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); color: var(--text-primary); }
         .nav-item.completed::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--success); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: -32px; margin-left: -8px; }
+        .nav-item.exercise-nav { background: rgba(255, 102, 0, 0.1); border-left-color: var(--accent-orange); }
+        .nav-item.exercise-nav:hover { background: rgba(255, 102, 0, 0.2); }
+        .nav-item.lab-nav { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); }
+        .nav-item.lab-nav:hover { background: rgba(204, 0, 0, 0.25); }
         .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
         .section { display: none; padding: 48px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
@@ -64,6 +68,7 @@
         h1 { font-family: 'Red Hat Display', sans-serif; font-size: 42px; font-weight: 900; margin-bottom: 16px; line-height: 1.2; }
         h2 { font-family: 'Red Hat Display', sans-serif; font-size: 28px; font-weight: 700; margin-top: 48px; margin-bottom: 20px; color: var(--text-primary); border-bottom: 2px solid var(--rh-red); padding-bottom: 12px; }
         h3 { font-family: 'Red Hat Display', sans-serif; font-size: 22px; font-weight: 600; margin-top: 32px; margin-bottom: 16px; color: var(--text-primary); }
+        h4 { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; color: var(--text-primary); }
         p { margin-bottom: 16px; color: var(--text-secondary); }
         .lead { font-size: 20px; color: var(--text-primary); margin-bottom: 32px; line-height: 1.6; }
         code { font-family: 'Red Hat Mono', monospace; background: var(--bg-tertiary); padding: 2px 8px; border-radius: 4px; font-size: 0.9em; color: var(--accent-cyan); }
@@ -117,18 +122,13 @@
         td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
         tr:last-child td { border-bottom: none; }
         tr:hover { background: var(--bg-tertiary); }
-        .tabs { margin: 32px 0; }
-        .tab-buttons { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; flex-wrap: wrap; }
-        .tab-btn { background: transparent; border: none; padding: 12px 24px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .tab-btn:hover { color: var(--text-primary); }
-        .tab-btn.active { color: var(--rh-red); border-bottom-color: var(--rh-red); }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
         .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; }
         .btn-primary { background: var(--rh-red); color: white; }
         .btn-primary:hover { background: var(--rh-red-dark); }
         .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background: var(--bg-tertiary); }
+        .btn-exercise { background: var(--accent-orange); color: white; }
+        .btn-exercise:hover { background: #E65C00; }
         .nav-buttons { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color); }
         .diagram { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; text-align: center; }
         .diagram-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; margin-bottom: 24px; }
@@ -140,19 +140,47 @@
         .flow-item.always { border-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
         .flow-arrow { color: var(--text-muted); font-size: 24px; }
         .flow-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-        .exercise { background: linear-gradient(135deg, rgba(204, 0, 0, 0.1) 0%, rgba(255, 102, 0, 0.1) 100%); border: 1px solid var(--rh-red); border-radius: 12px; padding: 32px; margin: 32px 0; }
-        .exercise-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-        .exercise-badge { background: var(--rh-red); color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .exercise-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; }
-        .exercise-steps { counter-reset: step; }
-        .exercise-step { display: flex; gap: 16px; margin-bottom: 24px; padding-left: 8px; }
-        .exercise-step::before { counter-increment: step; content: counter(step); background: var(--rh-red); color: white; width: 28px; height: 28px; min-width: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        /* Pause Point / Exercise Styles */
+        .pause-banner { background: linear-gradient(135deg, var(--accent-orange) 0%, var(--rh-red) 100%); border-radius: 16px; padding: 40px; margin: 32px 0; text-align: center; position: relative; overflow: hidden; }
+        .pause-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; }
+        .pause-icon { font-size: 64px; margin-bottom: 16px; position: relative; z-index: 1; }
+        .pause-title { font-family: 'Red Hat Display', sans-serif; font-size: 32px; font-weight: 900; color: white; margin-bottom: 12px; position: relative; z-index: 1; }
+        .pause-subtitle { font-size: 18px; color: rgba(255,255,255,0.9); margin-bottom: 24px; position: relative; z-index: 1; }
+        .pause-badge { display: inline-block; background: rgba(0,0,0,0.3); color: white; padding: 8px 20px; border-radius: 20px; font-family: 'Red Hat Display', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; position: relative; z-index: 1; }
+        .lab-banner { background: linear-gradient(135deg, var(--rh-red) 0%, var(--rh-red-dark) 100%); }
+        .exercise-overview { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .exercise-overview h3 { margin-top: 0; color: var(--accent-orange); }
+        .exercise-objectives { list-style: none; padding: 0; margin: 20px 0; }
+        .exercise-objectives li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .exercise-objectives li:last-child { border-bottom: none; }
+        .exercise-objectives li::before { content: '▶'; color: var(--accent-orange); font-size: 12px; margin-top: 4px; }
+        .skills-practiced { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .skill-tag { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--text-secondary); }
         .checklist { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
         .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
         .checklist-item:last-child { border-bottom: none; }
         .checklist-check { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 12px; color: transparent; margin-top: 2px; }
         .checklist-check:hover { border-color: var(--success); }
         .checklist-check.checked { background: var(--success); border-color: var(--success); color: white; }
+        .interactive-demo { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin: 32px 0; }
+        .demo-header { background: var(--bg-tertiary); padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .demo-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
+        .demo-body { padding: 20px; }
+        .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+        .demo-control { display: flex; flex-direction: column; gap: 6px; }
+        .demo-control label { font-size: 12px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
+        .demo-control select, .demo-control input { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; color: var(--text-primary); font-family: 'Red Hat Mono', monospace; font-size: 14px; min-width: 150px; }
+        .demo-control select:focus, .demo-control input:focus { outline: none; border-color: var(--rh-red); }
+        .demo-output { background: var(--code-bg); border-radius: 8px; padding: 16px; font-family: 'Red Hat Mono', monospace; font-size: 14px; min-height: 200px; max-height: 400px; overflow-y: auto; }
+        .demo-btn { background: var(--rh-red); border: none; color: white; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .demo-btn:hover { background: var(--rh-red-dark); }
+        .output-line { margin-bottom: 4px; }
+        .output-ok { color: var(--success); }
+        .output-changed { color: var(--accent-yellow); }
+        .output-failed { color: var(--error); }
+        .output-skipped { color: var(--accent-cyan); }
+        .output-task { color: var(--accent-cyan); font-weight: 600; }
+        .output-play { color: var(--accent-purple); font-weight: 700; }
         .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
         .quiz-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
         .quiz-progress-bar { flex: 1; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
@@ -179,25 +207,6 @@
         .quiz-score { text-align: center; padding: 40px; }
         .quiz-score-value { font-family: 'Red Hat Display', sans-serif; font-size: 64px; font-weight: 900; color: var(--rh-red); }
         .quiz-score-label { font-size: 18px; color: var(--text-muted); margin-top: 8px; }
-        .interactive-demo { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin: 32px 0; }
-        .demo-header { background: var(--bg-tertiary); padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .demo-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
-        .demo-body { padding: 20px; }
-        .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
-        .demo-control { display: flex; flex-direction: column; gap: 6px; }
-        .demo-control label { font-size: 12px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-weight: 600; }
-        .demo-control select, .demo-control input { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; color: var(--text-primary); font-family: 'Red Hat Mono', monospace; font-size: 14px; min-width: 150px; }
-        .demo-control select:focus, .demo-control input:focus { outline: none; border-color: var(--rh-red); }
-        .demo-output { background: var(--code-bg); border-radius: 8px; padding: 16px; font-family: 'Red Hat Mono', monospace; font-size: 14px; min-height: 200px; max-height: 400px; overflow-y: auto; }
-        .demo-btn { background: var(--rh-red); border: none; color: white; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
-        .demo-btn:hover { background: var(--rh-red-dark); }
-        .output-line { margin-bottom: 4px; }
-        .output-ok { color: var(--success); }
-        .output-changed { color: var(--accent-yellow); }
-        .output-failed { color: var(--error); }
-        .output-skipped { color: var(--accent-cyan); }
-        .output-task { color: var(--accent-cyan); font-weight: 600; }
-        .output-play { color: var(--accent-purple); font-weight: 700; }
         @media (max-width: 1024px) {
             nav { transform: translateX(-100%); transition: transform 0.3s; }
             nav.open { transform: translateX(0); }
@@ -212,6 +221,9 @@
             .card-grid { grid-template-columns: 1fr; }
             .header-brand { flex-direction: column; align-items: flex-start; gap: 4px; }
             .progress-container { display: none; }
+            .pause-banner { padding: 24px; }
+            .pause-title { font-size: 24px; }
+            .pause-icon { font-size: 48px; }
         }
         @media print { nav, header, .skip-link, .nav-buttons, .quiz-btn { display: none !important; } main { margin: 0; } .section { display: block !important; } }
         @media (prefers-contrast: high) { :root { --border-color: #FFFFFF; --text-muted: #E0E0E0; } }
@@ -243,26 +255,31 @@
             <a href="#" class="nav-item" data-section="objectives" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🎯</span>Learning Objectives</a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Conditionals</div>
+            <div class="nav-section-title">Conditionals & Loops</div>
             <a href="#" class="nav-item" data-section="when-basics" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">❓</span>The when Clause</a>
             <a href="#" class="nav-item" data-section="when-advanced" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔀</span>Advanced Conditionals</a>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">Loops</div>
             <a href="#" class="nav-item" data-section="loops-basics" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔄</span>Loop Basics</a>
             <a href="#" class="nav-item" data-section="loops-advanced" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⚙️</span>Loop Control</a>
+            <a href="#" class="nav-item exercise-nav" data-section="exercise-loops" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">✋</span>Exercise: Loops & Conditionals</a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">Handlers</div>
             <a href="#" class="nav-item" data-section="handlers" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔔</span>Handler Concepts</a>
+            <a href="#" class="nav-item" data-section="handlers-advanced" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔧</span>Advanced Handlers</a>
+            <a href="#" class="nav-item exercise-nav" data-section="exercise-handlers" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">✋</span>Exercise: Handlers</a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">Error Handling</div>
             <a href="#" class="nav-item" data-section="errors-basic" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">⚠️</span>Handling Failures</a>
             <a href="#" class="nav-item" data-section="blocks" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📦</span>Blocks</a>
+            <a href="#" class="nav-item exercise-nav" data-section="exercise-errors" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">✋</span>Exercise: Task Failure</a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Practice</div>
+            <div class="nav-section-title">Comprehensive Lab</div>
+            <a href="#" class="nav-item lab-nav" data-section="lab" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">🔬</span>Lab: Task Control</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Assessment</div>
             <a href="#" class="nav-item" data-section="quiz" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📋</span>Knowledge Check</a>
             <a href="#" class="nav-item" data-section="summary" tabindex="0" role="button"><span class="nav-icon" aria-hidden="true">📚</span>Summary</a>
         </div>
@@ -294,13 +311,25 @@
                     <div class="card-content">Group tasks and implement try/catch/finally error handling patterns.</div>
                 </div>
             </div>
+            
+            <h2>Chapter Structure</h2>
+            <p>This chapter is organized into content sections followed by hands-on exercises. Look for the <span style="color: var(--accent-orange); font-weight: 600;">✋ PAUSE</span> indicators that signal when to stop for guided exercises.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Section</th><th>Content</th><th>Followed By</th></tr></thead>
+                    <tbody>
+                        <tr><td>Conditionals & Loops</td><td>when clause, operators, loop keyword, loop_control</td><td style="color: var(--accent-orange);">✋ Guided Exercise: Writing Loops and Conditional Tasks</td></tr>
+                        <tr><td>Handlers</td><td>notify, handler concepts, listen, flush_handlers</td><td style="color: var(--accent-orange);">✋ Guided Exercise: Implementing Handlers</td></tr>
+                        <tr><td>Error Handling</td><td>ignore_errors, failed_when, changed_when, blocks</td><td style="color: var(--accent-orange);">✋ Guided Exercise: Handling Task Failure</td></tr>
+                        <tr><td>Comprehensive Practice</td><td>Combine all concepts</td><td style="color: var(--rh-red);">🔬 Lab: Implementing Task Control</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
             <div class="info-box">
                 <div class="info-box-title"><span aria-hidden="true">⏱️</span> Estimated Time</div>
-                <p>This chapter takes approximately <strong>2-3 hours</strong> to complete, including hands-on exercises.</p>
-            </div>
-            <div class="info-box tip">
-                <div class="info-box-title"><span aria-hidden="true">✅</span> Prerequisites</div>
-                <p>Before starting, ensure you have completed Chapters 1-3 and understand playbook structure, YAML syntax, variables, and facts.</p>
+                <p>This chapter takes approximately <strong>2-3 hours</strong> to complete, including four hands-on exercises.</p>
             </div>
             <div class="nav-buttons">
                 <div></div>
@@ -332,7 +361,7 @@
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
-                    <div class="objective-text">Configure handlers to respond to task changes</div>
+                    <div class="objective-text">Configure handlers to respond to task changes with notify and listen</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleObjective(this)">✓</div>
@@ -359,7 +388,7 @@
             
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Key Point</div>
-                <p>The <code>when</code> clause uses raw Jinja2 expressions without the double curly braces <code>{{ }}</code>. Variables are referenced by name directly.</p>
+                <p>The <code>when</code> clause uses raw Jinja2 expressions <strong>without</strong> the double curly braces <code>{{ }}</code>. Variables are referenced by name directly.</p>
             </div>
 
             <h2>Basic when Syntax</h2>
@@ -382,6 +411,7 @@
             </div>
 
             <h2>Testing Variables</h2>
+            <p>You can test variables in many ways with the <code>when</code> clause:</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -394,14 +424,37 @@
                         <tr><td>Defined</td><td><code>when: my_var is defined</code></td><td>True when variable exists</td></tr>
                         <tr><td>Undefined</td><td><code>when: my_var is not defined</code></td><td>True when variable doesn't exist</td></tr>
                         <tr><td>In list</td><td><code>when: item in my_list</code></td><td>True when item is in the list</td></tr>
-                        <tr><td>Numeric</td><td><code>when: count > 5</code></td><td>Standard numeric comparisons</td></tr>
+                        <tr><td>Greater than</td><td><code>when: count > 5</code></td><td>Standard numeric comparisons</td></tr>
+                        <tr><td>Less than</td><td><code>when: memory_mb < 512</code></td><td>Compare numeric values</td></tr>
                     </tbody>
                 </table>
             </div>
 
+            <h2>Testing Facts</h2>
+            <p>Ansible facts provide information about managed hosts. Common facts used in conditionals:</p>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Common fact tests</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Test operating system family</span>
+<span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['os_family'] == "RedHat"</span>
+
+<span class="yaml-comment"># Test specific distribution</span>
+<span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['distribution'] == "CentOS"</span>
+
+<span class="yaml-comment"># Test distribution version</span>
+<span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['distribution_major_version'] == "9"</span>
+
+<span class="yaml-comment"># Test available memory</span>
+<span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['memfree_mb'] >= 512</span>
+
+<span class="yaml-comment"># Test if running in a virtual machine</span>
+<span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['virtualization_type'] == "kvm"</span></pre>
+                </div>
+            </div>
+
             <div class="info-box warning">
                 <div class="info-box-title"><span aria-hidden="true">⚠️</span> Important</div>
-                <p>When using <code>when</code> with a list of conditions, all conditions must be true (logical AND). Each condition is a separate list item.</p>
+                <p>When testing strings, be careful with case sensitivity. <code>"RedHat"</code> is different from <code>"redhat"</code>. Use the <code>lower</code> filter if needed: <code>when: ansible_facts['os_family'] | lower == "redhat"</code></p>
             </div>
 
             <div class="nav-buttons">
@@ -415,27 +468,51 @@
             <h1 id="when-advanced-heading">Advanced Conditionals</h1>
             <p class="lead">Combine multiple conditions and test registered variables for powerful conditional logic.</p>
 
-            <h2>Multiple Conditions</h2>
-            <p>Combine conditions using <span class="term tooltip-left" tabindex="0">logical operators<span class="tooltip" role="tooltip">Boolean operators (and, or, not) that combine multiple conditions. Parentheses can group sub-expressions.</span></span>:</p>
+            <h2>Multiple Conditions with AND</h2>
+            <p>When you need <strong>all conditions to be true</strong>, use a list format or the <code>and</code> operator:</p>
 
             <div class="code-block">
-                <div class="code-header"><span class="code-title">AND conditions (all must be true)</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header"><span class="code-title">AND conditions - List format (implicit AND)</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
-<pre><span class="yaml-comment"># Method 1: List format (implicit AND)</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package on RHEL web servers</span>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package on RHEL 9 web servers</span>
   <span class="yaml-module">ansible.builtin.dnf</span>:
     <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
   <span class="yaml-key">when</span>:
     <span class="yaml-dash">-</span> <span class="yaml-value">ansible_facts['os_family'] == "RedHat"</span>
-    <span class="yaml-dash">-</span> <span class="yaml-value">inventory_hostname in groups['webservers']</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">ansible_facts['distribution_major_version'] == "9"</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">inventory_hostname in groups['webservers']</span></pre>
+                </div>
+            </div>
 
-<span class="yaml-comment"># Method 2: OR operator</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install on Red Hat or Fedora</span>
+            <h2>Multiple Conditions with OR</h2>
+            <p>When you need <strong>any condition to be true</strong>, use the <code>or</code> operator:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">OR conditions</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install on Red Hat or Fedora</span>
   <span class="yaml-module">ansible.builtin.dnf</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">vim</span>
+    <span class="yaml-key">name</span>: <span class="yaml-value">vim-enhanced</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-  <span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['distribution'] == "RedHat" or ansible_facts['distribution'] == "Fedora"</span></pre>
+  <span class="yaml-key">when</span>: <span class="yaml-value">ansible_facts['distribution'] == "RedHat" or
+        ansible_facts['distribution'] == "Fedora"</span></pre>
+                </div>
+            </div>
+
+            <h2>Combining AND and OR</h2>
+            <p>Use parentheses to group conditions when combining <code>and</code> and <code>or</code>:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Combined AND/OR with parentheses</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure production web servers</span>
+  <span class="yaml-module">ansible.builtin.template</span>:
+    <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf.j2</span>
+    <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+  <span class="yaml-key">when</span>: <span class="yaml-value">(ansible_facts['os_family'] == "RedHat" or
+        ansible_facts['os_family'] == "Debian") and
+        environment == "production"</span></pre>
                 </div>
             </div>
 
@@ -457,7 +534,12 @@
     <span class="yaml-module">ansible.builtin.service</span>:
       <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
       <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-    <span class="yaml-key">when</span>: <span class="yaml-value">httpd_status.rc != 0</span></pre>
+    <span class="yaml-key">when</span>: <span class="yaml-value">httpd_status.rc != 0</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display status message</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Service was already running"</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">httpd_status.rc == 0</span></pre>
                 </div>
             </div>
 
@@ -466,12 +548,13 @@
                 <table>
                     <thead><tr><th>Test</th><th>Description</th></tr></thead>
                     <tbody>
-                        <tr><td><code>result.rc == 0</code></td><td>Command exited successfully</td></tr>
+                        <tr><td><code>result.rc == 0</code></td><td>Command exited successfully (return code 0)</td></tr>
                         <tr><td><code>result is succeeded</code></td><td>Task completed without failure</td></tr>
                         <tr><td><code>result is failed</code></td><td>Task failed</td></tr>
                         <tr><td><code>result is changed</code></td><td>Task made changes</td></tr>
                         <tr><td><code>result is skipped</code></td><td>Task was skipped</td></tr>
-                        <tr><td><code>'string' in result.stdout</code></td><td>String found in output</td></tr>
+                        <tr><td><code>'string' in result.stdout</code></td><td>String found in command output</td></tr>
+                        <tr><td><code>result.stdout_lines | length > 0</code></td><td>Command produced output</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -518,45 +601,67 @@
         <!-- Loops Basics Section -->
         <section id="section-loops-basics" class="section" aria-labelledby="loops-basics-heading">
             <h1 id="loops-basics-heading">Loop Basics</h1>
-            <p class="lead">Loops allow you to repeat a task multiple times with different values, reducing code duplication.</p>
+            <p class="lead">Loops allow you to repeat a task multiple times with different values, reducing code duplication and making playbooks more maintainable.</p>
 
             <h2>The loop Keyword</h2>
-            <p>The <span class="term" tabindex="0">loop<span class="tooltip" role="tooltip">Iterates over a list, running the task once for each item. The current item is available as the 'item' variable.</span></span> keyword is the modern way to iterate in Ansible.</p>
+            <p>The <span class="term" tabindex="0">loop<span class="tooltip" role="tooltip">Iterates over a list, running the task once for each item. The current item is available as the 'item' variable.</span></span> keyword is the modern, recommended way to iterate in Ansible (replacing the older <code>with_*</code> plugins).</p>
 
             <div class="code-block">
                 <div class="code-header"><span class="code-title">Basic loop example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
 <pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install multiple packages</span>
-    <span class="yaml-module">ansible.builtin.dnf</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create multiple users</span>
+    <span class="yaml-module">ansible.builtin.user</span>:
       <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item }}"</span>
       <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
     <span class="yaml-key">loop</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
-      <span class="yaml-dash">-</span> <span class="yaml-value">mariadb-server</span>
-      <span class="yaml-dash">-</span> <span class="yaml-value">php</span>
-      <span class="yaml-dash">-</span> <span class="yaml-value">php-mysqlnd</span></pre>
+      <span class="yaml-dash">-</span> <span class="yaml-value">alice</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">bob</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">charlie</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">diana</span></pre>
                 </div>
             </div>
 
             <div class="info-box tip">
-                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
-                <p>For package installation, pass the entire list to <code>name</code> instead of looping for better efficiency:</p>
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Package Installation Best Practice</div>
+                <p>For package installation, pass the entire list to <code>name</code> instead of looping—it's more efficient as it makes a single transaction:</p>
                 <div class="code-block" style="margin: 12px 0 0 0; border: none;">
                     <div class="code-content" style="padding: 12px;">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages (efficient)</span>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install packages (efficient - single transaction)</span>
   <span class="yaml-module">ansible.builtin.dnf</span>:
     <span class="yaml-key">name</span>:
       <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
       <span class="yaml-dash">-</span> <span class="yaml-value">mariadb-server</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">php</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
                     </div>
                 </div>
             </div>
 
-            <h2>Looping Over Complex Data</h2>
+            <h2>Looping Over a List Variable</h2>
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Complex data loop</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header"><span class="code-title">Loop with variable list</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">packages_to_install</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">firewalld</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">vim-enhanced</span>
+
+<span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install required packages</span>
+    <span class="yaml-module">ansible.builtin.dnf</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ packages_to_install }}"</span></pre>
+                </div>
+            </div>
+
+            <h2>Looping Over Dictionaries (Hash)</h2>
+            <p>When looping over complex data structures with multiple attributes, access them using <code>item.key</code> syntax:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Loop over list of dictionaries</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
 <pre><span class="yaml-key">vars</span>:
   <span class="yaml-key">users</span>:
@@ -566,6 +671,9 @@
     <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">bob</span>
       <span class="yaml-key">groups</span>: <span class="yaml-value">admins</span>
       <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/zsh</span>
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">charlie</span>
+      <span class="yaml-key">groups</span>: <span class="yaml-value">developers</span>
+      <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/bash</span>
 
 <span class="yaml-key">tasks</span>:
   <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create users with full configuration</span>
@@ -578,6 +686,28 @@
                 </div>
             </div>
 
+            <h2>Using the dict2items Filter</h2>
+            <p>Convert a dictionary to a list of key/value pairs for iteration:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">dict2items filter example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">vars</span>:
+  <span class="yaml-key">user_uids</span>:
+    <span class="yaml-key">alice</span>: <span class="yaml-value">1001</span>
+    <span class="yaml-key">bob</span>: <span class="yaml-value">1002</span>
+    <span class="yaml-key">charlie</span>: <span class="yaml-value">1003</span>
+
+<span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create users with specific UIDs</span>
+    <span class="yaml-module">ansible.builtin.user</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.key }}"</span>
+      <span class="yaml-key">uid</span>: <span class="yaml-string">"{{ item.value }}"</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ user_uids | dict2items }}"</span></pre>
+                </div>
+            </div>
+
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('when-advanced')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('loops-advanced')">Continue to Loop Control <span aria-hidden="true">→</span></button>
@@ -587,9 +717,11 @@
         <!-- Loop Control Section -->
         <section id="section-loops-advanced" class="section" aria-labelledby="loops-advanced-heading">
             <h1 id="loops-advanced-heading">Loop Control</h1>
-            <p class="lead">Fine-tune loop behavior with the loop_control directive.</p>
+            <p class="lead">Fine-tune loop behavior with the loop_control directive and access extended loop information.</p>
 
             <h2>The loop_control Directive</h2>
+            <p>The <span class="term" tabindex="0">loop_control<span class="tooltip" role="tooltip">A directive that modifies loop behavior, including output labeling, variable naming, indexing, and timing between iterations.</span></span> directive provides options to customize loop execution:</p>
+
             <div class="card-grid">
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">🏷️</div>
@@ -599,7 +731,7 @@
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">📛</div>
                     <div class="card-title">loop_var</div>
-                    <div class="card-content">Rename the default <code>item</code> variable to avoid conflicts.</div>
+                    <div class="card-content">Rename the default <code>item</code> variable to avoid conflicts in nested loops.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">🔢</div>
@@ -609,85 +741,224 @@
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">⏸️</div>
                     <div class="card-title">pause</div>
-                    <div class="card-content">Add a delay between loop iterations.</div>
+                    <div class="card-content">Add a delay (in seconds) between loop iterations.</div>
                 </div>
             </div>
 
             <div class="code-block">
-                <div class="code-header"><span class="code-title">loop_control examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header"><span class="code-title">loop_control with label</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
-<pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create users with custom label</span>
-    <span class="yaml-module">ansible.builtin.user</span>:
-      <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.name }}"</span>
-      <span class="yaml-key">uid</span>: <span class="yaml-string">"{{ item.uid }}"</span>
-    <span class="yaml-key">loop</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">alice</span>
-        <span class="yaml-key">uid</span>: <span class="yaml-value">1001</span>
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">bob</span>
-        <span class="yaml-key">uid</span>: <span class="yaml-value">1002</span>
-    <span class="yaml-key">loop_control</span>:
-      <span class="yaml-key">label</span>: <span class="yaml-string">"{{ item.name }}"</span>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create users with custom output label</span>
+  <span class="yaml-module">ansible.builtin.user</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.name }}"</span>
+    <span class="yaml-key">uid</span>: <span class="yaml-string">"{{ item.uid }}"</span>
+    <span class="yaml-key">groups</span>: <span class="yaml-string">"{{ item.groups }}"</span>
+  <span class="yaml-key">loop</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">alice</span>
+      <span class="yaml-key">uid</span>: <span class="yaml-value">1001</span>
+      <span class="yaml-key">groups</span>: <span class="yaml-value">developers,wheel</span>
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">bob</span>
+      <span class="yaml-key">uid</span>: <span class="yaml-value">1002</span>
+      <span class="yaml-key">groups</span>: <span class="yaml-value">admins</span>
+  <span class="yaml-key">loop_control</span>:
+    <span class="yaml-key">label</span>: <span class="yaml-string">"{{ item.name }}"</span>  <span class="yaml-comment"># Shows only username instead of entire dict</span></pre>
+                </div>
+            </div>
 
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Show item with index</span>
-    <span class="yaml-module">ansible.builtin.debug</span>:
-      <span class="yaml-key">msg</span>: <span class="yaml-string">"Item {{ idx }}: {{ item }}"</span>
-    <span class="yaml-key">loop</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-value">first</span>
-      <span class="yaml-dash">-</span> <span class="yaml-value">second</span>
-    <span class="yaml-key">loop_control</span>:
-      <span class="yaml-key">index_var</span>: <span class="yaml-value">idx</span></pre>
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">loop_control with index_var</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display items with index</span>
+  <span class="yaml-module">ansible.builtin.debug</span>:
+    <span class="yaml-key">msg</span>: <span class="yaml-string">"Item {{ idx }}: {{ server }}"</span>
+  <span class="yaml-key">loop</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">web1.example.com</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">web2.example.com</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">db1.example.com</span>
+  <span class="yaml-key">loop_control</span>:
+    <span class="yaml-key">index_var</span>: <span class="yaml-value">idx</span>
+    <span class="yaml-key">loop_var</span>: <span class="yaml-value">server</span></pre>
                 </div>
             </div>
 
             <h2>Extended Loop Variables</h2>
+            <p>Enable extended loop information with <code>extended: true</code>:</p>
             <div class="table-container">
                 <table>
                     <thead><tr><th>Variable</th><th>Description</th></tr></thead>
                     <tbody>
                         <tr><td><code>ansible_loop.index</code></td><td>Current iteration (1-indexed)</td></tr>
                         <tr><td><code>ansible_loop.index0</code></td><td>Current iteration (0-indexed)</td></tr>
-                        <tr><td><code>ansible_loop.first</code></td><td>True if first iteration</td></tr>
-                        <tr><td><code>ansible_loop.last</code></td><td>True if last iteration</td></tr>
-                        <tr><td><code>ansible_loop.length</code></td><td>Total number of items</td></tr>
+                        <tr><td><code>ansible_loop.first</code></td><td>True if this is the first iteration</td></tr>
+                        <tr><td><code>ansible_loop.last</code></td><td>True if this is the last iteration</td></tr>
+                        <tr><td><code>ansible_loop.length</code></td><td>Total number of items in the loop</td></tr>
+                        <tr><td><code>ansible_loop.previtem</code></td><td>Item from the previous iteration</td></tr>
+                        <tr><td><code>ansible_loop.nextitem</code></td><td>Item from the next iteration</td></tr>
                     </tbody>
                 </table>
             </div>
 
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Extended loop variables example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Process items with position awareness</span>
+  <span class="yaml-module">ansible.builtin.debug</span>:
+    <span class="yaml-key">msg</span>: <span class="yaml-string">"Processing {{ item }} ({{ ansible_loop.index }}/{{ ansible_loop.length }})"</span>
+  <span class="yaml-key">loop</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">first_item</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">middle_item</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">last_item</span>
+  <span class="yaml-key">loop_control</span>:
+    <span class="yaml-key">extended</span>: <span class="yaml-bool">true</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Special handling for first and last</span>
+  <span class="yaml-module">ansible.builtin.debug</span>:
+    <span class="yaml-key">msg</span>: <span class="yaml-string">"{{ 'START: ' if ansible_loop.first else '' }}{{ item }}{{ ' :END' if ansible_loop.last else '' }}"</span>
+  <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ items }}"</span>
+  <span class="yaml-key">loop_control</span>:
+    <span class="yaml-key">extended</span>: <span class="yaml-bool">true</span></pre>
+                </div>
+            </div>
+
+            <h2>Register with Loops</h2>
+            <p>When using <code>register</code> with loops, the registered variable contains a <code>results</code> list:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Registering loop results</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check multiple services</span>
+  <span class="yaml-module">ansible.builtin.command</span>:
+    <span class="yaml-key">cmd</span>: <span class="yaml-string">"systemctl is-active {{ item }}"</span>
+  <span class="yaml-key">loop</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">mariadb</span>
+    <span class="yaml-dash">-</span> <span class="yaml-value">firewalld</span>
+  <span class="yaml-key">register</span>: <span class="yaml-value">service_status</span>
+  <span class="yaml-key">ignore_errors</span>: <span class="yaml-bool">true</span>
+  <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display inactive services</span>
+  <span class="yaml-module">ansible.builtin.debug</span>:
+    <span class="yaml-key">msg</span>: <span class="yaml-string">"{{ item.item }} is not running"</span>
+  <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ service_status.results }}"</span>
+  <span class="yaml-key">when</span>: <span class="yaml-value">item.rc != 0</span>
+  <span class="yaml-key">loop_control</span>:
+    <span class="yaml-key">label</span>: <span class="yaml-string">"{{ item.item }}"</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Combining Loops and Conditionals</div>
+                <p>You can use <code>when</code> with loops. The condition is evaluated for each item, so some items may be processed while others are skipped.</p>
+            </div>
+
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('loops-basics')"><span aria-hidden="true">←</span> Previous</button>
-                <button class="btn btn-primary" onclick="navigateTo('handlers')">Continue to Handlers <span aria-hidden="true">→</span></button>
+                <button class="btn btn-exercise" onclick="navigateTo('exercise-loops')">✋ PAUSE: Guided Exercise <span aria-hidden="true">→</span></button>
             </div>
         </section>
 
+        <!-- EXERCISE PAUSE: Writing Loops and Conditional Tasks -->
+        <section id="section-exercise-loops" class="section" aria-labelledby="exercise-loops-heading">
+            <div class="pause-banner">
+                <div class="pause-icon" aria-hidden="true">✋</div>
+                <div class="pause-title">Instructor Pause Point</div>
+                <div class="pause-subtitle">Time for hands-on practice with loops and conditionals</div>
+                <div class="pause-badge">Guided Exercise</div>
+            </div>
+
+            <h1 id="exercise-loops-heading">Guided Exercise: Writing Loops and Conditional Tasks</h1>
+            <p class="lead">Apply what you've learned about conditionals and loops in a hands-on lab environment.</p>
+
+            <div class="exercise-overview">
+                <h3>Exercise Objectives</h3>
+                <ul class="exercise-objectives">
+                    <li>Write playbook tasks that use the <code>when</code> clause to test variables and facts</li>
+                    <li>Combine multiple conditions using AND and OR operators</li>
+                    <li>Implement loops using the <code>loop</code> keyword with simple lists</li>
+                    <li>Loop over lists of dictionaries and access item attributes</li>
+                    <li>Use <code>loop_control</code> to customize loop output with labels</li>
+                    <li>Register task results and use them in conditional statements</li>
+                </ul>
+
+                <h3>Skills Practiced</h3>
+                <div class="skills-practiced">
+                    <span class="skill-tag">when clause</span>
+                    <span class="skill-tag">Logical operators</span>
+                    <span class="skill-tag">loop keyword</span>
+                    <span class="skill-tag">loop_control</span>
+                    <span class="skill-tag">register</span>
+                    <span class="skill-tag">Fact testing</span>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">👨‍🏫</span> Instructor Action</div>
+                <p>Students should now complete the <strong>Guided Exercise: Writing Loops and Conditional Tasks</strong> in their lab environment. This exercise reinforces the concepts covered in the Conditionals and Loops sections.</p>
+            </div>
+
+            <h2>Key Concepts to Review</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>The <code>when</code> clause does NOT use <code>{{ }}</code> around variables</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Multiple conditions in a list are combined with AND (all must be true)</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Use <code>or</code> keyword to match any condition</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>The <code>loop</code> variable is <code>item</code> by default</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Access dictionary values in loops with <code>item.key</code></div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Use <code>loop_control.label</code> to simplify output</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('loops-advanced')"><span aria-hidden="true">←</span> Back to Content</button>
+                <button class="btn btn-primary" onclick="navigateTo('handlers')">Continue to Handlers <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
         <!-- Handlers Section -->
         <section id="section-handlers" class="section" aria-labelledby="handlers-heading">
             <h1 id="handlers-heading">Handler Concepts</h1>
-            <p class="lead">Handlers are special tasks that only run when notified, perfect for service restarts.</p>
+            <p class="lead">Handlers are special tasks that only run when notified, making them perfect for actions like service restarts that should only happen when configuration changes.</p>
 
             <h2>How Handlers Work</h2>
-            <p><span class="term" tabindex="0">Handlers<span class="tooltip" role="tooltip">Special tasks that only execute when notified. They run once at the end of the play, regardless of how many times notified.</span></span> have three key characteristics:</p>
+            <p><span class="term" tabindex="0">Handlers<span class="tooltip" role="tooltip">Special tasks defined in a handlers section that only execute when notified by a task. They run once at the end of the play, regardless of how many times notified.</span></span> have three key characteristics:</p>
 
             <div class="card-grid">
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">🔔</div>
                     <div class="card-title">Notification Triggered</div>
-                    <div class="card-content">Only run when a task reports "changed" status.</div>
+                    <div class="card-content">Handlers only run when a task that notifies them reports a "changed" status.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">1️⃣</div>
-                    <div class="card-title">Run Once</div>
-                    <div class="card-content">Each handler runs only once per play.</div>
+                    <div class="card-title">Run Once Per Play</div>
+                    <div class="card-content">Each handler runs only once per play, regardless of how many tasks notify it.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">⏰</div>
-                    <div class="card-title">End of Play</div>
-                    <div class="card-content">Execute after all tasks complete.</div>
+                    <div class="card-title">End of Play Execution</div>
+                    <div class="card-content">Handlers execute after all tasks in the play complete, not immediately when notified.</div>
                 </div>
             </div>
 
+            <h2>Basic Handler Syntax</h2>
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Handler example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header"><span class="code-title">Handler example - Web server configuration</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
 <pre><span class="yaml-dash">---</span>
 <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web server</span>
@@ -695,15 +966,23 @@
   <span class="yaml-key">become</span>: <span class="yaml-bool">true</span>
 
   <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy configuration file</span>
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install httpd package</span>
+      <span class="yaml-module">ansible.builtin.dnf</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy main configuration file</span>
       <span class="yaml-module">ansible.builtin.copy</span>:
-        <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf</span>
+        <span class="yaml-key">src</span>: <span class="yaml-value">files/httpd.conf</span>
         <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+        <span class="yaml-key">owner</span>: <span class="yaml-value">root</span>
+        <span class="yaml-key">group</span>: <span class="yaml-value">root</span>
+        <span class="yaml-key">mode</span>: <span class="yaml-value">'0644'</span>
       <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
 
     <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Copy SSL configuration</span>
       <span class="yaml-module">ansible.builtin.copy</span>:
-        <span class="yaml-key">src</span>: <span class="yaml-value">ssl.conf</span>
+        <span class="yaml-key">src</span>: <span class="yaml-value">files/ssl.conf</span>
         <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf.d/ssl.conf</span>
       <span class="yaml-key">notify</span>: <span class="yaml-value">Restart httpd</span>
 
@@ -721,17 +1000,17 @@
                 <div class="flow-chart">
                     <div class="flow-item">
                         <strong>Task 1: Install httpd</strong>
-                        <div class="flow-label">STATUS: ok (no change)</div>
+                        <div class="flow-label">STATUS: ok (no change) — no notification</div>
                     </div>
                     <div class="flow-arrow">↓</div>
                     <div class="flow-item" style="border-color: var(--accent-yellow); background: rgba(255, 204, 0, 0.1);">
                         <strong>Task 2: Copy httpd.conf</strong>
-                        <div class="flow-label">STATUS: changed → notifies handler</div>
+                        <div class="flow-label">STATUS: changed → notifies "Restart httpd"</div>
                     </div>
                     <div class="flow-arrow">↓</div>
                     <div class="flow-item" style="border-color: var(--accent-yellow); background: rgba(255, 204, 0, 0.1);">
                         <strong>Task 3: Copy ssl.conf</strong>
-                        <div class="flow-label">STATUS: changed → notifies handler</div>
+                        <div class="flow-label">STATUS: changed → notifies "Restart httpd"</div>
                     </div>
                     <div class="flow-arrow">↓ All tasks complete</div>
                     <div class="flow-item" style="border-color: var(--accent-orange); background: rgba(255, 102, 0, 0.1);">
@@ -741,88 +1020,362 @@
                 </div>
             </div>
 
+            <h2>Notifying Multiple Handlers</h2>
+            <p>A single task can notify multiple handlers using a list:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Notifying multiple handlers</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update configuration</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">config.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/myapp/config.conf</span>
+    <span class="yaml-key">notify</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">Validate configuration</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">Restart application</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">Clear cache</span>
+
+<span class="yaml-key">handlers</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Validate configuration</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/usr/bin/myapp --validate-config</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart application</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Clear cache</span>
+    <span class="yaml-module">ansible.builtin.file</span>:
+      <span class="yaml-key">path</span>: <span class="yaml-value">/var/cache/myapp</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
+                </div>
+            </div>
+
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Handler Order</div>
-                <p>Handlers run in the order they are defined in the <code>handlers</code> section, not the order they are notified.</p>
+                <p>Handlers run in the order they are <strong>defined in the handlers section</strong>, not the order they are notified. Plan your handler order accordingly.</p>
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('loops-advanced')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('exercise-loops')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('handlers-advanced')">Continue to Advanced Handlers <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- Advanced Handlers Section -->
+        <section id="section-handlers-advanced" class="section" aria-labelledby="handlers-advanced-heading">
+            <h1 id="handlers-advanced-heading">Advanced Handlers</h1>
+            <p class="lead">Learn about handler listening, flushing handlers early, and controlling handler behavior during failures.</p>
+
+            <h2>The listen Directive</h2>
+            <p>The <span class="term" tabindex="0">listen<span class="tooltip" role="tooltip">Allows multiple handlers to respond to a single notification topic, enabling flexible handler grouping and execution.</span></span> directive allows multiple handlers to "listen" to a common topic:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Handlers with listen directive</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update web server configuration</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+    <span class="yaml-key">notify</span>: <span class="yaml-value">restart web services</span>  <span class="yaml-comment"># Notify topic, not handler name</span>
+
+<span class="yaml-key">handlers</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart httpd</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
+    <span class="yaml-key">listen</span>: <span class="yaml-value">restart web services</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart php-fpm</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">php-fpm</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
+    <span class="yaml-key">listen</span>: <span class="yaml-value">restart web services</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Clear varnish cache</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">varnishadm "ban req.url ~ ."</span>
+    <span class="yaml-key">listen</span>: <span class="yaml-value">restart web services</span></pre>
+                </div>
+            </div>
+
+            <h2>Flushing Handlers</h2>
+            <p>Normally handlers run at the end of a play. Use <span class="term tooltip-left" tabindex="0">meta: flush_handlers<span class="tooltip" role="tooltip">A special task that forces all pending handlers to run immediately, before continuing with remaining tasks.</span></span> to run them immediately:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">flush_handlers example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update firewall configuration</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">firewall.conf.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/firewalld/firewalld.conf</span>
+    <span class="yaml-key">notify</span>: <span class="yaml-value">Restart firewalld</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Flush handlers to restart firewall now</span>
+    <span class="yaml-module">ansible.builtin.meta</span>: <span class="yaml-value">flush_handlers</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure application (needs firewall running)</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">app.conf.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/myapp/app.conf</span>
+
+<span class="yaml-key">handlers</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart firewalld</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">firewalld</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                </div>
+            </div>
+
+            <h2>Handlers and Task Failures</h2>
+            <p>By default, if a task fails, handlers are <strong>not run</strong>. Use <code>force_handlers: true</code> to change this:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Force handlers on failure</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure services with guaranteed handler execution</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>
+  <span class="yaml-key">force_handlers</span>: <span class="yaml-bool">true</span>  <span class="yaml-comment"># Handlers run even if tasks fail</span>
+
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update configuration</span>
+      <span class="yaml-module">ansible.builtin.template</span>:
+        <span class="yaml-key">src</span>: <span class="yaml-value">config.j2</span>
+        <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/myapp/config.conf</span>
+      <span class="yaml-key">notify</span>: <span class="yaml-value">Restart myapp</span>
+
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">This task might fail</span>
+      <span class="yaml-module">ansible.builtin.command</span>:
+        <span class="yaml-key">cmd</span>: <span class="yaml-value">/usr/local/bin/risky-operation.sh</span>
+
+  <span class="yaml-key">handlers</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart myapp</span>
+      <span class="yaml-module">ansible.builtin.service</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Handler Behavior Summary</div>
+                <p><strong>Default behavior:</strong> Handlers run at end of play, only if notified, only once, and NOT if a task fails.<br>
+                <strong>With force_handlers:</strong> Handlers run even after task failures.<br>
+                <strong>With flush_handlers:</strong> Pending handlers run immediately at that point in the play.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('handlers')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-exercise" onclick="navigateTo('exercise-handlers')">✋ PAUSE: Guided Exercise <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- EXERCISE PAUSE: Implementing Handlers -->
+        <section id="section-exercise-handlers" class="section" aria-labelledby="exercise-handlers-heading">
+            <div class="pause-banner">
+                <div class="pause-icon" aria-hidden="true">✋</div>
+                <div class="pause-title">Instructor Pause Point</div>
+                <div class="pause-subtitle">Time for hands-on practice with handlers</div>
+                <div class="pause-badge">Guided Exercise</div>
+            </div>
+
+            <h1 id="exercise-handlers-heading">Guided Exercise: Implementing Handlers</h1>
+            <p class="lead">Practice implementing handlers to respond to configuration changes efficiently.</p>
+
+            <div class="exercise-overview">
+                <h3>Exercise Objectives</h3>
+                <ul class="exercise-objectives">
+                    <li>Define handlers in the handlers section of a playbook</li>
+                    <li>Use the <code>notify</code> directive to trigger handlers from tasks</li>
+                    <li>Understand when handlers execute (end of play, only on change)</li>
+                    <li>Implement the <code>listen</code> directive for handler grouping</li>
+                    <li>Use <code>meta: flush_handlers</code> to run handlers immediately</li>
+                    <li>Configure <code>force_handlers</code> for failure scenarios</li>
+                </ul>
+
+                <h3>Skills Practiced</h3>
+                <div class="skills-practiced">
+                    <span class="skill-tag">notify</span>
+                    <span class="skill-tag">handlers section</span>
+                    <span class="skill-tag">listen</span>
+                    <span class="skill-tag">flush_handlers</span>
+                    <span class="skill-tag">force_handlers</span>
+                    <span class="skill-tag">Service management</span>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">👨‍🏫</span> Instructor Action</div>
+                <p>Students should now complete the <strong>Guided Exercise: Implementing Handlers</strong> in their lab environment. This exercise focuses on configuring services that restart only when their configuration files change.</p>
+            </div>
+
+            <h2>Key Concepts to Review</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Handlers only run when notified by a task that reports "changed"</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Each handler runs only ONCE per play, even if notified multiple times</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Handlers run at the END of the play, after all tasks complete</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Handler order is determined by their position in the handlers section</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Use <code>listen</code> to group multiple handlers under one notification topic</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>By default, handlers do NOT run if a task fails</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('handlers-advanced')"><span aria-hidden="true">←</span> Back to Content</button>
                 <button class="btn btn-primary" onclick="navigateTo('errors-basic')">Continue to Error Handling <span aria-hidden="true">→</span></button>
             </div>
         </section>
         <!-- Error Handling Section -->
         <section id="section-errors-basic" class="section" aria-labelledby="errors-basic-heading">
             <h1 id="errors-basic-heading">Handling Failures</h1>
-            <p class="lead">Control how Ansible responds to task failures with options to ignore errors and define custom failure conditions.</p>
+            <p class="lead">Control how Ansible responds to task failures with options to ignore errors, define custom failure conditions, and manage change reporting.</p>
 
             <h2>Ignoring Errors</h2>
-            <p>Use <span class="term tooltip-left" tabindex="0">ignore_errors<span class="tooltip" role="tooltip">Allows playbook execution to continue even if this task fails. The task is still marked as failed in statistics.</span></span> to continue execution when a task fails:</p>
+            <p>Use <span class="term tooltip-left" tabindex="0">ignore_errors<span class="tooltip" role="tooltip">Allows playbook execution to continue even if this task fails. The task is still marked as failed in the play recap statistics.</span></span> to continue execution when a task fails:</p>
 
             <div class="code-block">
                 <div class="code-header"><span class="code-title">ignore_errors example</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Try to stop a service that might not exist</span>
-  <span class="yaml-module">ansible.builtin.service</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">optional-service</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">stopped</span>
-  <span class="yaml-key">ignore_errors</span>: <span class="yaml-bool">true</span></pre>
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Try to stop a service that might not exist</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">optional-service</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">stopped</span>
+    <span class="yaml-key">ignore_errors</span>: <span class="yaml-bool">true</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">This task runs even if previous failed</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: <span class="yaml-string">"Continuing with playbook execution"</span></pre>
                 </div>
             </div>
 
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">⚠️</span> Use With Caution</div>
+                <p>While <code>ignore_errors</code> prevents playbook failure, the task is still reported as failed. Consider using <code>failed_when: false</code> if you want to completely suppress failure status.</p>
+            </div>
+
             <h2>Custom Failure Conditions</h2>
-            <p>Use <span class="term" tabindex="0">failed_when<span class="tooltip" role="tooltip">Defines custom conditions that determine when a task should be considered failed.</span></span> to define when a task should fail:</p>
+            <p>Use <span class="term" tabindex="0">failed_when<span class="tooltip" role="tooltip">Defines custom conditions that determine when a task should be considered failed, overriding the default failure detection.</span></span> to define when a task should fail:</p>
 
             <div class="code-block">
                 <div class="code-header"><span class="code-title">failed_when examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
 <pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-comment"># Fail based on output content</span>
+  <span class="yaml-comment"># Fail based on output content, not return code</span>
   <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run deployment script</span>
     <span class="yaml-module">ansible.builtin.command</span>:
-      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/deploy.sh</span>
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/scripts/deploy.sh</span>
     <span class="yaml-key">register</span>: <span class="yaml-value">deploy_result</span>
     <span class="yaml-key">failed_when</span>: <span class="yaml-string">"'ERROR' in deploy_result.stderr"</span>
 
-  <span class="yaml-comment"># Never fail (useful for checking status)</span>
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check service status</span>
+  <span class="yaml-comment"># Fail on specific return codes</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check application status</span>
     <span class="yaml-module">ansible.builtin.command</span>:
-      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl is-active myservice</span>
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/app/healthcheck.sh</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">health_check</span>
+    <span class="yaml-key">failed_when</span>: <span class="yaml-value">health_check.rc > 1</span>  <span class="yaml-comment"># rc=1 is warning, >1 is error</span>
+
+  <span class="yaml-comment"># Never fail (useful for checking status)</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Check if service exists</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">systemctl status myservice</span>
     <span class="yaml-key">register</span>: <span class="yaml-value">service_status</span>
-    <span class="yaml-key">failed_when</span>: <span class="yaml-bool">false</span></pre>
+    <span class="yaml-key">failed_when</span>: <span class="yaml-bool">false</span>  <span class="yaml-comment"># Never fails, check rc in next task</span></pre>
                 </div>
             </div>
 
             <h2>Custom Change Detection</h2>
-            <p>Use <span class="term tooltip-right" tabindex="0">changed_when<span class="tooltip" role="tooltip">Defines custom conditions that determine when a task should report a change.</span></span> to control when a task reports as "changed":</p>
+            <p>Use <span class="term tooltip-right" tabindex="0">changed_when<span class="tooltip" role="tooltip">Defines custom conditions that determine when a task should report a change, controlling handler notifications and play statistics.</span></span> to control when a task reports as "changed":</p>
 
             <div class="code-block">
                 <div class="code-header"><span class="code-title">changed_when examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
 <pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-comment"># Never report change (for status checks)</span>
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Get current user</span>
+  <span class="yaml-comment"># Never report change (for information gathering)</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Get current kernel version</span>
     <span class="yaml-module">ansible.builtin.command</span>:
-      <span class="yaml-key">cmd</span>: <span class="yaml-value">whoami</span>
-    <span class="yaml-key">register</span>: <span class="yaml-value">current_user</span>
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">uname -r</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">kernel_version</span>
     <span class="yaml-key">changed_when</span>: <span class="yaml-bool">false</span>
 
-  <span class="yaml-comment"># Change based on output</span>
+  <span class="yaml-comment"># Change based on output content</span>
   <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Apply database migrations</span>
     <span class="yaml-module">ansible.builtin.command</span>:
-      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/migrate.sh</span>
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/app/migrate.sh</span>
     <span class="yaml-key">register</span>: <span class="yaml-value">migration</span>
-    <span class="yaml-key">changed_when</span>: <span class="yaml-string">"'Migrations applied' in migration.stdout"</span></pre>
+    <span class="yaml-key">changed_when</span>: <span class="yaml-string">"'Migrations applied' in migration.stdout"</span>
+
+  <span class="yaml-comment"># Combined conditions</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update application</span>
+    <span class="yaml-module">ansible.builtin.command</span>:
+      <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/app/update.sh</span>
+    <span class="yaml-key">register</span>: <span class="yaml-value">update_result</span>
+    <span class="yaml-key">changed_when</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">update_result.rc == 0</span>
+      <span class="yaml-dash">-</span> <span class="yaml-string">"'Updated' in update_result.stdout"</span></pre>
+                </div>
+            </div>
+
+            <h2>Fail Fast Options</h2>
+            <p>Control playbook behavior when managing multiple hosts:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Option</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>any_errors_fatal: true</code></td><td>Stop playbook on ALL hosts if any host fails</td></tr>
+                        <tr><td><code>max_fail_percentage: 30</code></td><td>Abort if more than 30% of hosts fail</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Fail fast options</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-dash">---</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Critical deployment - fail fast</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">production</span>
+  <span class="yaml-key">any_errors_fatal</span>: <span class="yaml-bool">true</span>  <span class="yaml-comment"># One failure stops everything</span>
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-comment"># ...</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Rolling update - tolerate some failures</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
+  <span class="yaml-key">max_fail_percentage</span>: <span class="yaml-value">25</span>  <span class="yaml-comment"># Continue if ≤25% fail</span>
+  <span class="yaml-key">serial</span>: <span class="yaml-value">5</span>  <span class="yaml-comment"># Process 5 hosts at a time</span>
+  <span class="yaml-key">tasks</span>:
+    <span class="yaml-comment"># ...</span></pre>
                 </div>
             </div>
 
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
-                <p>Always use <code>changed_when: false</code> for tasks that only gather information to maintain accurate change reporting.</p>
+                <p>Always use <code>changed_when: false</code> for tasks that only gather information (like <code>command</code> or <code>shell</code> used for status checks). This maintains accurate change reporting and prevents unintended handler notifications.</p>
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('handlers')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('exercise-handlers')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('blocks')">Continue to Blocks <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -830,25 +1383,30 @@
         <!-- Blocks Section -->
         <section id="section-blocks" class="section" aria-labelledby="blocks-heading">
             <h1 id="blocks-heading">Blocks</h1>
-            <p class="lead">Group related tasks together and implement try/catch/finally error handling patterns.</p>
+            <p class="lead">Group related tasks together and implement try/catch/finally error handling patterns for robust automation.</p>
 
             <h2>What are Blocks?</h2>
-            <p><span class="term" tabindex="0">Blocks<span class="tooltip" role="tooltip">A way to group multiple tasks together. Tasks in a block can share common attributes and participate in error handling.</span></span> group tasks and allow you to apply common attributes. They also provide error handling similar to try/catch.</p>
+            <p><span class="term" tabindex="0">Blocks<span class="tooltip" role="tooltip">A way to group multiple tasks together. Tasks in a block can share common attributes and participate in error handling with rescue and always sections.</span></span> group tasks and enable you to:</p>
+            <ul style="color: var(--text-secondary); margin-bottom: 24px;">
+                <li>Apply common attributes (like <code>when</code>, <code>become</code>) to multiple tasks</li>
+                <li>Implement error handling with <code>rescue</code> and <code>always</code> sections</li>
+                <li>Create logical groupings for better playbook organization</li>
+            </ul>
 
-            <h2>Block Error Handling</h2>
+            <h2>Block Error Handling Structure</h2>
             <div class="diagram">
-                <div class="diagram-title">Block Error Handling Flow</div>
+                <div class="diagram-title">Block / Rescue / Always Flow</div>
                 <div class="flow-chart">
                     <div class="flow-item block">
                         <strong>block:</strong>
-                        <div class="flow-label">Main tasks - try to execute these</div>
+                        <div class="flow-label">Main tasks - attempt to execute these first</div>
                     </div>
-                    <div class="flow-arrow">↓ If any task fails</div>
+                    <div class="flow-arrow">↓ If any task in block fails...</div>
                     <div class="flow-item rescue">
                         <strong>rescue:</strong>
-                        <div class="flow-label">Error recovery tasks - run on failure</div>
+                        <div class="flow-label">Error recovery tasks - only run on block failure</div>
                     </div>
-                    <div class="flow-arrow">↓ Always runs</div>
+                    <div class="flow-arrow">↓ Always executed (success or failure)</div>
                     <div class="flow-item always">
                         <strong>always:</strong>
                         <div class="flow-label">Cleanup tasks - run regardless of outcome</div>
@@ -860,20 +1418,24 @@
                 <div class="code-header"><span class="code-title">Complete block with rescue and always</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
                 <div class="code-content">
 <pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Upgrade application with rollback</span>
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Upgrade application with rollback capability</span>
     <span class="yaml-key">block</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create backup</span>
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create backup of current version</span>
         <span class="yaml-module">ansible.builtin.copy</span>:
-          <span class="yaml-key">src</span>: <span class="yaml-value">/opt/app</span>
-          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app.backup</span>
+          <span class="yaml-key">src</span>: <span class="yaml-value">/opt/app/</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app.backup/</span>
           <span class="yaml-key">remote_src</span>: <span class="yaml-bool">true</span>
 
       <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy new version</span>
         <span class="yaml-module">ansible.builtin.unarchive</span>:
-          <span class="yaml-key">src</span>: <span class="yaml-value">app-v2.0.tar.gz</span>
-          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app</span>
+          <span class="yaml-key">src</span>: <span class="yaml-value">files/app-v2.0.tar.gz</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app/</span>
 
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Verify deployment</span>
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Run database migrations</span>
+        <span class="yaml-module">ansible.builtin.command</span>:
+          <span class="yaml-key">cmd</span>: <span class="yaml-value">/opt/app/migrate.sh</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Verify deployment with health check</span>
         <span class="yaml-module">ansible.builtin.uri</span>:
           <span class="yaml-key">url</span>: <span class="yaml-value">http://localhost:8080/health</span>
           <span class="yaml-key">status_code</span>: <span class="yaml-value">200</span>
@@ -881,13 +1443,13 @@
     <span class="yaml-key">rescue</span>:
       <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Rollback - Restore from backup</span>
         <span class="yaml-module">ansible.builtin.copy</span>:
-          <span class="yaml-key">src</span>: <span class="yaml-value">/opt/app.backup</span>
-          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app</span>
+          <span class="yaml-key">src</span>: <span class="yaml-value">/opt/app.backup/</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/opt/app/</span>
           <span class="yaml-key">remote_src</span>: <span class="yaml-bool">true</span>
 
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Log failure</span>
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Log the failure details</span>
         <span class="yaml-module">ansible.builtin.debug</span>:
-          <span class="yaml-key">msg</span>: <span class="yaml-string">"Error: {{ ansible_failed_task.name }}"</span>
+          <span class="yaml-key">msg</span>: <span class="yaml-string">"Deployment failed at: {{ ansible_failed_task.name }}"</span>
 
     <span class="yaml-key">always</span>:
       <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart application service</span>
@@ -895,7 +1457,7 @@
           <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
           <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
 
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove backup</span>
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Clean up backup directory</span>
         <span class="yaml-module">ansible.builtin.file</span>:
           <span class="yaml-key">path</span>: <span class="yaml-value">/opt/app.backup</span>
           <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
@@ -903,19 +1465,72 @@
             </div>
 
             <h2>Special Variables in Rescue</h2>
+            <p>When a rescue block runs, special variables provide information about the failure:</p>
             <div class="table-container">
                 <table>
                     <thead><tr><th>Variable</th><th>Description</th></tr></thead>
                     <tbody>
-                        <tr><td><code>ansible_failed_task</code></td><td>Information about the task that triggered rescue</td></tr>
-                        <tr><td><code>ansible_failed_result</code></td><td>The result of the failed task</td></tr>
+                        <tr><td><code>ansible_failed_task</code></td><td>Dictionary with info about the failed task (name, action, args)</td></tr>
+                        <tr><td><code>ansible_failed_result</code></td><td>The registered result of the failed task (stdout, stderr, rc, etc.)</td></tr>
                     </tbody>
                 </table>
             </div>
 
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Using failure information in rescue</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">rescue</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Display detailed failure information</span>
+    <span class="yaml-module">ansible.builtin.debug</span>:
+      <span class="yaml-key">msg</span>: |
+        <span class="yaml-string">Task '{{ ansible_failed_task.name }}' failed.
+        Action: {{ ansible_failed_task.action }}
+        Error: {{ ansible_failed_result.msg | default('Unknown error') }}</span>
+
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Send failure notification</span>
+    <span class="yaml-module">ansible.builtin.mail</span>:
+      <span class="yaml-key">to</span>: <span class="yaml-value">admin@example.com</span>
+      <span class="yaml-key">subject</span>: <span class="yaml-string">"Deployment Failed: {{ ansible_failed_task.name }}"</span>
+      <span class="yaml-key">body</span>: <span class="yaml-string">"{{ ansible_failed_result | to_nice_yaml }}"</span></pre>
+                </div>
+            </div>
+
             <div class="info-box danger">
                 <div class="info-box-title"><span aria-hidden="true">❌</span> Rescue Limitations</div>
-                <p>The <code>rescue</code> section only runs for task failures, not for syntax errors, unreachable hosts, or undefined variables.</p>
+                <p>The <code>rescue</code> section only runs for <strong>task failures</strong>. It does NOT run for:
+                <br>• Syntax errors in the playbook
+                <br>• Unreachable hosts
+                <br>• Undefined variables
+                <br>• Connection failures</p>
+            </div>
+
+            <h2>Blocks Without Error Handling</h2>
+            <p>Blocks can also be used simply to apply common attributes to multiple tasks:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-title">Block with shared attributes</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web servers only</span>
+    <span class="yaml-key">block</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install httpd</span>
+        <span class="yaml-module">ansible.builtin.dnf</span>:
+          <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+          <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure httpd</span>
+        <span class="yaml-module">ansible.builtin.template</span>:
+          <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf.j2</span>
+          <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start httpd</span>
+        <span class="yaml-module">ansible.builtin.service</span>:
+          <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+          <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+          <span class="yaml-key">enabled</span>: <span class="yaml-bool">true</span>
+    <span class="yaml-key">when</span>: <span class="yaml-value">inventory_hostname in groups['webservers']</span>
+    <span class="yaml-key">become</span>: <span class="yaml-bool">true</span></pre>
+                </div>
             </div>
 
             <div class="interactive-demo">
@@ -926,8 +1541,8 @@
                             <label for="block-scenario">Scenario</label>
                             <select id="block-scenario">
                                 <option value="success">All tasks succeed</option>
-                                <option value="fail-task2">Task 2 fails</option>
-                                <option value="fail-task3">Task 3 fails</option>
+                                <option value="fail-task2">Task 2 (Deploy) fails</option>
+                                <option value="fail-task3">Task 3 (Health check) fails</option>
                                 <option value="rescue-fails">Rescue also fails</option>
                             </select>
                         </div>
@@ -936,20 +1551,206 @@
                         </div>
                     </div>
                     <div class="demo-output" id="block-output">
-                        <div class="output-line" style="color: var(--text-muted);">Select a scenario and click "Run Block" to see execution flow...</div>
+                        <div class="output-line" style="color: var(--text-muted);">Select a scenario and click "Run Block" to see the execution flow...</div>
                     </div>
                 </div>
             </div>
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('errors-basic')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-exercise" onclick="navigateTo('exercise-errors')">✋ PAUSE: Guided Exercise <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+
+        <!-- EXERCISE PAUSE: Handling Task Failure -->
+        <section id="section-exercise-errors" class="section" aria-labelledby="exercise-errors-heading">
+            <div class="pause-banner">
+                <div class="pause-icon" aria-hidden="true">✋</div>
+                <div class="pause-title">Instructor Pause Point</div>
+                <div class="pause-subtitle">Time for hands-on practice with error handling</div>
+                <div class="pause-badge">Guided Exercise</div>
+            </div>
+
+            <h1 id="exercise-errors-heading">Guided Exercise: Handling Task Failure</h1>
+            <p class="lead">Practice implementing robust error handling strategies in Ansible playbooks.</p>
+
+            <div class="exercise-overview">
+                <h3>Exercise Objectives</h3>
+                <ul class="exercise-objectives">
+                    <li>Use <code>ignore_errors</code> to continue playbook execution after failures</li>
+                    <li>Implement custom failure conditions with <code>failed_when</code></li>
+                    <li>Control change reporting with <code>changed_when</code></li>
+                    <li>Create blocks with <code>rescue</code> and <code>always</code> sections</li>
+                    <li>Access failure information using <code>ansible_failed_task</code> and <code>ansible_failed_result</code></li>
+                    <li>Implement rollback procedures using block error handling</li>
+                </ul>
+
+                <h3>Skills Practiced</h3>
+                <div class="skills-practiced">
+                    <span class="skill-tag">ignore_errors</span>
+                    <span class="skill-tag">failed_when</span>
+                    <span class="skill-tag">changed_when</span>
+                    <span class="skill-tag">block</span>
+                    <span class="skill-tag">rescue</span>
+                    <span class="skill-tag">always</span>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">👨‍🏫</span> Instructor Action</div>
+                <p>Students should now complete the <strong>Guided Exercise: Handling Task Failure</strong> in their lab environment. This exercise focuses on implementing error handling patterns including blocks with rescue and always sections.</p>
+            </div>
+
+            <h2>Key Concepts to Review</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div><code>ignore_errors: true</code> continues execution but still reports failure</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div><code>failed_when: false</code> means the task NEVER fails</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div><code>changed_when: false</code> prevents handler notifications from command/shell tasks</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>The <code>rescue</code> section only runs when a task in <code>block</code> fails</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>The <code>always</code> section runs regardless of success or failure</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Use <code>ansible_failed_task</code> and <code>ansible_failed_result</code> in rescue for debugging</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('blocks')"><span aria-hidden="true">←</span> Back to Content</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab <span aria-hidden="true">→</span></button>
+            </div>
+        </section>
+        <!-- LAB: Implementing Task Control -->
+        <section id="section-lab" class="section" aria-labelledby="lab-heading">
+            <div class="pause-banner lab-banner">
+                <div class="pause-icon" aria-hidden="true">🔬</div>
+                <div class="pause-title">Comprehensive Lab</div>
+                <div class="pause-subtitle">Apply all task control concepts in a complete scenario</div>
+                <div class="pause-badge">Lab Exercise</div>
+            </div>
+
+            <h1 id="lab-heading">Lab: Implementing Task Control</h1>
+            <p class="lead">This comprehensive lab brings together conditionals, loops, handlers, and error handling in a realistic deployment scenario.</p>
+
+            <div class="exercise-overview">
+                <h3>Lab Scenario</h3>
+                <p style="color: var(--text-secondary);">You will create a playbook that deploys a web application across multiple servers with different operating systems. The playbook must handle OS-specific package installation, create multiple users with loops, configure services with handlers, and implement rollback procedures using blocks.</p>
+
+                <h3>Lab Objectives</h3>
+                <ul class="exercise-objectives">
+                    <li>Use conditionals to handle different operating system families</li>
+                    <li>Implement loops to create users and deploy configuration files</li>
+                    <li>Configure handlers to restart services only when configuration changes</li>
+                    <li>Use <code>loop_control</code> to customize loop output</li>
+                    <li>Implement error handling with blocks, rescue, and always sections</li>
+                    <li>Register task results and use them in subsequent tasks</li>
+                    <li>Apply <code>failed_when</code> and <code>changed_when</code> appropriately</li>
+                </ul>
+
+                <h3>Skills Assessed</h3>
+                <div class="skills-practiced">
+                    <span class="skill-tag">when conditionals</span>
+                    <span class="skill-tag">loop keyword</span>
+                    <span class="skill-tag">loop_control</span>
+                    <span class="skill-tag">handlers</span>
+                    <span class="skill-tag">notify/listen</span>
+                    <span class="skill-tag">block/rescue/always</span>
+                    <span class="skill-tag">ignore_errors</span>
+                    <span class="skill-tag">failed_when</span>
+                    <span class="skill-tag">changed_when</span>
+                    <span class="skill-tag">register</span>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title"><span aria-hidden="true">👨‍🏫</span> Instructor Action</div>
+                <p>Students should now complete the <strong>Lab: Implementing Task Control</strong> in their lab environment. This is a comprehensive lab that tests all concepts covered in this chapter. Allow adequate time for completion.</p>
+            </div>
+
+            <h2>Lab Requirements Summary</h2>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Playbook uses <code>when</code> to install OS-appropriate packages</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Users are created using a loop over a list of dictionaries</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Loop output is customized with <code>loop_control.label</code></div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Handlers are defined and notified when configuration changes</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Block with rescue implements rollback on failure</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Always section ensures cleanup tasks run</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Status check commands use <code>changed_when: false</code></div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)" onkeydown="handleCheckKey(event, this)">✓</div>
+                    <div>Registered variables are used in conditionals</div>
+                </div>
+            </div>
+
+            <h2>Concepts Applied in This Lab</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">❓</div>
+                    <div class="card-title">Conditionals</div>
+                    <div class="card-content">OS detection, variable testing, registered result checks</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔄</div>
+                    <div class="card-title">Loops</div>
+                    <div class="card-content">User creation, file deployment, dictionary iteration</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🔔</div>
+                    <div class="card-title">Handlers</div>
+                    <div class="card-content">Service restarts, configuration validation</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Error Handling</div>
+                    <div class="card-content">Blocks, rescue, always, rollback procedures</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('exercise-errors')"><span aria-hidden="true">←</span> Back to Content</button>
                 <button class="btn btn-primary" onclick="navigateTo('quiz')">Take the Quiz <span aria-hidden="true">→</span></button>
             </div>
         </section>
+
         <!-- Quiz Section -->
         <section id="section-quiz" class="section" aria-labelledby="quiz-heading">
             <h1 id="quiz-heading">Knowledge Check</h1>
-            <p class="lead">Test your understanding of task control concepts.</p>
+            <p class="lead">Test your understanding of task control concepts covered in this chapter.</p>
 
             <div class="quiz-container">
                 <div class="quiz-progress">
@@ -968,7 +1769,7 @@
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('blocks')"><span aria-hidden="true">←</span> Previous</button>
+                <button class="btn btn-secondary" onclick="navigateTo('lab')"><span aria-hidden="true">←</span> Previous</button>
                 <button class="btn btn-primary" onclick="navigateTo('summary')">View Summary <span aria-hidden="true">→</span></button>
             </div>
         </section>
@@ -976,39 +1777,39 @@
         <!-- Summary Section -->
         <section id="section-summary" class="section" aria-labelledby="summary-heading">
             <h1 id="summary-heading">Chapter Summary</h1>
-            <p class="lead">You've learned to implement comprehensive task control in Ansible playbooks.</p>
+            <p class="lead">You've learned to implement comprehensive task control in Ansible playbooks, including conditionals, loops, handlers, and error handling.</p>
 
-            <h2>Key Concepts</h2>
+            <h2>Key Concepts Covered</h2>
             <div class="card-grid">
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">❓</div>
                     <div class="card-title">Conditionals</div>
-                    <div class="card-content">Use <code>when</code> to control task execution based on variables, facts, and registered results.</div>
+                    <div class="card-content">Use <code>when</code> to control task execution based on variables, facts, and registered results. Combine with <code>and</code>, <code>or</code>, and <code>not</code>.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">🔄</div>
                     <div class="card-title">Loops</div>
-                    <div class="card-content">Iterate with <code>loop</code> keyword and control behavior with <code>loop_control</code>.</div>
+                    <div class="card-content">Iterate with <code>loop</code> keyword over lists and dictionaries. Control behavior with <code>loop_control</code> options like <code>label</code> and <code>loop_var</code>.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">🔔</div>
                     <div class="card-title">Handlers</div>
-                    <div class="card-content">Respond to changes with handlers that run once at play end when notified.</div>
+                    <div class="card-content">Respond to changes with handlers that run once at play end when notified. Use <code>listen</code> for grouping and <code>flush_handlers</code> for immediate execution.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">⚠️</div>
                     <div class="card-title">Error Handling</div>
-                    <div class="card-content">Control failures with <code>ignore_errors</code>, <code>failed_when</code>, and <code>changed_when</code>.</div>
+                    <div class="card-content">Control failures with <code>ignore_errors</code>, <code>failed_when</code>, and <code>changed_when</code>. Implement graceful error recovery.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">📦</div>
                     <div class="card-title">Blocks</div>
-                    <div class="card-content">Group tasks and implement try/catch/finally with <code>block</code>/<code>rescue</code>/<code>always</code>.</div>
+                    <div class="card-content">Group tasks and implement try/catch/finally patterns with <code>block</code>, <code>rescue</code>, and <code>always</code> sections.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">📝</div>
                     <div class="card-title">Register</div>
-                    <div class="card-content">Capture task output for use in conditionals and subsequent tasks.</div>
+                    <div class="card-content">Capture task output for use in conditionals and subsequent tasks. Access <code>results</code> list when registering in loops.</div>
                 </div>
             </div>
 
@@ -1019,28 +1820,41 @@
                     <tbody>
                         <tr><td>Conditional</td><td><code>when: condition</code></td><td>Execute task only if condition is true</td></tr>
                         <tr><td>Loop</td><td><code>loop: list</code></td><td>Repeat task for each item in list</td></tr>
+                        <tr><td>Loop Label</td><td><code>loop_control: label:</code></td><td>Customize loop output display</td></tr>
                         <tr><td>Handler</td><td><code>notify: handler_name</code></td><td>Trigger handler on task change</td></tr>
+                        <tr><td>Listen</td><td><code>listen: topic</code></td><td>Group handlers under notification topic</td></tr>
                         <tr><td>Ignore Errors</td><td><code>ignore_errors: true</code></td><td>Continue on task failure</td></tr>
                         <tr><td>Custom Failure</td><td><code>failed_when: condition</code></td><td>Define custom failure condition</td></tr>
                         <tr><td>Custom Change</td><td><code>changed_when: condition</code></td><td>Define when task reports change</td></tr>
                         <tr><td>Block</td><td><code>block: / rescue: / always:</code></td><td>Group tasks with error handling</td></tr>
+                        <tr><td>Flush Handlers</td><td><code>meta: flush_handlers</code></td><td>Run pending handlers immediately</td></tr>
                     </tbody>
                 </table>
             </div>
 
+            <h2>Exercises Completed</h2>
             <div class="checklist">
-                <h3 style="margin-top: 0; margin-bottom: 16px;">Best Practices Checklist</h3>
-                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use <code>changed_when: false</code> for status check commands</div></div>
-                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Name all tasks and handlers descriptively</div></div>
-                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use <code>loop_control.label</code> to reduce verbose output</div></div>
-                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Implement blocks for multi-task operations that may fail</div></div>
-                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Use handlers for service restarts to avoid unnecessary restarts</div></div>
-                <div class="checklist-item"><div class="checklist-check checked" role="checkbox" tabindex="0">✓</div><div>Test conditionals with diverse inventory to ensure correct behavior</div></div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" tabindex="0">✓</div>
+                    <div><strong>Guided Exercise:</strong> Writing Loops and Conditional Tasks</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" tabindex="0">✓</div>
+                    <div><strong>Guided Exercise:</strong> Implementing Handlers</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" tabindex="0">✓</div>
+                    <div><strong>Guided Exercise:</strong> Handling Task Failure</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked" role="checkbox" tabindex="0">✓</div>
+                    <div><strong>Lab:</strong> Implementing Task Control</div>
+                </div>
             </div>
 
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Next Steps</div>
-                <p>Continue with Chapter 5 to learn about deploying files to managed hosts using templates and the Jinja2 templating language.</p>
+                <p>Continue with <strong>Chapter 5: Deploying Files to Managed Hosts</strong> to learn about templates, the Jinja2 templating language, and deploying customized configuration files.</p>
             </div>
 
             <div class="nav-buttons">
@@ -1050,196 +1864,474 @@
         </section>
     </main>
     <script>
-        const sections = { 'welcome': 'Welcome', 'objectives': 'Learning Objectives', 'when-basics': 'The when Clause', 'when-advanced': 'Advanced Conditionals', 'loops-basics': 'Loop Basics', 'loops-advanced': 'Loop Control', 'handlers': 'Handler Concepts', 'errors-basic': 'Handling Failures', 'blocks': 'Blocks', 'quiz': 'Knowledge Check', 'summary': 'Summary' };
-        let currentSection = 'welcome';
+        // Section Navigation
+        const sections = ['welcome', 'objectives', 'when-basics', 'when-advanced', 'loops-basics', 'loops-advanced', 'exercise-loops', 'handlers', 'handlers-advanced', 'exercise-handlers', 'errors-basic', 'blocks', 'exercise-errors', 'lab', 'quiz', 'summary'];
+        let currentSection = 0;
         let completedSections = new Set();
-        const quizQuestions = [
-            { question: "What keyword is used to conditionally execute a task in Ansible?", options: ["if", "when", "condition", "unless"], correct: 1, explanation: "The 'when' keyword is used to conditionally execute tasks. It evaluates a Jinja2 expression and runs the task only if true." },
-            { question: "How do you combine multiple conditions that must ALL be true?", options: ["Use OR operator", "Use a list of conditions under 'when'", "Use the 'all' keyword", "Use multiple 'when' statements"], correct: 1, explanation: "When you provide a list of conditions under 'when', all conditions must be true (implicit AND)." },
-            { question: "What variable holds the current item in a loop?", options: ["current", "loop_item", "item", "value"], correct: 2, explanation: "By default, the current iteration value is available as the 'item' variable." },
-            { question: "What is the purpose of loop_control.label?", options: ["Name the loop", "Control iteration count", "Customize output display", "Set loop variable name"], correct: 2, explanation: "The 'label' option controls what is displayed during loop execution." },
-            { question: "When do handlers run in a playbook?", options: ["Immediately when notified", "At the start of each play", "At the end of each play", "Only when explicitly called"], correct: 2, explanation: "Handlers run at the end of each play, after all tasks complete." },
-            { question: "If a handler is notified multiple times, how many times does it run?", options: ["Once per notification", "Twice", "Only once", "Depends on the handler type"], correct: 2, explanation: "Handlers run only once per play, regardless of how many times they are notified." },
-            { question: "What does 'ignore_errors: true' do?", options: ["Prevents any errors", "Continues playbook execution after task failure", "Suppresses error output", "Retries failed tasks"], correct: 1, explanation: "The 'ignore_errors: true' directive allows playbook execution to continue even if the task fails." },
-            { question: "Which block section runs only when a task in the block fails?", options: ["always", "rescue", "catch", "except"], correct: 1, explanation: "The 'rescue' section runs only when a task in the 'block' section fails." },
-            { question: "What special variable provides information about a failed task in a rescue block?", options: ["failed_task", "error_info", "ansible_failed_task", "block_error"], correct: 2, explanation: "The 'ansible_failed_task' variable contains information about the task that triggered the rescue block." },
-            { question: "What is the purpose of 'changed_when: false'?", options: ["Prevent task execution", "Never report the task as changed", "Force task to always change", "Skip change notification"], correct: 1, explanation: "Using 'changed_when: false' ensures the task never reports as changed." }
-        ];
-        let currentQuestion = 0, selectedOption = null, score = 0, quizState = 'selecting';
-
-        function initNavigation() {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', (e) => { e.preventDefault(); navigateTo(item.dataset.section); });
-                item.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateTo(item.dataset.section); } });
-            });
-        }
 
         function navigateTo(sectionId) {
-            completedSections.add(currentSection);
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const targetSection = document.getElementById('section-' + sectionId);
-            const targetNav = document.querySelector(`[data-section="${sectionId}"]`);
-            if (targetSection) { targetSection.classList.add('active'); currentSection = sectionId; }
-            if (targetNav) { targetNav.classList.add('active'); }
-            completedSections.forEach(id => { const navItem = document.querySelector(`[data-section="${id}"]`); if (navItem && id !== sectionId) navItem.classList.add('completed'); });
-            updateProgress();
-            if (sectionId === 'quiz' && quizState !== 'finished') initQuiz();
-            document.getElementById('nav').classList.remove('open');
-            window.scrollTo(0, 0);
+            const section = document.getElementById('section-' + sectionId);
+            const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+            if (section) {
+                section.classList.add('active');
+                currentSection = sections.indexOf(sectionId);
+                completedSections.add(sectionId);
+                updateProgress();
+                window.scrollTo(0, 0);
+            }
+            if (navItem) {
+                navItem.classList.add('active');
+                navItem.classList.add('completed');
+            }
+            if (window.innerWidth <= 1024) {
+                document.getElementById('nav').classList.remove('open');
+            }
         }
 
         function updateProgress() {
-            const percentage = Math.round((completedSections.size / Object.keys(sections).length) * 100);
-            document.getElementById('progress-fill').style.width = percentage + '%';
-            document.getElementById('progress-text').textContent = percentage + '%';
+            const progress = Math.round((completedSections.size / sections.length) * 100);
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = progress + '%';
+            document.querySelector('.progress-bar').setAttribute('aria-valuenow', progress);
         }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateTo(item.dataset.section);
+            });
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateTo(item.dataset.section);
+                }
+            });
+        });
 
         function toggleNav() {
             const nav = document.getElementById('nav');
+            const toggle = document.querySelector('.menu-toggle');
             nav.classList.toggle('open');
-            document.querySelector('.menu-toggle').setAttribute('aria-expanded', nav.classList.contains('open'));
+            toggle.setAttribute('aria-expanded', nav.classList.contains('open'));
         }
 
-        function initQuiz() { currentQuestion = 0; selectedOption = null; score = 0; quizState = 'selecting'; showQuestion(); }
-
-        function showQuestion() {
-            if (currentQuestion >= quizQuestions.length) { showScore(); return; }
-            const q = quizQuestions[currentQuestion];
-            document.getElementById('quiz-question').textContent = q.question;
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = '';
-            q.options.forEach((option, index) => {
-                const optionEl = document.createElement('div');
-                optionEl.className = 'quiz-option';
-                optionEl.setAttribute('role', 'radio');
-                optionEl.setAttribute('tabindex', '0');
-                optionEl.innerHTML = `<div class="quiz-option-marker">${String.fromCharCode(65 + index)}</div><div>${option}</div>`;
-                optionEl.addEventListener('click', () => selectOption(index));
-                optionEl.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectOption(index); } });
-                optionsContainer.appendChild(optionEl);
-            });
-            document.getElementById('quiz-explanation').classList.remove('visible');
-            document.getElementById('quiz-btn').disabled = true;
-            document.getElementById('quiz-btn').textContent = 'Check Answer';
-            updateQuizProgress();
-            quizState = 'selecting';
+        // Objective and Checklist Toggles
+        function toggleObjective(el) {
+            el.classList.toggle('checked');
+            el.setAttribute('aria-checked', el.classList.contains('checked'));
         }
 
-        function selectOption(index) {
-            if (quizState !== 'selecting') return;
-            selectedOption = index;
-            document.querySelectorAll('.quiz-option').forEach((opt, i) => { opt.classList.remove('selected'); opt.setAttribute('aria-checked', i === index); });
-            document.querySelectorAll('.quiz-option')[index].classList.add('selected');
-            document.getElementById('quiz-btn').disabled = false;
+        function toggleCheck(el) {
+            el.classList.toggle('checked');
+            el.setAttribute('aria-checked', el.classList.contains('checked'));
         }
 
-        function handleQuizAction() { if (quizState === 'selecting') checkAnswer(); else if (quizState === 'answered') nextQuestion(); }
-
-        function checkAnswer() {
-            const q = quizQuestions[currentQuestion];
-            const options = document.querySelectorAll('.quiz-option');
-            options[q.correct].classList.add('correct');
-            if (selectedOption !== q.correct) options[selectedOption].classList.add('incorrect'); else score++;
-            const explanationEl = document.getElementById('quiz-explanation');
-            document.getElementById('quiz-explanation-title').textContent = selectedOption === q.correct ? '✓ Correct!' : '✗ Incorrect';
-            document.getElementById('quiz-explanation-title').className = 'quiz-explanation-title ' + (selectedOption === q.correct ? 'correct' : 'incorrect');
-            document.getElementById('quiz-explanation-text').textContent = q.explanation;
-            explanationEl.classList.add('visible');
-            document.getElementById('quiz-btn').textContent = currentQuestion < quizQuestions.length - 1 ? 'Next Question →' : 'See Results';
-            quizState = 'answered';
+        function handleCheckKey(event, el) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleCheck(el);
+            }
         }
 
-        function nextQuestion() { currentQuestion++; selectedOption = null; showQuestion(); }
-
-        function showScore() {
-            const percentage = Math.round((score / quizQuestions.length) * 100);
-            let message = percentage >= 80 ? 'Excellent work! You have a strong understanding of task control.' : percentage >= 60 ? 'Good effort! Review the sections you found challenging.' : 'Keep practicing! Review the chapter and try again.';
-            document.getElementById('quiz-content').innerHTML = `<div class="quiz-score"><div class="quiz-score-value">${percentage}%</div><div class="quiz-score-label">${score} of ${quizQuestions.length} correct</div><p style="margin-top: 24px; color: var(--text-secondary);">${message}</p></div>`;
-            document.getElementById('quiz-btn').textContent = 'Retake Quiz';
-            document.getElementById('quiz-btn').disabled = false;
-            document.getElementById('quiz-btn').onclick = initQuiz;
-            quizState = 'finished';
-            completedSections.add('quiz');
-            updateProgress();
-        }
-
-        function updateQuizProgress() {
-            document.getElementById('quiz-progress-fill').style.width = ((currentQuestion) / quizQuestions.length) * 100 + '%';
-            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
-        }
-
-        function toggleObjective(el) { el.classList.toggle('checked'); el.setAttribute('aria-checked', el.classList.contains('checked')); }
-        function toggleCheck(el) { el.classList.toggle('checked'); el.setAttribute('aria-checked', el.classList.contains('checked')); }
-
+        // Copy Code Function
         function copyCode(btn) {
             const code = btn.closest('.code-block').querySelector('pre').textContent;
-            navigator.clipboard.writeText(code).then(() => { const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = orig, 2000); });
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
         }
 
+        // Conditional Demo
         function runConditionalDemo() {
             const os = document.getElementById('cond-os').value;
             const env = document.getElementById('cond-env').value;
             const memory = parseInt(document.getElementById('cond-memory').value);
             const output = document.getElementById('cond-output');
-            output.innerHTML = '';
-            const lines = [
-                { text: 'PLAY [Conditional Demo] **********************', class: 'output-play' },
-                { text: '' },
-                { text: 'TASK [Check conditions] **********************', class: 'output-task' },
-                { text: `Facts: os_family=${os}, env=${env}, memfree_mb=${memory}`, class: '' },
-                { text: '' }
-            ];
-            if (os === 'RedHat') { lines.push({ text: 'TASK [Install httpd on Red Hat] **************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' }); }
-            else { lines.push({ text: 'TASK [Install httpd on Red Hat] **************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
-            if (os === 'Debian') { lines.push({ text: 'TASK [Install apache2 on Debian] *************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' }); }
-            else { lines.push({ text: 'TASK [Install apache2 on Debian] *************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
-            if (memory < 512) { lines.push({ text: 'TASK [Warn if low memory] ********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost] => msg: "Low memory warning!"', class: 'output-changed' }); }
-            else { lines.push({ text: 'TASK [Warn if low memory] ********************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
-            if (env === 'production') { lines.push({ text: 'TASK [Production deployment] *****************', class: 'output-task' }); lines.push({ text: 'changed: [localhost]', class: 'output-changed' }); }
-            else { lines.push({ text: 'TASK [Production deployment] *****************', class: 'output-task' }); lines.push({ text: 'skipping: [localhost]', class: 'output-skipped' }); }
-            lines.push({ text: '' }); lines.push({ text: 'PLAY RECAP ***********************************', class: 'output-play' });
-            let idx = 0;
-            function addLine() { if (idx < lines.length) { const div = document.createElement('div'); div.className = 'output-line ' + (lines[idx].class || ''); div.textContent = lines[idx].text; output.appendChild(div); idx++; setTimeout(addLine, 80); } }
-            addLine();
+            
+            let lines = [];
+            lines.push('<div class="output-line output-play">PLAY [Evaluate Conditionals Demo] ****</div>');
+            lines.push('<div class="output-line">&nbsp;</div>');
+            
+            // Task 1: OS Family check
+            lines.push('<div class="output-line output-task">TASK [Install httpd on RedHat] ****</div>');
+            if (os === 'RedHat') {
+                lines.push('<div class="output-line output-changed">changed: [demo-host] => {"msg": "Installing httpd via dnf"}</div>');
+            } else {
+                lines.push('<div class="output-line output-skipped">skipping: [demo-host] => when: ansible_facts[\'os_family\'] == "RedHat"</div>');
+            }
+            
+            // Task 2: Debian check
+            lines.push('<div class="output-line output-task">TASK [Install apache2 on Debian] ****</div>');
+            if (os === 'Debian') {
+                lines.push('<div class="output-line output-changed">changed: [demo-host] => {"msg": "Installing apache2 via apt"}</div>');
+            } else {
+                lines.push('<div class="output-line output-skipped">skipping: [demo-host] => when: ansible_facts[\'os_family\'] == "Debian"</div>');
+            }
+            
+            // Task 3: Environment check
+            lines.push('<div class="output-line output-task">TASK [Configure production settings] ****</div>');
+            if (env === 'production') {
+                lines.push('<div class="output-line output-changed">changed: [demo-host] => {"msg": "Applying production configuration"}</div>');
+            } else {
+                lines.push('<div class="output-line output-skipped">skipping: [demo-host] => when: environment == "production"</div>');
+            }
+            
+            // Task 4: Memory check
+            lines.push('<div class="output-line output-task">TASK [Enable caching if sufficient memory] ****</div>');
+            if (memory >= 512) {
+                lines.push('<div class="output-line output-changed">changed: [demo-host] => {"msg": "Enabling cache (' + memory + 'MB available)"}</div>');
+            } else {
+                lines.push('<div class="output-line output-skipped">skipping: [demo-host] => when: memfree_mb >= 512 (only ' + memory + 'MB available)</div>');
+            }
+            
+            // Task 5: Combined condition
+            lines.push('<div class="output-line output-task">TASK [Deploy to production Linux servers] ****</div>');
+            if ((os === 'RedHat' || os === 'Debian') && env === 'production') {
+                lines.push('<div class="output-line output-changed">changed: [demo-host] => {"msg": "Deploying to production ' + os + ' server"}</div>');
+            } else {
+                lines.push('<div class="output-line output-skipped">skipping: [demo-host] => combined condition not met</div>');
+            }
+            
+            lines.push('<div class="output-line">&nbsp;</div>');
+            lines.push('<div class="output-line output-play">PLAY RECAP ****</div>');
+            lines.push('<div class="output-line">demo-host : <span class="output-ok">ok=evaluated</span> <span class="output-changed">changed=see above</span></div>');
+            
+            output.innerHTML = lines.join('');
         }
 
+        // Block Demo
         function runBlockDemo() {
             const scenario = document.getElementById('block-scenario').value;
             const output = document.getElementById('block-output');
-            output.innerHTML = '';
-            const lines = [{ text: 'PLAY [Block Demo] *****************************', class: 'output-play' }, { text: '' }];
-            lines.push({ text: 'TASK [block: Task 1 - Create backup] *********', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
+            
+            let lines = [];
+            lines.push('<div class="output-line output-play">PLAY [Block Execution Demo] ****</div>');
+            lines.push('<div class="output-line">&nbsp;</div>');
+            
+            // Block tasks
+            lines.push('<div class="output-line" style="color: var(--accent-blue); font-weight: 600;">BLOCK: Application Deployment ====</div>');
+            
+            lines.push('<div class="output-line output-task">TASK [Create backup] ****</div>');
+            lines.push('<div class="output-line output-changed">changed: [server1]</div>');
+            
+            lines.push('<div class="output-line output-task">TASK [Deploy new version] ****</div>');
             if (scenario === 'fail-task2') {
-                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
-                lines.push({ text: '' }); lines.push({ text: 'TASK [rescue: Rollback] **********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-changed' });
-            } else if (scenario === 'fail-task3') {
-                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'changed: [localhost]', class: 'output-changed' });
-                lines.push({ text: 'TASK [block: Task 3 - Verify] ****************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
-                lines.push({ text: '' }); lines.push({ text: 'TASK [rescue: Rollback] **********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-changed' });
-            } else if (scenario === 'rescue-fails') {
-                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
-                lines.push({ text: '' }); lines.push({ text: 'TASK [rescue: Rollback] **********************', class: 'output-task' }); lines.push({ text: 'fatal: [localhost]: FAILED!', class: 'output-failed' });
+                lines.push('<div class="output-line output-failed">fatal: [server1]: FAILED! => {"msg": "Deployment archive corrupted"}</div>');
             } else {
-                lines.push({ text: 'TASK [block: Task 2 - Deploy] ****************', class: 'output-task' }); lines.push({ text: 'changed: [localhost]', class: 'output-changed' });
-                lines.push({ text: 'TASK [block: Task 3 - Verify] ****************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
+                lines.push('<div class="output-line output-changed">changed: [server1]</div>');
+                
+                lines.push('<div class="output-line output-task">TASK [Run health check] ****</div>');
+                if (scenario === 'fail-task3') {
+                    lines.push('<div class="output-line output-failed">fatal: [server1]: FAILED! => {"msg": "Health check failed - service not responding"}</div>');
+                } else {
+                    lines.push('<div class="output-line output-ok">ok: [server1]</div>');
+                }
             }
-            lines.push({ text: '' }); lines.push({ text: 'TASK [always: Restart service] ***************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
-            lines.push({ text: 'TASK [always: Clean up] **********************', class: 'output-task' }); lines.push({ text: 'ok: [localhost]', class: 'output-ok' });
-            lines.push({ text: '' }); lines.push({ text: 'PLAY RECAP ***********************************', class: 'output-play' });
-            if (scenario === 'rescue-fails') lines.push({ text: 'localhost : ok=3 changed=0 failed=1', class: 'output-failed' });
-            else if (scenario === 'success') lines.push({ text: 'localhost : ok=5 changed=1 failed=0', class: 'output-ok' });
-            else lines.push({ text: 'localhost : ok=4 changed=0 rescued=1', class: 'output-ok' });
-            let idx = 0;
-            function addLine() { if (idx < lines.length) { const div = document.createElement('div'); div.className = 'output-line ' + (lines[idx].class || ''); div.textContent = lines[idx].text; output.appendChild(div); output.scrollTop = output.scrollHeight; idx++; setTimeout(addLine, 100); } }
-            addLine();
+            
+            // Rescue if failed
+            if (scenario !== 'success') {
+                lines.push('<div class="output-line">&nbsp;</div>');
+                lines.push('<div class="output-line" style="color: var(--accent-orange); font-weight: 600;">RESCUE: Error Recovery ====</div>');
+                
+                lines.push('<div class="output-line output-task">TASK [Restore from backup] ****</div>');
+                if (scenario === 'rescue-fails') {
+                    lines.push('<div class="output-line output-failed">fatal: [server1]: FAILED! => {"msg": "Backup restoration failed!"}</div>');
+                } else {
+                    lines.push('<div class="output-line output-changed">changed: [server1]</div>');
+                    lines.push('<div class="output-line output-task">TASK [Log failure] ****</div>');
+                    lines.push('<div class="output-line output-ok">ok: [server1] => {"msg": "Logged failure to /var/log/deploy.log"}</div>');
+                }
+            }
+            
+            // Always section
+            lines.push('<div class="output-line">&nbsp;</div>');
+            lines.push('<div class="output-line" style="color: var(--accent-green); font-weight: 600;">ALWAYS: Cleanup Tasks ====</div>');
+            
+            lines.push('<div class="output-line output-task">TASK [Restart application] ****</div>');
+            lines.push('<div class="output-line output-changed">changed: [server1]</div>');
+            
+            lines.push('<div class="output-line output-task">TASK [Remove backup directory] ****</div>');
+            lines.push('<div class="output-line output-changed">changed: [server1]</div>');
+            
+            // Play recap
+            lines.push('<div class="output-line">&nbsp;</div>');
+            lines.push('<div class="output-line output-play">PLAY RECAP ****</div>');
+            
+            if (scenario === 'success') {
+                lines.push('<div class="output-line">server1 : <span class="output-ok">ok=5</span> <span class="output-changed">changed=4</span> failed=0</div>');
+                lines.push('<div class="output-line" style="color: var(--success); margin-top: 12px; font-weight: 600;">✓ Deployment completed successfully!</div>');
+            } else if (scenario === 'rescue-fails') {
+                lines.push('<div class="output-line">server1 : <span class="output-ok">ok=3</span> <span class="output-changed">changed=3</span> <span class="output-failed">failed=2</span></div>');
+                lines.push('<div class="output-line" style="color: var(--error); margin-top: 12px; font-weight: 600;">✗ Deployment and recovery both failed!</div>');
+            } else {
+                lines.push('<div class="output-line">server1 : <span class="output-ok">ok=5</span> <span class="output-changed">changed=5</span> <span class="output-failed">failed=1</span> rescued=1</div>');
+                lines.push('<div class="output-line" style="color: var(--warning); margin-top: 12px; font-weight: 600;">⚠ Deployment failed but recovery succeeded</div>');
+            }
+            
+            output.innerHTML = lines.join('');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initNavigation();
-            document.addEventListener('click', (e) => { const nav = document.getElementById('nav'); const toggle = document.querySelector('.menu-toggle'); if (!nav.contains(e.target) && !toggle.contains(e.target)) nav.classList.remove('open'); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.getElementById('nav').classList.remove('open'); });
+        // Quiz System
+        const quizQuestions = [
+            {
+                question: "What is the correct way to test if a variable is defined in a when clause?",
+                options: [
+                    "when: {{ my_var is defined }}",
+                    "when: my_var is defined",
+                    "when: defined(my_var)",
+                    "when: my_var != undefined"
+                ],
+                correct: 1,
+                explanation: "The when clause uses raw Jinja2 expressions WITHOUT the double curly braces. The correct test is 'my_var is defined'."
+            },
+            {
+                question: "How do you combine multiple conditions where ALL must be true?",
+                options: [
+                    "Use 'or' between conditions",
+                    "Use a list format under when:",
+                    "Use 'all:' keyword",
+                    "Conditions cannot be combined"
+                ],
+                correct: 1,
+                explanation: "Multiple conditions listed under 'when:' are combined with implicit AND - all conditions must be true for the task to run."
+            },
+            {
+                question: "What is the default variable name for the current item in a loop?",
+                options: [
+                    "loop_item",
+                    "current",
+                    "item",
+                    "element"
+                ],
+                correct: 2,
+                explanation: "The default loop variable is 'item'. You can change it using loop_control with the loop_var option."
+            },
+            {
+                question: "When do handlers run by default?",
+                options: [
+                    "Immediately when notified",
+                    "At the end of the play",
+                    "At the end of each task",
+                    "Only when explicitly called"
+                ],
+                correct: 1,
+                explanation: "Handlers run at the end of the play, after all tasks have completed. Use 'meta: flush_handlers' to run them earlier."
+            },
+            {
+                question: "If a handler is notified three times in a play, how many times does it run?",
+                options: [
+                    "Three times",
+                    "Once",
+                    "Zero times",
+                    "Depends on the handler configuration"
+                ],
+                correct: 1,
+                explanation: "Handlers run only ONCE per play, regardless of how many times they are notified. This prevents unnecessary service restarts."
+            },
+            {
+                question: "What does 'ignore_errors: true' do?",
+                options: [
+                    "Prevents the task from ever failing",
+                    "Continues playbook execution even if the task fails",
+                    "Removes errors from the output",
+                    "Retries the task until it succeeds"
+                ],
+                correct: 1,
+                explanation: "ignore_errors: true allows the playbook to continue even if the task fails. The task is still reported as failed in the recap."
+            },
+            {
+                question: "When does the 'rescue' section of a block run?",
+                options: [
+                    "Always, after the block completes",
+                    "Only when a task in the block fails",
+                    "Before the block tasks run",
+                    "When explicitly triggered by a notify"
+                ],
+                correct: 1,
+                explanation: "The rescue section only runs when a task within the block fails. It's used for error recovery, similar to a catch block in programming."
+            },
+            {
+                question: "What is the purpose of 'changed_when: false'?",
+                options: [
+                    "Prevents the task from making any changes",
+                    "Prevents the task from reporting as changed",
+                    "Makes the task always fail",
+                    "Skips the task entirely"
+                ],
+                correct: 1,
+                explanation: "changed_when: false prevents a task from reporting 'changed' status. This is useful for command/shell tasks that gather information but don't modify the system."
+            },
+            {
+                question: "What does 'loop_control: label:' do?",
+                options: [
+                    "Adds a label to each item in the loop",
+                    "Controls what is displayed in the loop output",
+                    "Names the loop for reference",
+                    "Limits the number of iterations"
+                ],
+                correct: 1,
+                explanation: "The label option in loop_control customizes what is shown in the task output during loop execution, making output cleaner when looping over complex data structures."
+            },
+            {
+                question: "What special variable contains information about a failed task when in a rescue block?",
+                options: [
+                    "failed_task_info",
+                    "ansible_failed_task",
+                    "error_details",
+                    "rescue_info"
+                ],
+                correct: 1,
+                explanation: "ansible_failed_task contains a dictionary with information about the failed task including its name, action, and arguments. ansible_failed_result contains the task's return data."
+            }
+        ];
+
+        let currentQuizQuestion = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+
+        function initQuiz() {
+            currentQuizQuestion = 0;
+            quizScore = 0;
+            quizAnswered = false;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = quizQuestions[currentQuizQuestion];
+            document.getElementById('quiz-question').textContent = q.question;
+            document.getElementById('quiz-progress-fill').style.width = ((currentQuizQuestion + 1) / quizQuestions.length * 100) + '%';
+            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuizQuestion + 1} of ${quizQuestions.length}`;
+            
+            const optionsHtml = q.options.map((opt, idx) => 
+                `<div class="quiz-option" onclick="selectOption(${idx})" role="radio" aria-checked="false" tabindex="0">
+                    <div class="quiz-option-marker">${String.fromCharCode(65 + idx)}</div>
+                    <div>${opt}</div>
+                </div>`
+            ).join('');
+            document.getElementById('quiz-options').innerHTML = optionsHtml;
+            document.getElementById('quiz-explanation').classList.remove('visible');
+            document.getElementById('quiz-btn').textContent = 'Check Answer';
+            document.getElementById('quiz-btn').disabled = true;
+            quizAnswered = false;
+        }
+
+        function selectOption(idx) {
+            if (quizAnswered) return;
+            document.querySelectorAll('.quiz-option').forEach((opt, i) => {
+                opt.classList.remove('selected');
+                opt.setAttribute('aria-checked', 'false');
+            });
+            document.querySelectorAll('.quiz-option')[idx].classList.add('selected');
+            document.querySelectorAll('.quiz-option')[idx].setAttribute('aria-checked', 'true');
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function handleQuizAction() {
+            if (!quizAnswered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        }
+
+        function checkAnswer() {
+            const selected = document.querySelector('.quiz-option.selected');
+            if (!selected) return;
+            
+            const selectedIdx = Array.from(document.querySelectorAll('.quiz-option')).indexOf(selected);
+            const q = quizQuestions[currentQuizQuestion];
+            
+            quizAnswered = true;
+            document.querySelectorAll('.quiz-option').forEach((opt, i) => {
+                if (i === q.correct) opt.classList.add('correct');
+                if (i === selectedIdx && i !== q.correct) opt.classList.add('incorrect');
+            });
+            
+            const explanationEl = document.getElementById('quiz-explanation');
+            const titleEl = document.getElementById('quiz-explanation-title');
+            const textEl = document.getElementById('quiz-explanation-text');
+            
+            if (selectedIdx === q.correct) {
+                quizScore++;
+                titleEl.textContent = '✓ Correct!';
+                titleEl.className = 'quiz-explanation-title correct';
+            } else {
+                titleEl.textContent = '✗ Incorrect';
+                titleEl.className = 'quiz-explanation-title incorrect';
+            }
+            textEl.textContent = q.explanation;
+            explanationEl.classList.add('visible');
+            
+            document.getElementById('quiz-btn').textContent = currentQuizQuestion < quizQuestions.length - 1 ? 'Next Question' : 'See Results';
+        }
+
+        function nextQuestion() {
+            if (currentQuizQuestion < quizQuestions.length - 1) {
+                currentQuizQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="quiz-score">
+                    <div class="quiz-score-value">${percentage}%</div>
+                    <div class="quiz-score-label">${quizScore} out of ${quizQuestions.length} correct</div>
+                    <p style="margin-top: 24px; color: var(--text-secondary);">
+                        ${percentage >= 80 ? 'Excellent work! You have a solid understanding of task control concepts.' : 
+                          percentage >= 60 ? 'Good effort! Review the sections where you had difficulty.' : 
+                          'Keep studying! Review the chapter content and try again.'}
+                    </p>
+                </div>
+            `;
+            document.getElementById('quiz-btn').textContent = 'Retake Quiz';
+            document.getElementById('quiz-btn').onclick = () => {
+                document.getElementById('quiz-content').innerHTML = `
+                    <div class="quiz-question" id="quiz-question"></div>
+                    <div class="quiz-options" id="quiz-options" role="radiogroup"></div>
+                    <div class="quiz-explanation" id="quiz-explanation">
+                        <div class="quiz-explanation-title" id="quiz-explanation-title"></div>
+                        <div id="quiz-explanation-text"></div>
+                    </div>
+                `;
+                document.getElementById('quiz-btn').onclick = handleQuizAction;
+                initQuiz();
+            };
+        }
+
+        // Tooltip positioning
+        function positionTooltips() {
+            document.querySelectorAll('.term').forEach(term => {
+                const rect = term.getBoundingClientRect();
+                const tooltip = term.querySelector('.tooltip');
+                if (!tooltip) return;
+                
+                term.classList.remove('tooltip-left', 'tooltip-right');
+                
+                if (rect.left < 200) {
+                    term.classList.add('tooltip-left');
+                } else if (window.innerWidth - rect.right < 200) {
+                    term.classList.add('tooltip-right');
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            navigateTo('welcome');
+            positionTooltips();
+            initQuiz();
         });
+
+        window.addEventListener('resize', positionTooltips);
+        window.addEventListener('scroll', positionTooltips);
     </script>
 </body>
 </html>
