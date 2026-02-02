@@ -76,20 +76,29 @@
         .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
         .nav-item.active { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); color: var(--text-primary); }
         .nav-item.completed::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--success); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: -32px; margin-left: -8px; }
+        .nav-item.pause-item { color: var(--accent-orange); }
+        .nav-item.pause-item .nav-icon { color: var(--accent-orange); }
         .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
         .section { display: none; padding: 48px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         h1 { font-family: 'Red Hat Display', sans-serif; font-size: 42px; font-weight: 900; margin-bottom: 16px; line-height: 1.2; }
-        h2 { font-family: 'Red Hat Display', sans-serif; font-size: 28px; font-weight: 700; margin: 40px 0 20px; color: var(--text-primary); }
-        h3 { font-family: 'Red Hat Display', sans-serif; font-size: 22px; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary); }
+        h2 { font-family: 'Red Hat Display', sans-serif; font-size: 28px; font-weight: 700; margin: 40px 0 20px; color: var(--text-primary); border-bottom: 2px solid var(--rh-red); padding-bottom: 8px; }
+        h3 { font-family: 'Red Hat Display', sans-serif; font-size: 22px; font-weight: 600; margin: 32px 0 16px; color: var(--accent-yellow); }
         h4 { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 600; margin: 24px 0 12px; color: var(--text-primary); }
         p { margin-bottom: 16px; color: var(--text-secondary); }
         .lead { font-size: 20px; color: var(--text-primary); margin-bottom: 32px; line-height: 1.6; }
         code { font-family: 'Red Hat Mono', monospace; background: var(--bg-tertiary); padding: 2px 8px; border-radius: 4px; font-size: 15px; color: var(--accent-cyan); }
+        
+        /* Tooltip styles with smart positioning */
         .term { position: relative; color: var(--accent-yellow); cursor: help; border-bottom: 1px dotted var(--accent-yellow); }
-        .term .tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--tooltip-bg); color: var(--tooltip-text); padding: 12px 16px; border-radius: 8px; font-size: 14px; width: 280px; opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1.5; pointer-events: none; }
+        .term .tooltip { 
+            position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); 
+            background: var(--tooltip-bg); color: var(--tooltip-text); padding: 12px 16px; border-radius: 8px; 
+            font-size: 14px; width: 280px; opacity: 0; visibility: hidden; transition: all 0.2s; 
+            z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1.5; pointer-events: none; 
+        }
         .term .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 8px solid transparent; border-top-color: var(--tooltip-bg); }
         .term:hover .tooltip, .term:focus .tooltip { opacity: 1; visibility: visible; }
         .term.tooltip-left .tooltip { left: 0; transform: translateX(0); }
@@ -98,6 +107,8 @@
         .term.tooltip-right .tooltip::after { left: auto; right: 24px; }
         .term.tooltip-bottom .tooltip { bottom: auto; top: calc(100% + 8px); }
         .term.tooltip-bottom .tooltip::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--tooltip-bg); }
+        
+        /* Info boxes */
         .info-box { background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
         .info-box.warning { border-left-color: var(--warning); background: rgba(255, 153, 0, 0.1); }
         .info-box.tip { border-left-color: var(--accent-green); background: rgba(0, 153, 51, 0.1); }
@@ -108,8 +119,18 @@
         .info-box.tip .info-box-title { color: var(--accent-green); }
         .info-box.danger .info-box-title { color: var(--error); }
         .info-box.important .info-box-title { color: var(--accent-purple); }
-        .code-block { background: var(--code-bg); border-radius: 8px; overflow: hidden; margin: 20px 0; border: 1px solid var(--border-color); }
-        .code-header { background: var(--bg-tertiary); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        
+        /* Cards */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 32px 0; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s; }
+        .card:hover { border-color: var(--rh-red); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(204, 0, 0, 0.2); }
+        .card-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--rh-red) 0%, var(--accent-orange) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+        .card-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .card-content { color: var(--text-muted); font-size: 15px; }
+        
+        /* Code blocks */
+        .code-block { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; margin: 24px 0; overflow: hidden; }
+        .code-header { background: var(--bg-tertiary); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
         .code-title { font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
         .code-copy { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .code-copy:hover { background: var(--rh-red); color: white; border-color: var(--rh-red); }
@@ -123,51 +144,158 @@
         .yaml-comment { color: #5C6370; font-style: italic; }
         .yaml-module { color: #61AFEF; }
         .yaml-dash { color: #E06C75; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 24px 0; }
-        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s; }
-        .card:hover { border-color: var(--rh-red); transform: translateY(-2px); }
-        .card-icon { font-size: 32px; margin-bottom: 16px; }
-        .card-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-        .card-content { color: var(--text-secondary); font-size: 15px; }
+        
+        /* Tables */
+        .table-container { overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        th { background: var(--bg-tertiary); padding: 14px 16px; text-align: left; font-weight: 600; color: var(--text-primary); }
+        td { padding: 14px 16px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        
+        /* Objectives list */
+        .objectives-list { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .objectives-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+        .objective-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .objective-item:last-child { border-bottom: none; }
+        .objective-checkbox { width: 28px; height: 28px; border: 2px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; color: transparent; font-size: 14px; font-weight: bold; }
+        .objective-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+        .objective-text { color: var(--text-secondary); line-height: 1.6; }
+        
+        /* Buttons */
         .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 6px; font-family: 'Red Hat Display', sans-serif; font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; }
         .btn-primary { background: var(--rh-red); color: white; }
         .btn-primary:hover { background: var(--rh-red-dark); }
         .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background: var(--bg-secondary); border-color: var(--text-muted); }
         .nav-buttons { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-color); }
-        .table-container { overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; font-size: 15px; }
-        th { background: var(--bg-tertiary); padding: 14px 16px; text-align: left; font-weight: 600; color: var(--text-primary); }
-        td { padding: 14px 16px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-        .terminal { background: var(--code-bg); border-radius: 8px; overflow: hidden; margin: 24px 0; border: 1px solid var(--border-color); }
-        .terminal-header { background: var(--bg-tertiary); padding: 12px 16px; display: flex; align-items: center; }
-        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
-        .terminal-dot.red { background: #FF5F56; }
-        .terminal-dot.yellow { background: #FFBD2E; }
-        .terminal-dot.green { background: #27CA40; }
-        .terminal-title { margin-left: 12px; font-family: 'Red Hat Mono', monospace; font-size: 13px; color: var(--text-muted); }
-        .terminal-body { padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 14px; line-height: 1.6; }
-        .objectives-list { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
-        .objectives-title { font-family: 'Red Hat Display', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .objective-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-        .objective-item:last-child { border-bottom: none; }
-        .objective-checkbox { width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; color: transparent; font-size: 14px; }
-        .objective-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
-        .objective-text { color: var(--text-secondary); }
-        .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 24px 0; }
+        
+        /* Pause Point Styles */
+        .pause-point {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--rh-red) 100%);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .pause-point::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .pause-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 40px;
+        }
+        .pause-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            text-align: center;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .pause-subtitle {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 18px;
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 32px;
+        }
+        .pause-details {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .pause-detail-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: white;
+        }
+        .pause-detail-row:last-child {
+            border-bottom: none;
+        }
+        .pause-detail-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .pause-detail-label {
+            font-weight: 600;
+            min-width: 120px;
+        }
+        .pause-skills {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 24px;
+            color: var(--bg-primary);
+        }
+        .pause-skills-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--rh-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .pause-skill-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            color: var(--bg-primary);
+        }
+        .pause-skill-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--rh-red);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        
+        /* Quiz styles */
+        .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
         .quiz-progress { margin-bottom: 32px; }
         .quiz-progress-bar { height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
         .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--rh-red), var(--accent-orange)); transition: width 0.3s; }
         .quiz-progress-text { font-size: 14px; color: var(--text-muted); text-align: center; }
-        .quiz-question { font-size: 20px; font-weight: 600; margin-bottom: 24px; line-height: 1.4; }
+        .quiz-question { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 24px; line-height: 1.4; }
         .quiz-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
         .quiz-option { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .quiz-option:hover { border-color: var(--accent-cyan); transform: translateX(4px); }
         .quiz-option.selected { border-color: var(--accent-blue); background: rgba(0, 102, 204, 0.1); }
         .quiz-option.correct { border-color: var(--success); background: rgba(0, 204, 102, 0.1); }
         .quiz-option.incorrect { border-color: var(--error); background: rgba(255, 51, 51, 0.1); }
-        .quiz-option-letter { width: 32px; height: 32px; background: var(--bg-secondary); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .quiz-option-letter { width: 32px; height: 32px; background: var(--bg-secondary); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
         .quiz-explanation { display: none; background: var(--bg-tertiary); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
         .quiz-explanation.show { display: block; }
         .quiz-explanation-title { font-weight: 700; margin-bottom: 8px; }
@@ -181,35 +309,29 @@
         .quiz-score.excellent { color: var(--success); }
         .quiz-score.good { color: var(--accent-yellow); }
         .quiz-score.needs-work { color: var(--warning); }
-        .exercise { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; margin: 24px 0; overflow: hidden; }
-        .exercise-header { background: linear-gradient(135deg, var(--rh-red), var(--accent-orange)); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
-        .exercise-badge { background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .exercise-title { font-size: 18px; font-weight: 700; }
-        .exercise-body { padding: 24px; }
-        .exercise-steps { margin-top: 20px; }
-        .exercise-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
-        .exercise-step:last-child { border-bottom: none; }
-        .exercise-step-number { width: 28px; height: 28px; min-width: 28px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
-        .simulator { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid var(--border-color); }
-        .simulator-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-        .simulator-controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .simulator-select { padding: 10px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-family: 'Red Hat Text', sans-serif; font-size: 14px; min-width: 200px; }
-        .simulator-btn { padding: 10px 20px; background: var(--rh-red); border: none; border-radius: 6px; color: white; font-family: 'Red Hat Display', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .simulator-btn:hover { background: var(--rh-red-dark); }
-        .simulator-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .simulator-output { background: var(--code-bg); border-radius: 8px; padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 13px; line-height: 1.6; min-height: 300px; max-height: 500px; overflow-y: auto; }
-        .sim-line { margin: 2px 0; }
-        .sim-task { color: var(--accent-cyan); font-weight: 600; }
-        .sim-ok { color: var(--success); }
-        .sim-changed { color: var(--accent-yellow); }
-        .sim-failed { color: var(--error); }
-        .sim-play { color: var(--accent-orange); font-weight: 700; }
+        
+        /* Checklist */
         .checklist { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
-        .checklist-title { font-family: 'Red Hat Display', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 20px; }
-        .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .checklist-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        .checklist-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
         .checklist-item:last-child { border-bottom: none; }
         .checklist-check { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-muted); flex-shrink: 0; }
         .checklist-check.checked { background: var(--success); color: white; }
+        
+        /* Week indicator */
+        .week-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        
+        /* Responsive */
         @media (max-width: 1024px) {
             nav { transform: translateX(-100%); transition: transform 0.3s; }
             nav.open { transform: translateX(0); }
@@ -222,6 +344,8 @@
             h2 { font-size: 24px; }
             .progress-bar { width: 120px; }
             .card-grid { grid-template-columns: 1fr; }
+            .pause-point { padding: 24px; }
+            .pause-title { font-size: 24px; }
         }
     </style>
 </head>
@@ -256,49 +380,46 @@
             </div>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">User & Group Management</div>
+            <div class="nav-section-title">Week 1: Software & Users</div>
+            <div class="nav-item" data-section="software" tabindex="0">
+                <span class="nav-icon">📦</span> Managing Software
+            </div>
+            <div class="nav-item pause-item" data-section="pause1" tabindex="0">
+                <span class="nav-icon">⏸️</span> Exercise: Software
+            </div>
             <div class="nav-item" data-section="users" tabindex="0">
-                <span class="nav-icon">👥</span> Managing Users & Groups
+                <span class="nav-icon">👥</span> Users & Authentication
             </div>
-            <div class="nav-item" data-section="ssh" tabindex="0">
-                <span class="nav-icon">🔑</span> SSH Keys & Sudo
+            <div class="nav-item pause-item" data-section="pause2" tabindex="0">
+                <span class="nav-icon">⏸️</span> Exercise: Users
             </div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">Scheduling & Services</div>
-            <div class="nav-item" data-section="cron" tabindex="0">
-                <span class="nav-icon">⏰</span> Cron & At Jobs
+            <div class="nav-item" data-section="boot" tabindex="0">
+                <span class="nav-icon">⚙️</span> Boot Process & Scheduling
             </div>
-            <div class="nav-item" data-section="services" tabindex="0">
-                <span class="nav-icon">⚙️</span> Service Management
+            <div class="nav-item pause-item" data-section="pause3" tabindex="0">
+                <span class="nav-icon">⏸️</span> Exercise: Boot & Scheduling
             </div>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Package Management</div>
-            <div class="nav-item" data-section="packages" tabindex="0">
-                <span class="nav-icon">📦</span> Software Packages
-            </div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">Infrastructure</div>
+            <div class="nav-section-title">Week 2: Storage & Network</div>
             <div class="nav-item" data-section="storage" tabindex="0">
-                <span class="nav-icon">💾</span> Storage Configuration
+                <span class="nav-icon">💾</span> Managing Storage
             </div>
-            <div class="nav-item" data-section="firewall" tabindex="0">
-                <span class="nav-icon">🛡️</span> Firewall Management
+            <div class="nav-item pause-item" data-section="pause4" tabindex="0">
+                <span class="nav-icon">⏸️</span> Exercise: Storage
             </div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">Practice</div>
-            <div class="nav-item" data-section="simulator" tabindex="0">
-                <span class="nav-icon">🖥️</span> Simulator
+            <div class="nav-item" data-section="network" tabindex="0">
+                <span class="nav-icon">🌐</span> Network Configuration
             </div>
-            <div class="nav-item" data-section="lab" tabindex="0">
-                <span class="nav-icon">🔬</span> Hands-On Lab
+            <div class="nav-item pause-item" data-section="pause5" tabindex="0">
+                <span class="nav-icon">⏸️</span> Exercise: Network
             </div>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Assessment</div>
+            <div class="nav-section-title">Final Lab & Assessment</div>
+            <div class="nav-item pause-item" data-section="lab" tabindex="0">
+                <span class="nav-icon">🔬</span> Lab: Linux Administration
+            </div>
             <div class="nav-item" data-section="quiz" tabindex="0">
                 <span class="nav-icon">📝</span> Knowledge Check
             </div>
@@ -311,35 +432,46 @@
     <main id="main-content">
         <!-- Welcome Section -->
         <section id="welcome" class="section active">
+            <div class="week-indicator">📅 Two-Week Module</div>
             <h1>Automating Linux Administration Tasks</h1>
-            <p class="lead">Master the art of automating common system administration tasks with Ansible. From user management to storage configuration, learn to manage your entire Linux infrastructure with code.</p>
+            <p class="lead">Master the art of automating common system administration tasks with Ansible. From software management to network configuration, learn to manage your entire Linux infrastructure as code.</p>
             
             <div class="info-box">
                 <div class="info-box-title"><span aria-hidden="true">📚</span> Chapter Overview</div>
-                <p>This chapter covers the practical application of Ansible to everyday Linux system administration. You'll learn to automate <span class="term" tabindex="0">user provisioning<span class="tooltip" role="tooltip">The process of creating, configuring, and managing user accounts including permissions, groups, and authentication credentials.</span></span>, package management, service control, storage setup, and firewall configuration across your infrastructure.</p>
+                <p>This chapter covers the practical application of Ansible to everyday Linux system administration. You'll learn to automate <span class="term" tabindex="0">software management<span class="tooltip" role="tooltip">Installing, updating, and removing software packages and managing Red Hat subscriptions across multiple systems.</span></span>, user provisioning, service control, storage setup, and network configuration across your infrastructure.</p>
+            </div>
+            
+            <div class="info-box important">
+                <div class="info-box-title"><span aria-hidden="true">⏰</span> Course Timeline</div>
+                <p>This module is designed to be completed over <strong>two weeks</strong> with five guided exercises and one comprehensive lab. Each section builds upon the previous, culminating in the ability to fully automate Linux administration tasks.</p>
             </div>
             
             <h2>What You'll Learn</h2>
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon" aria-hidden="true">👥</div>
-                    <div class="card-title">User & Group Management</div>
-                    <p class="card-content">Create and manage users, groups, SSH keys, and sudo privileges across multiple systems.</p>
+                    <div class="card-icon" aria-hidden="true">📦</div>
+                    <div class="card-title">Software & Subscriptions</div>
+                    <p class="card-content">Manage packages with DNF/YUM, configure repositories, and automate Red Hat subscription management.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon" aria-hidden="true">📦</div>
-                    <div class="card-title">Package Management</div>
-                    <p class="card-content">Install, update, and remove software packages and manage repositories consistently.</p>
+                    <div class="card-icon" aria-hidden="true">👥</div>
+                    <div class="card-title">Users & Authentication</div>
+                    <p class="card-content">Create users and groups, deploy SSH keys, and configure sudo access across systems.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon" aria-hidden="true">⚙️</div>
-                    <div class="card-title">Service Control</div>
-                    <p class="card-content">Manage services, configure boot targets, and schedule recurring tasks with cron.</p>
+                    <div class="card-title">Boot Process & Scheduling</div>
+                    <p class="card-content">Manage services, configure boot targets, and schedule tasks with cron and at.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon" aria-hidden="true">🛡️</div>
-                    <div class="card-title">Storage & Security</div>
-                    <p class="card-content">Configure storage volumes, file systems, and firewall rules across your infrastructure.</p>
+                    <div class="card-icon" aria-hidden="true">💾</div>
+                    <div class="card-title">Storage Configuration</div>
+                    <p class="card-content">Configure partitions, LVM, and file systems using RHEL System Roles.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon" aria-hidden="true">🌐</div>
+                    <div class="card-title">Network Configuration</div>
+                    <p class="card-content">Configure network interfaces, static IPs, and firewall rules with Ansible.</p>
                 </div>
             </div>
             
@@ -358,7 +490,15 @@
                 <div class="objectives-title">🎯 Chapter Goals</div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Create and manage <strong>user accounts and groups</strong> using the user and group modules</div>
+                    <div class="objective-text">Install and manage <strong>software packages</strong> using the dnf and yum modules</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
+                    <div class="objective-text">Configure <strong>YUM repositories</strong> and manage Red Hat subscriptions</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
+                    <div class="objective-text">Create and manage <strong>user accounts and groups</strong> across multiple systems</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
@@ -366,167 +506,447 @@
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Schedule recurring tasks using <strong>cron</strong> and one-time jobs with <strong>at</strong></div>
-                </div>
-                <div class="objective-item">
-                    <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
                     <div class="objective-text">Manage <strong>system services</strong> and configure boot targets with systemd</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Install and remove <strong>software packages</strong> using dnf and yum modules</div>
+                    <div class="objective-text">Schedule recurring tasks using <strong>cron</strong> and one-time jobs with <strong>at</strong></div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Configure <strong>storage</strong> using RHEL System Roles</div>
+                    <div class="objective-text">Configure <strong>storage</strong> including partitions, LVM, and file systems using RHEL System Roles</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Manage <strong>firewall rules</strong> with the firewalld module</div>
+                    <div class="objective-text">Configure <strong>network interfaces</strong> and manage firewall rules with Ansible</div>
                 </div>
             </div>
             
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('welcome')">← Back</button>
-                <button class="btn btn-primary" onclick="navigateTo('users')">Continue →</button>
+                <button class="btn btn-primary" onclick="navigateTo('software')">Continue →</button>
             </div>
         </section>
         
-        <!-- Users Section -->
-        <section id="users" class="section">
-            <h1>Managing Users and Groups</h1>
-            <p class="lead">Ansible provides powerful modules for managing user accounts and groups across your infrastructure.</p>
+        <!-- Software Management Section -->
+        <section id="software" class="section">
+            <div class="week-indicator">📅 Week 1</div>
+            <h1>Managing Software and Subscriptions</h1>
+            <p class="lead">Use Ansible to manage software packages, configure repositories, and handle Red Hat subscriptions across your infrastructure.</p>
             
-            <h2>The User Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.builtin.user<span class="tooltip" role="tooltip">A core Ansible module for managing user accounts on Unix-like systems. It can create, modify, or remove users.</span></span> module manages user accounts on managed hosts.</p>
+            <h2>Managing Packages with DNF</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.dnf<span class="tooltip" role="tooltip">The package manager module for RHEL 8+, Fedora, and CentOS Stream. It manages software packages using DNF.</span></span> module manages packages on systems that use the DNF package manager (RHEL 8+, Fedora, CentOS Stream):</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Creating a user account</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Installing packages with DNF</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create developer user</span>
-  <span class="yaml-module">ansible.builtin.user</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">devuser</span>
-    <span class="yaml-key">comment</span>: <span class="yaml-string">"Developer Account"</span>
-    <span class="yaml-key">uid</span>: <span class="yaml-number">1050</span>
-    <span class="yaml-key">group</span>: <span class="yaml-value">developers</span>
-    <span class="yaml-key">groups</span>: <span class="yaml-value">wheel,docker</span>
-    <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/bash</span>
-    <span class="yaml-key">create_home</span>: <span class="yaml-boolean">true</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install multiple packages</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">php</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">mariadb-server</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install the latest version</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">latest</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install a package group</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-string">"@Development Tools"</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove a package</span>
+  <span class="yaml-module">ansible.builtin.dnf</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">telnet</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
                 </div>
             </div>
             
-            <h3>Key User Module Parameters</h3>
+            <h3>Package State Options</h3>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>name</code></td><td>Username to create, modify, or remove (required)</td></tr>
-                        <tr><td><code>uid</code></td><td>Numeric user ID</td></tr>
-                        <tr><td><code>group</code></td><td>Primary group for the user</td></tr>
-                        <tr><td><code>groups</code></td><td>Supplementary groups (comma-separated)</td></tr>
-                        <tr><td><code>append</code></td><td>Add to groups without removing from others</td></tr>
-                        <tr><td><code>shell</code></td><td>User's login shell</td></tr>
-                        <tr><td><code>password</code></td><td>Encrypted password (use password_hash filter)</td></tr>
-                        <tr><td><code>state</code></td><td>present or absent</td></tr>
+                        <tr>
+                            <td><code>present</code></td>
+                            <td>Ensure package is installed (default version)</td>
+                        </tr>
+                        <tr>
+                            <td><code>latest</code></td>
+                            <td>Ensure the latest version is installed (updates if needed)</td>
+                        </tr>
+                        <tr>
+                            <td><code>absent</code></td>
+                            <td>Ensure the package is removed</td>
+                        </tr>
+                        <tr>
+                            <td><code>installed</code></td>
+                            <td>Alias for present</td>
+                        </tr>
+                        <tr>
+                            <td><code>removed</code></td>
+                            <td>Alias for absent</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             
-            <h2>The Group Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.builtin.group<span class="tooltip" role="tooltip">A module for managing groups on Unix-like systems. Create groups before users that depend on them.</span></span> module manages group accounts.</p>
+            <h2>The YUM Module for Legacy Systems</h2>
+            <p>For RHEL 7 and earlier systems, use the <span class="term" tabindex="0">ansible.builtin.yum<span class="tooltip" role="tooltip">The package manager module for RHEL 7 and earlier systems that use the YUM package manager.</span></span> module:</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Managing groups</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Using the YUM module</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create developers group</span>
-  <span class="yaml-module">ansible.builtin.group</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">developers</span>
-    <span class="yaml-key">gid</span>: <span class="yaml-number">1050</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">present</span></pre>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package with yum</span>
+  <span class="yaml-module">ansible.builtin.yum</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update all packages</span>
+  <span class="yaml-module">ansible.builtin.yum</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-string">"*"</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">latest</span></pre>
                 </div>
             </div>
             
-            <h2>Setting Passwords Securely</h2>
-            <p>Use the <span class="term" tabindex="0">password_hash<span class="tooltip" role="tooltip">A Jinja2 filter that generates a password hash. Supports sha256, sha512, and other algorithms.</span></span> filter to hash passwords:</p>
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
+                <p>Use the <code>ansible.builtin.package</code> module when writing playbooks that need to work across different Linux distributions. It automatically uses the correct package manager for each system.</p>
+            </div>
+            
+            <h2>Configuring YUM Repositories</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.yum_repository<span class="tooltip" role="tooltip">A module that creates and manages YUM repository configuration files in /etc/yum.repos.d/.</span></span> module manages repository configuration files:</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Setting user password</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Adding a custom repository</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create user with password</span>
-  <span class="yaml-module">ansible.builtin.user</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">newuser</span>
-    <span class="yaml-key">password</span>: <span class="yaml-string">"{{ 'mypassword' | password_hash('sha512') }}"</span>
-    <span class="yaml-key">update_password</span>: <span class="yaml-value">on_create</span></pre>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Add EPEL repository</span>
+  <span class="yaml-module">ansible.builtin.yum_repository</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">epel</span>
+    <span class="yaml-key">description</span>: <span class="yaml-string">"Extra Packages for Enterprise Linux"</span>
+    <span class="yaml-key">baseurl</span>: <span class="yaml-string">"https://dl.fedoraproject.org/pub/epel/$releasever/$basearch/"</span>
+    <span class="yaml-key">gpgcheck</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">gpgkey</span>: <span class="yaml-string">"https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever"</span>
+    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Disable a repository</span>
+  <span class="yaml-module">ansible.builtin.yum_repository</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">epel</span>
+    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">false</span></pre>
+                </div>
+            </div>
+            
+            <h2>Managing Red Hat Subscriptions</h2>
+            <p>The <span class="term" tabindex="0">community.general.redhat_subscription<span class="tooltip" role="tooltip">A module for managing Red Hat subscriptions, allowing systems to register with the customer portal or Satellite server.</span></span> module automates subscription management:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Registering with Red Hat</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Register system with Red Hat</span>
+  <span class="yaml-module">community.general.redhat_subscription</span>:
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">username</span>: <span class="yaml-string">"{{ rhn_username }}"</span>
+    <span class="yaml-key">password</span>: <span class="yaml-string">"{{ rhn_password }}"</span>
+    <span class="yaml-key">auto_attach</span>: <span class="yaml-boolean">true</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Register with activation key</span>
+  <span class="yaml-module">community.general.redhat_subscription</span>:
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+    <span class="yaml-key">org_id</span>: <span class="yaml-string">"{{ org_id }}"</span>
+    <span class="yaml-key">activationkey</span>: <span class="yaml-string">"{{ activation_key }}"</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Unregister system</span>
+  <span class="yaml-module">community.general.redhat_subscription</span>:
+    <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
                 </div>
             </div>
             
             <div class="info-box warning">
                 <div class="info-box-title"><span aria-hidden="true">⚠️</span> Security Warning</div>
-                <p>Never store plaintext passwords. Use Ansible Vault to encrypt sensitive variables.</p>
+                <p>Never store Red Hat credentials in plain text. Use Ansible Vault to encrypt sensitive variables like usernames, passwords, and activation keys.</p>
             </div>
             
-            <h2>Bulk User Management</h2>
+            <h2>Enabling and Disabling Repositories</h2>
+            <p>Use the <span class="term tooltip-right" tabindex="0">community.general.rhsm_repository<span class="tooltip" role="tooltip">A module for enabling or disabling Red Hat Subscription Manager repositories on registered systems.</span></span> module to manage which repositories are enabled:</p>
+            
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Creating multiple users with loop</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Managing RHSM repositories</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create developer accounts</span>
-  <span class="yaml-module">ansible.builtin.user</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.name }}"</span>
-    <span class="yaml-key">uid</span>: <span class="yaml-string">"{{ item.uid }}"</span>
-    <span class="yaml-key">groups</span>: <span class="yaml-string">"{{ item.groups }}"</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-  <span class="yaml-key">loop</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">alice</span>
-      <span class="yaml-key">uid</span>: <span class="yaml-number">2001</span>
-      <span class="yaml-key">groups</span>: <span class="yaml-value">developers</span>
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">bob</span>
-      <span class="yaml-key">uid</span>: <span class="yaml-number">2002</span>
-      <span class="yaml-key">groups</span>: <span class="yaml-value">developers,wheel</span>
-  <span class="yaml-key">loop_control</span>:
-    <span class="yaml-key">label</span>: <span class="yaml-string">"{{ item.name }}"</span></pre>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Enable specific repositories</span>
+  <span class="yaml-module">community.general.rhsm_repository</span>:
+    <span class="yaml-key">name</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">rhel-9-for-x86_64-baseos-rpms</span>
+      <span class="yaml-dash">-</span> <span class="yaml-value">rhel-9-for-x86_64-appstream-rpms</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Disable all repos and enable only specific ones</span>
+  <span class="yaml-module">community.general.rhsm_repository</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-string">"*"</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">disabled</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Enable required repositories</span>
+  <span class="yaml-module">community.general.rhsm_repository</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">rhel-9-for-x86_64-baseos-rpms</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span></pre>
                 </div>
             </div>
             
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('objectives')">← Objectives</button>
-                <button class="btn btn-primary" onclick="navigateTo('ssh')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('objectives')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause1')">Continue to Exercise →</button>
             </div>
         </section>
         
-        <!-- SSH Section -->
-        <section id="ssh" class="section">
-            <h1>SSH Keys and Sudo Access</h1>
-            <p class="lead">Secure your infrastructure by automating SSH key deployment and sudo configuration.</p>
+        <!-- Pause Point 1: Managing Software and Subscriptions -->
+        <section id="pause1" class="section">
+            <div class="pause-point">
+                <div class="pause-icon">⏸️</div>
+                <div class="pause-title">Guided Exercise: Managing Software and Subscriptions</div>
+                <div class="pause-subtitle">Practice installing packages, configuring repositories, and managing subscriptions</div>
+                
+                <div class="pause-details">
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">⏱️</div>
+                        <div class="pause-detail-label">Estimated Time:</div>
+                        <div>30 minutes</div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">📂</div>
+                        <div class="pause-detail-label">Lab Directory:</div>
+                        <div><code>~/admin-software</code></div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">🚀</div>
+                        <div class="pause-detail-label">Lab Start Command:</div>
+                        <div><code>lab start admin-software</code></div>
+                    </div>
+                </div>
+
+                <div class="pause-skills">
+                    <div class="pause-skills-title">Skills You Will Practice</div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Install and remove packages using the <code>ansible.builtin.dnf</code> module</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure YUM repositories with <code>ansible.builtin.yum_repository</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use different package states: present, latest, and absent</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Install package groups for development tools</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Manage Red Hat subscriptions and repositories</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">📋 Exercise Overview</div>
+                <p>In this exercise, you will create playbooks to install and manage software packages on managed hosts. You'll configure custom repositories, install package groups, and ensure consistent software configurations across your infrastructure.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('software')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('users')">Continue After Exercise →</button>
+            </div>
+        </section>
+        
+        <!-- Users and Authentication Section -->
+        <section id="users" class="section">
+            <h1>Managing Users and Authentication</h1>
+            <p class="lead">Ansible provides powerful modules for managing user accounts, groups, SSH keys, and authentication across your infrastructure.</p>
             
-            <h2>Deploying SSH Authorized Keys</h2>
-            <p>The <span class="term" tabindex="0">ansible.posix.authorized_key<span class="tooltip" role="tooltip">A module for managing SSH authorized keys in users' ~/.ssh/authorized_keys files.</span></span> module manages SSH authorized keys:</p>
+            <h2>The User Module</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.user<span class="tooltip" role="tooltip">A core Ansible module for managing user accounts on Unix-like systems, including creating, modifying, and deleting users.</span></span> module manages user accounts:</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Adding SSH keys</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Creating and managing users</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Add SSH key for developer</span>
-  <span class="yaml-module">ansible.posix.authorized_key</span>:
-    <span class="yaml-key">user</span>: <span class="yaml-value">devuser</span>
-    <span class="yaml-key">key</span>: <span class="yaml-string">"{{ lookup('file', 'files/devuser.pub') }}"</span>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create a user with specific attributes</span>
+  <span class="yaml-module">ansible.builtin.user</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">devuser</span>
+    <span class="yaml-key">uid</span>: <span class="yaml-number">2001</span>
+    <span class="yaml-key">group</span>: <span class="yaml-value">developers</span>
+    <span class="yaml-key">groups</span>: <span class="yaml-value">wheel,docker</span>
+    <span class="yaml-key">shell</span>: <span class="yaml-value">/bin/bash</span>
+    <span class="yaml-key">home</span>: <span class="yaml-value">/home/devuser</span>
+    <span class="yaml-key">create_home</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">comment</span>: <span class="yaml-string">"Development User Account"</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
 
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Manage exclusive key access</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create user with encrypted password</span>
+  <span class="yaml-module">ansible.builtin.user</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">secureuser</span>
+    <span class="yaml-key">password</span>: <span class="yaml-string">"{{ 'MyPassword123' | password_hash('sha512') }}"</span>
+    <span class="yaml-key">update_password</span>: <span class="yaml-value">on_create</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove a user and their home directory</span>
+  <span class="yaml-module">ansible.builtin.user</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">olduser</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">absent</span>
+    <span class="yaml-key">remove</span>: <span class="yaml-boolean">true</span></pre>
+                </div>
+            </div>
+            
+            <h3>Important User Module Parameters</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>Username (required)</td>
+                        </tr>
+                        <tr>
+                            <td><code>uid</code></td>
+                            <td>User ID number</td>
+                        </tr>
+                        <tr>
+                            <td><code>group</code></td>
+                            <td>Primary group</td>
+                        </tr>
+                        <tr>
+                            <td><code>groups</code></td>
+                            <td>Supplementary groups (comma-separated)</td>
+                        </tr>
+                        <tr>
+                            <td><code>append</code></td>
+                            <td>If true, adds to groups instead of replacing</td>
+                        </tr>
+                        <tr>
+                            <td><code>password</code></td>
+                            <td>Encrypted password hash</td>
+                        </tr>
+                        <tr>
+                            <td><code>update_password</code></td>
+                            <td>When to update: always, on_create</td>
+                        </tr>
+                        <tr>
+                            <td><code>generate_ssh_key</code></td>
+                            <td>Generate SSH key pair for user</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>The Group Module</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.group<span class="tooltip" role="tooltip">A module for managing groups on Unix-like systems, including creating, modifying, and deleting groups.</span></span> module manages groups:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Managing groups</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create a group</span>
+  <span class="yaml-module">ansible.builtin.group</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">developers</span>
+    <span class="yaml-key">gid</span>: <span class="yaml-number">3000</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create system group</span>
+  <span class="yaml-module">ansible.builtin.group</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">appservice</span>
+    <span class="yaml-key">system</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove a group</span>
+  <span class="yaml-module">ansible.builtin.group</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">obsolete</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
+                </div>
+            </div>
+            
+            <h2>Managing SSH Authorized Keys</h2>
+            <p>The <span class="term" tabindex="0">ansible.posix.authorized_key<span class="tooltip" role="tooltip">A module for managing SSH authorized keys, allowing you to add or remove public keys from user accounts.</span></span> module deploys SSH public keys:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Deploying SSH keys</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Add authorized key from file</span>
   <span class="yaml-module">ansible.posix.authorized_key</span>:
-    <span class="yaml-key">user</span>: <span class="yaml-value">admin</span>
-    <span class="yaml-key">key</span>: <span class="yaml-string">"{{ admin_public_key }}"</span>
+    <span class="yaml-key">user</span>: <span class="yaml-value">devuser</span>
+    <span class="yaml-key">key</span>: <span class="yaml-string">"{{ lookup('file', '/home/admin/.ssh/id_rsa.pub') }}"</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Add authorized key with options</span>
+  <span class="yaml-module">ansible.posix.authorized_key</span>:
+    <span class="yaml-key">user</span>: <span class="yaml-value">devuser</span>
+    <span class="yaml-key">key</span>: <span class="yaml-string">"ssh-rsa AAAAB3NzaC1yc2E..."</span>
+    <span class="yaml-key">key_options</span>: <span class="yaml-string">'no-port-forwarding,from="10.0.0.0/8"'</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Ensure only specified keys are present</span>
+  <span class="yaml-module">ansible.posix.authorized_key</span>:
+    <span class="yaml-key">user</span>: <span class="yaml-value">devuser</span>
+    <span class="yaml-key">key</span>: <span class="yaml-string">"{{ lookup('file', 'authorized_keys') }}"</span>
     <span class="yaml-key">exclusive</span>: <span class="yaml-boolean">true</span></pre>
                 </div>
             </div>
             
             <h2>Configuring Sudo Access</h2>
+            <p>Use the <code>ansible.builtin.copy</code> or <code>ansible.builtin.template</code> module to manage sudoers files:</p>
+            
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Managing sudo access</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Configuring sudo access</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
 <pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Allow developers sudo without password</span>
   <span class="yaml-module">ansible.builtin.copy</span>:
     <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/sudoers.d/developers</span>
     <span class="yaml-key">content</span>: <span class="yaml-string">"%developers ALL=(ALL) NOPASSWD: ALL\n"</span>
+    <span class="yaml-key">owner</span>: <span class="yaml-value">root</span>
+    <span class="yaml-key">group</span>: <span class="yaml-value">root</span>
+    <span class="yaml-key">mode</span>: <span class="yaml-string">'0440'</span>
+    <span class="yaml-key">validate</span>: <span class="yaml-string">'/usr/sbin/visudo -cf %s'</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy sudoers template</span>
+  <span class="yaml-module">ansible.builtin.template</span>:
+    <span class="yaml-key">src</span>: <span class="yaml-value">sudoers.j2</span>
+    <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/sudoers.d/custom</span>
     <span class="yaml-key">owner</span>: <span class="yaml-value">root</span>
     <span class="yaml-key">group</span>: <span class="yaml-value">root</span>
     <span class="yaml-key">mode</span>: <span class="yaml-string">'0440'</span>
@@ -536,25 +956,204 @@
             
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
-                <p>Always use the <code>validate</code> parameter with visudo when modifying sudoers files to prevent lockouts from syntax errors.</p>
+                <p>Always use the <code>validate</code> parameter when modifying sudoers files. This runs <code>visudo</code> to check syntax before saving, preventing lockouts from syntax errors.</p>
             </div>
             
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('users')">← Users</button>
-                <button class="btn btn-primary" onclick="navigateTo('cron')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause1')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause2')">Continue to Exercise →</button>
             </div>
         </section>
         
-        <!-- Cron Section -->
-        <section id="cron" class="section">
-            <h1>Scheduling with Cron and At</h1>
-            <p class="lead">Automate task scheduling across your infrastructure using Ansible's cron and at modules.</p>
+        <!-- Pause Point 2: Managing Users and Authentication -->
+        <section id="pause2" class="section">
+            <div class="pause-point">
+                <div class="pause-icon">⏸️</div>
+                <div class="pause-title">Guided Exercise: Managing Users and Authentication</div>
+                <div class="pause-subtitle">Practice creating users, deploying SSH keys, and configuring sudo access</div>
+                
+                <div class="pause-details">
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">⏱️</div>
+                        <div class="pause-detail-label">Estimated Time:</div>
+                        <div>30 minutes</div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">📂</div>
+                        <div class="pause-detail-label">Lab Directory:</div>
+                        <div><code>~/admin-users</code></div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">🚀</div>
+                        <div class="pause-detail-label">Lab Start Command:</div>
+                        <div><code>lab start admin-users</code></div>
+                    </div>
+                </div>
+
+                <div class="pause-skills">
+                    <div class="pause-skills-title">Skills You Will Practice</div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Create users with specific attributes using <code>ansible.builtin.user</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Create and manage groups with <code>ansible.builtin.group</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Deploy SSH authorized keys with <code>ansible.posix.authorized_key</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure sudo access using sudoers files with validation</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use loops to create multiple users from variable data</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">📋 Exercise Overview</div>
+                <p>In this exercise, you will create playbooks to provision user accounts across your infrastructure. You'll create groups, add users with proper permissions, deploy SSH keys for passwordless authentication, and configure sudo privileges.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('users')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('boot')">Continue After Exercise →</button>
+            </div>
+        </section>
+        
+        <!-- Boot Process and Scheduling Section -->
+        <section id="boot" class="section">
+            <h1>Managing the Boot Process and Scheduled Processes</h1>
+            <p class="lead">Use Ansible to manage system services, configure boot targets, and schedule tasks using cron and at.</p>
             
-            <h2>The Cron Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.builtin.cron<span class="tooltip" role="tooltip">A module for managing crontab entries. Create, modify, or remove cron jobs.</span></span> module manages cron jobs:</p>
+            <h2>Managing Services with systemd</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.service<span class="tooltip" role="tooltip">A generic module that manages services across different init systems including systemd, SysV init, and others.</span></span> module manages services across different init systems:</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Creating cron jobs</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Managing services</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start and enable httpd</span>
+  <span class="yaml-module">ansible.builtin.service</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Stop and disable a service</span>
+  <span class="yaml-module">ansible.builtin.service</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">firewalld</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">stopped</span>
+    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">false</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart service</span>
+  <span class="yaml-module">ansible.builtin.service</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Reload service configuration</span>
+  <span class="yaml-module">ansible.builtin.service</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">reloaded</span></pre>
+                </div>
+            </div>
+            
+            <h3>Service States</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>started</code></td>
+                            <td>Ensure service is running</td>
+                        </tr>
+                        <tr>
+                            <td><code>stopped</code></td>
+                            <td>Ensure service is not running</td>
+                        </tr>
+                        <tr>
+                            <td><code>restarted</code></td>
+                            <td>Stop then start the service</td>
+                        </tr>
+                        <tr>
+                            <td><code>reloaded</code></td>
+                            <td>Reload configuration without stopping</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>The systemd Module</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.systemd<span class="tooltip" role="tooltip">A module specifically for managing systemd services with additional features like daemon_reload and scope settings.</span></span> module provides systemd-specific features:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Using the systemd module</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start service after deploying unit file</span>
+  <span class="yaml-module">ansible.builtin.systemd</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
+    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">daemon_reload</span>: <span class="yaml-boolean">true</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Reload systemd daemon</span>
+  <span class="yaml-module">ansible.builtin.systemd</span>:
+    <span class="yaml-key">daemon_reload</span>: <span class="yaml-boolean">true</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Manage user service</span>
+  <span class="yaml-module">ansible.builtin.systemd</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-value">podman</span>
+    <span class="yaml-key">scope</span>: <span class="yaml-value">user</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">started</span></pre>
+                </div>
+            </div>
+            
+            <h2>Using Handlers for Service Restarts</h2>
+            <p>Handlers are a best practice for restarting services only when configurations change:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Using handlers efficiently</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-key">tasks</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy configuration file</span>
+    <span class="yaml-module">ansible.builtin.template</span>:
+      <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf.j2</span>
+      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
+    <span class="yaml-key">notify</span>: <span class="yaml-value">restart apache</span>
+
+<span class="yaml-key">handlers</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">restart apache</span>
+    <span class="yaml-module">ansible.builtin.service</span>:
+      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
+      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
+                </div>
+            </div>
+            
+            <h2>Scheduling Tasks with Cron</h2>
+            <p>The <span class="term" tabindex="0">ansible.builtin.cron<span class="tooltip" role="tooltip">A module for managing crontab entries, allowing you to create, modify, or remove scheduled tasks.</span></span> module manages cron jobs:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Creating cron jobs</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
 <pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Schedule daily backup at 2 AM</span>
   <span class="yaml-module">ansible.builtin.cron</span>:
@@ -572,276 +1171,468 @@
 
 <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Every 15 minutes</span>
   <span class="yaml-module">ansible.builtin.cron</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-string">"Check health"</span>
+    <span class="yaml-key">name</span>: <span class="yaml-string">"Health check"</span>
     <span class="yaml-key">minute</span>: <span class="yaml-string">"*/15"</span>
-    <span class="yaml-key">job</span>: <span class="yaml-string">"/usr/local/bin/health.sh"</span></pre>
+    <span class="yaml-key">job</span>: <span class="yaml-string">"/usr/local/bin/health.sh"</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove a cron job</span>
+  <span class="yaml-module">ansible.builtin.cron</span>:
+    <span class="yaml-key">name</span>: <span class="yaml-string">"Old task"</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
                 </div>
             </div>
             
             <h3>Cron Time Specifications</h3>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Parameter</th><th>Values</th><th>Description</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Values</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>minute</code></td><td>0-59, *, */n</td><td>Minute of hour</td></tr>
-                        <tr><td><code>hour</code></td><td>0-23, *, */n</td><td>Hour of day</td></tr>
-                        <tr><td><code>day</code></td><td>1-31, *, */n</td><td>Day of month</td></tr>
-                        <tr><td><code>month</code></td><td>1-12, *, */n</td><td>Month of year</td></tr>
-                        <tr><td><code>weekday</code></td><td>0-6 (Sun-Sat)</td><td>Day of week</td></tr>
-                        <tr><td><code>special_time</code></td><td>reboot, hourly, daily, weekly, monthly</td><td>Shortcuts</td></tr>
+                        <tr>
+                            <td><code>minute</code></td>
+                            <td>0-59, *, */n</td>
+                            <td>Minute of hour</td>
+                        </tr>
+                        <tr>
+                            <td><code>hour</code></td>
+                            <td>0-23, *, */n</td>
+                            <td>Hour of day</td>
+                        </tr>
+                        <tr>
+                            <td><code>day</code></td>
+                            <td>1-31, *, */n</td>
+                            <td>Day of month</td>
+                        </tr>
+                        <tr>
+                            <td><code>month</code></td>
+                            <td>1-12, *, */n</td>
+                            <td>Month of year</td>
+                        </tr>
+                        <tr>
+                            <td><code>weekday</code></td>
+                            <td>0-6 (Sun-Sat)</td>
+                            <td>Day of week</td>
+                        </tr>
+                        <tr>
+                            <td><code>special_time</code></td>
+                            <td>reboot, hourly, daily, weekly, monthly, annually</td>
+                            <td>Shortcuts</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             
-            <h2>The At Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.posix.at<span class="tooltip" role="tooltip">A module for scheduling one-time tasks using the at daemon.</span></span> module schedules one-time tasks:</p>
+            <h2>One-time Tasks with At</h2>
+            <p>The <span class="term tooltip-right" tabindex="0">ansible.posix.at<span class="tooltip" role="tooltip">A module for scheduling one-time tasks using the at daemon.</span></span> module schedules one-time tasks:</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">One-time scheduled tasks</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Scheduling one-time tasks</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
 <pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Schedule maintenance in 2 hours</span>
   <span class="yaml-module">ansible.posix.at</span>:
     <span class="yaml-key">command</span>: <span class="yaml-string">"/usr/local/bin/maintenance.sh"</span>
     <span class="yaml-key">count</span>: <span class="yaml-number">2</span>
     <span class="yaml-key">units</span>: <span class="yaml-value">hours</span>
-    <span class="yaml-key">unique</span>: <span class="yaml-boolean">true</span></pre>
-                </div>
-            </div>
-            
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('ssh')">← SSH Keys</button>
-                <button class="btn btn-primary" onclick="navigateTo('services')">Continue →</button>
-            </div>
-        </section>
-        
-        <!-- Services Section -->
-        <section id="services" class="section">
-            <h1>Service Management</h1>
-            <p class="lead">Control system services across your infrastructure with Ansible.</p>
-            
-            <h2>The Service Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.builtin.service<span class="tooltip" role="tooltip">A generic service module that works with multiple init systems including systemd, SysV init, and others.</span></span> module manages services:</p>
-            
-            <div class="code-block">
-                <div class="code-header"><span class="code-title">Managing services</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
-                <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start and enable Apache</span>
-  <span class="yaml-module">ansible.builtin.service</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">unique</span>: <span class="yaml-boolean">true</span>
 
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Restart service</span>
-  <span class="yaml-module">ansible.builtin.service</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">nginx</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
-                </div>
-            </div>
-            
-            <h3>Service States</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>State</th><th>Description</th></tr></thead>
-                    <tbody>
-                        <tr><td><code>started</code></td><td>Ensure service is running</td></tr>
-                        <tr><td><code>stopped</code></td><td>Ensure service is not running</td></tr>
-                        <tr><td><code>restarted</code></td><td>Always restart the service</td></tr>
-                        <tr><td><code>reloaded</code></td><td>Reload configuration</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <h2>The Systemd Module</h2>
-            <div class="code-block">
-                <div class="code-header"><span class="code-title">Systemd-specific management</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
-                <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Reload systemd daemon</span>
-  <span class="yaml-module">ansible.builtin.systemd</span>:
-    <span class="yaml-key">daemon_reload</span>: <span class="yaml-boolean">true</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start custom service</span>
-  <span class="yaml-module">ansible.builtin.systemd</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">myapp</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span>
-    <span class="yaml-key">daemon_reload</span>: <span class="yaml-boolean">true</span></pre>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Schedule task for specific time</span>
+  <span class="yaml-module">ansible.posix.at</span>:
+    <span class="yaml-key">command</span>: <span class="yaml-string">"/usr/local/bin/report.sh"</span>
+    <span class="yaml-key">count</span>: <span class="yaml-number">30</span>
+    <span class="yaml-key">units</span>: <span class="yaml-value">minutes</span></pre>
                 </div>
             </div>
             
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
-                <p>Use handlers to restart services only when configuration changes:</p>
-            </div>
-            
-            <div class="code-block">
-                <div class="code-header"><span class="code-title">Using handlers</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
-                <div class="code-content">
-<pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Deploy configuration</span>
-    <span class="yaml-module">ansible.builtin.template</span>:
-      <span class="yaml-key">src</span>: <span class="yaml-value">httpd.conf.j2</span>
-      <span class="yaml-key">dest</span>: <span class="yaml-value">/etc/httpd/conf/httpd.conf</span>
-    <span class="yaml-key">notify</span>: <span class="yaml-value">restart apache</span>
-
-<span class="yaml-key">handlers</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">restart apache</span>
-    <span class="yaml-module">ansible.builtin.service</span>:
-      <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-      <span class="yaml-key">state</span>: <span class="yaml-value">restarted</span></pre>
-                </div>
+                <p>Use the <code>unique: true</code> parameter with the at module to prevent duplicate jobs from being scheduled if the playbook is run multiple times.</p>
             </div>
             
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('cron')">← Cron</button>
-                <button class="btn btn-primary" onclick="navigateTo('packages')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause2')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause3')">Continue to Exercise →</button>
             </div>
         </section>
         
-        <!-- Packages Section -->
-        <section id="packages" class="section">
-            <h1>Software Package Management</h1>
-            <p class="lead">Maintain consistent software installations across your infrastructure.</p>
-            
-            <h2>The DNF Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.builtin.dnf<span class="tooltip" role="tooltip">The package manager module for RHEL 8+, Fedora, and CentOS Stream.</span></span> module manages packages:</p>
-            
-            <div class="code-block">
-                <div class="code-header"><span class="code-title">Installing packages</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
-                <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install multiple packages</span>
-  <span class="yaml-module">ansible.builtin.dnf</span>:
-    <span class="yaml-key">name</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
-      <span class="yaml-dash">-</span> <span class="yaml-value">php</span>
-      <span class="yaml-dash">-</span> <span class="yaml-value">mariadb-server</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
+        <!-- Pause Point 3: Managing Boot Process and Scheduling -->
+        <section id="pause3" class="section">
+            <div class="pause-point">
+                <div class="pause-icon">⏸️</div>
+                <div class="pause-title">Guided Exercise: Managing the Boot Process and Scheduled Processes</div>
+                <div class="pause-subtitle">Practice managing services, configuring systemd, and scheduling tasks</div>
+                
+                <div class="pause-details">
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">⏱️</div>
+                        <div class="pause-detail-label">Estimated Time:</div>
+                        <div>30 minutes</div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">📂</div>
+                        <div class="pause-detail-label">Lab Directory:</div>
+                        <div><code>~/admin-boot</code></div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">🚀</div>
+                        <div class="pause-detail-label">Lab Start Command:</div>
+                        <div><code>lab start admin-boot</code></div>
+                    </div>
+                </div>
 
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Update all packages</span>
-  <span class="yaml-module">ansible.builtin.dnf</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-string">"*"</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">latest</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install package group</span>
-  <span class="yaml-module">ansible.builtin.dnf</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-string">"@Development Tools"</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Remove package</span>
-  <span class="yaml-module">ansible.builtin.dnf</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">telnet</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">absent</span></pre>
+                <div class="pause-skills">
+                    <div class="pause-skills-title">Skills You Will Practice</div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Manage services with <code>ansible.builtin.service</code> and <code>ansible.builtin.systemd</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Create and use handlers to restart services when needed</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Schedule recurring tasks with <code>ansible.builtin.cron</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Schedule one-time tasks with <code>ansible.posix.at</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use <code>daemon_reload</code> when deploying new unit files</div>
+                    </div>
                 </div>
             </div>
-            
-            <h3>Package States</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>State</th><th>Description</th></tr></thead>
-                    <tbody>
-                        <tr><td><code>present</code></td><td>Ensure package is installed</td></tr>
-                        <tr><td><code>latest</code></td><td>Ensure latest version</td></tr>
-                        <tr><td><code>absent</code></td><td>Ensure package is removed</td></tr>
-                    </tbody>
-                </table>
+
+            <div class="info-box">
+                <div class="info-box-title">📋 Exercise Overview</div>
+                <p>In this exercise, you will manage system services and scheduled processes. You'll start and enable services, create handlers that respond to configuration changes, and schedule both recurring and one-time tasks.</p>
             </div>
-            
-            <h2>Managing Repositories</h2>
-            <div class="code-block">
-                <div class="code-header"><span class="code-title">Adding a repository</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
-                <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Add EPEL repository</span>
-  <span class="yaml-module">ansible.builtin.yum_repository</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-value">epel</span>
-    <span class="yaml-key">description</span>: <span class="yaml-string">"Extra Packages for Enterprise Linux"</span>
-    <span class="yaml-key">baseurl</span>: <span class="yaml-string">"https://dl.fedoraproject.org/pub/epel/$releasever/$basearch/"</span>
-    <span class="yaml-key">gpgcheck</span>: <span class="yaml-boolean">true</span>
-    <span class="yaml-key">gpgkey</span>: <span class="yaml-string">"https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever"</span>
-    <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span></pre>
-                </div>
-            </div>
-            
+
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('services')">← Services</button>
-                <button class="btn btn-primary" onclick="navigateTo('storage')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('boot')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('storage')">Continue After Exercise →</button>
             </div>
         </section>
         
         <!-- Storage Section -->
         <section id="storage" class="section">
-            <h1>Storage Configuration</h1>
-            <p class="lead">Automate storage provisioning using Ansible and RHEL System Roles.</p>
+            <div class="week-indicator">📅 Week 2</div>
+            <h1>Managing Storage</h1>
+            <p class="lead">Configure storage including partitions, LVM, and file systems using Ansible and RHEL System Roles.</p>
             
             <h2>The Storage System Role</h2>
-            <p>The <span class="term" tabindex="0">redhat.rhel_system_roles.storage<span class="tooltip" role="tooltip">A Red Hat certified system role for complete storage management including LVM, partitions, and file systems.</span></span> provides comprehensive storage management:</p>
+            <p>The <span class="term" tabindex="0">redhat.rhel_system_roles.storage<span class="tooltip" role="tooltip">A Red Hat certified system role for comprehensive storage management including partitions, LVM, and file systems.</span></span> role provides comprehensive storage management. This role simplifies complex storage tasks by handling partitions, volume groups, logical volumes, and file systems.</p>
+            
+            <div class="info-box">
+                <div class="info-box-title"><span aria-hidden="true">📦</span> Installing the Storage Role</div>
+                <p>Install the RHEL System Roles package on your control node:</p>
+                <code>sudo dnf install rhel-system-roles</code>
+            </div>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Using storage system role</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Configuring LVM storage</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure storage</span>
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure storage with RHEL System Role</span>
   <span class="yaml-key">hosts</span>: <span class="yaml-value">servers</span>
   <span class="yaml-key">become</span>: <span class="yaml-boolean">true</span>
+  
   <span class="yaml-key">vars</span>:
     <span class="yaml-key">storage_pools</span>:
       <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">data_vg</span>
         <span class="yaml-key">type</span>: <span class="yaml-value">lvm</span>
         <span class="yaml-key">disks</span>:
           <span class="yaml-dash">-</span> <span class="yaml-value">/dev/sdb</span>
+          <span class="yaml-dash">-</span> <span class="yaml-value">/dev/sdc</span>
         <span class="yaml-key">volumes</span>:
-          <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">app_data</span>
-            <span class="yaml-key">size</span>: <span class="yaml-string">"50 GiB"</span>
+          <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">data_lv</span>
+            <span class="yaml-key">size</span>: <span class="yaml-string">"10 GiB"</span>
             <span class="yaml-key">fs_type</span>: <span class="yaml-value">xfs</span>
-            <span class="yaml-key">mount_point</span>: <span class="yaml-value">/var/app/data</span>
+            <span class="yaml-key">mount_point</span>: <span class="yaml-value">/data</span>
+          <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">backup_lv</span>
+            <span class="yaml-key">size</span>: <span class="yaml-string">"5 GiB"</span>
+            <span class="yaml-key">fs_type</span>: <span class="yaml-value">ext4</span>
+            <span class="yaml-key">mount_point</span>: <span class="yaml-value">/backup</span>
+  
   <span class="yaml-key">roles</span>:
     <span class="yaml-dash">-</span> <span class="yaml-value">redhat.rhel_system_roles.storage</span></pre>
                 </div>
             </div>
             
-            <h2>Manual LVM Management</h2>
+            <h3>Storage Role Variables</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>storage_pools</code></td>
+                            <td>List of storage pool definitions (VGs)</td>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>Name of the volume group</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>Storage type: lvm, partition, disk</td>
+                        </tr>
+                        <tr>
+                            <td><code>disks</code></td>
+                            <td>List of block devices for the pool</td>
+                        </tr>
+                        <tr>
+                            <td><code>volumes</code></td>
+                            <td>List of logical volumes to create</td>
+                        </tr>
+                        <tr>
+                            <td><code>size</code></td>
+                            <td>Size with unit (GiB, MiB, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_type</code></td>
+                            <td>File system type: xfs, ext4, swap</td>
+                        </tr>
+                        <tr>
+                            <td><code>mount_point</code></td>
+                            <td>Where to mount the volume</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Creating Partition-based Storage</h2>
+            <p>For simpler storage needs, create partition-based file systems:</p>
+            
             <div class="code-block">
-                <div class="code-header"><span class="code-title">LVM modules</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Partition-based storage</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create volume group</span>
-  <span class="yaml-module">community.general.lvg</span>:
-    <span class="yaml-key">vg</span>: <span class="yaml-value">data_vg</span>
-    <span class="yaml-key">pvs</span>: <span class="yaml-value">/dev/sdb1</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create logical volume</span>
-  <span class="yaml-module">community.general.lvol</span>:
-    <span class="yaml-key">vg</span>: <span class="yaml-value">data_vg</span>
-    <span class="yaml-key">lv</span>: <span class="yaml-value">app_data</span>
-    <span class="yaml-key">size</span>: <span class="yaml-value">50G</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create file system</span>
+<pre><span class="yaml-key">storage_volumes</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">data</span>
+    <span class="yaml-key">type</span>: <span class="yaml-value">partition</span>
+    <span class="yaml-key">disks</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-value">/dev/sdb</span>
+    <span class="yaml-key">size</span>: <span class="yaml-string">"10 GiB"</span>
+    <span class="yaml-key">fs_type</span>: <span class="yaml-value">xfs</span>
+    <span class="yaml-key">mount_point</span>: <span class="yaml-value">/data</span>
+    <span class="yaml-key">mount_options</span>: <span class="yaml-value">defaults,noatime</span></pre>
+                </div>
+            </div>
+            
+            <h2>Managing Mounts and File Systems</h2>
+            <p>For direct control without the system role, use individual modules:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Using individual modules</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create a file system</span>
   <span class="yaml-module">community.general.filesystem</span>:
     <span class="yaml-key">fstype</span>: <span class="yaml-value">xfs</span>
-    <span class="yaml-key">dev</span>: <span class="yaml-value">/dev/data_vg/app_data</span>
+    <span class="yaml-key">dev</span>: <span class="yaml-value">/dev/sdb1</span>
 
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Mount file system</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Mount and add to fstab</span>
   <span class="yaml-module">ansible.posix.mount</span>:
-    <span class="yaml-key">path</span>: <span class="yaml-value">/var/app/data</span>
-    <span class="yaml-key">src</span>: <span class="yaml-value">/dev/data_vg/app_data</span>
+    <span class="yaml-key">path</span>: <span class="yaml-value">/data</span>
+    <span class="yaml-key">src</span>: <span class="yaml-value">/dev/sdb1</span>
     <span class="yaml-key">fstype</span>: <span class="yaml-value">xfs</span>
+    <span class="yaml-key">opts</span>: <span class="yaml-value">defaults,noatime</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">mounted</span></pre>
                 </div>
             </div>
             
+            <div class="info-box tip">
+                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
+                <p>Use the storage system role when possible. It handles the complexity of storage configuration and ensures idempotent, declarative management of your storage infrastructure.</p>
+            </div>
+            
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('packages')">← Packages</button>
-                <button class="btn btn-primary" onclick="navigateTo('firewall')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause3')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause4')">Continue to Exercise →</button>
             </div>
         </section>
         
-        <!-- Firewall Section -->
-        <section id="firewall" class="section">
-            <h1>Firewall Management</h1>
-            <p class="lead">Secure your systems by automating firewall configuration with Ansible.</p>
+        <!-- Pause Point 4: Managing Storage -->
+        <section id="pause4" class="section">
+            <div class="pause-point">
+                <div class="pause-icon">⏸️</div>
+                <div class="pause-title">Guided Exercise: Managing Storage</div>
+                <div class="pause-subtitle">Practice configuring LVM, partitions, and file systems with Ansible</div>
+                
+                <div class="pause-details">
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">⏱️</div>
+                        <div class="pause-detail-label">Estimated Time:</div>
+                        <div>35 minutes</div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">📂</div>
+                        <div class="pause-detail-label">Lab Directory:</div>
+                        <div><code>~/admin-storage</code></div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">🚀</div>
+                        <div class="pause-detail-label">Lab Start Command:</div>
+                        <div><code>lab start admin-storage</code></div>
+                    </div>
+                </div>
+
+                <div class="pause-skills">
+                    <div class="pause-skills-title">Skills You Will Practice</div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use the <code>redhat.rhel_system_roles.storage</code> role</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure LVM volume groups and logical volumes</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Create file systems and configure mount points</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use partition-based storage configurations</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure persistent mounts in /etc/fstab</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">📋 Exercise Overview</div>
+                <p>In this exercise, you will configure storage on managed hosts using the RHEL storage system role. You'll create volume groups, logical volumes, and file systems, then mount them at appropriate locations.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('storage')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('network')">Continue After Exercise →</button>
+            </div>
+        </section>
+        
+        <!-- Network Configuration Section -->
+        <section id="network" class="section">
+            <h1>Managing Network Configuration</h1>
+            <p class="lead">Configure network interfaces, static IP addresses, and firewall rules using Ansible.</p>
             
-            <h2>The Firewalld Module</h2>
-            <p>The <span class="term" tabindex="0">ansible.posix.firewalld<span class="tooltip" role="tooltip">A module for managing firewalld zones, services, ports, and rich rules.</span></span> module configures firewall rules:</p>
+            <h2>The Network System Role</h2>
+            <p>The <span class="term" tabindex="0">redhat.rhel_system_roles.network<span class="tooltip" role="tooltip">A RHEL System Role for configuring network connections, interfaces, and related settings consistently across systems.</span></span> role provides comprehensive network configuration management:</p>
             
             <div class="code-block">
-                <div class="code-header"><span class="code-title">Firewall configuration</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header">
+                    <span class="code-title">Configuring static IP address</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure network with RHEL System Role</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">servers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-boolean">true</span>
+  
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">network_connections</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">eth0</span>
+        <span class="yaml-key">type</span>: <span class="yaml-value">ethernet</span>
+        <span class="yaml-key">interface_name</span>: <span class="yaml-value">eth0</span>
+        <span class="yaml-key">autoconnect</span>: <span class="yaml-boolean">true</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">up</span>
+        <span class="yaml-key">ip</span>:
+          <span class="yaml-key">address</span>:
+            <span class="yaml-dash">-</span> <span class="yaml-value">192.168.1.100/24</span>
+          <span class="yaml-key">gateway4</span>: <span class="yaml-value">192.168.1.1</span>
+          <span class="yaml-key">dns</span>:
+            <span class="yaml-dash">-</span> <span class="yaml-value">192.168.1.1</span>
+            <span class="yaml-dash">-</span> <span class="yaml-value">8.8.8.8</span>
+  
+  <span class="yaml-key">roles</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">redhat.rhel_system_roles.network</span></pre>
+                </div>
+            </div>
+            
+            <h3>Network Role Connection Types</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ethernet</code></td>
+                            <td>Standard wired network interface</td>
+                        </tr>
+                        <tr>
+                            <td><code>bond</code></td>
+                            <td>Bonded interface for redundancy</td>
+                        </tr>
+                        <tr>
+                            <td><code>bridge</code></td>
+                            <td>Software bridge for VMs</td>
+                        </tr>
+                        <tr>
+                            <td><code>vlan</code></td>
+                            <td>VLAN-tagged interface</td>
+                        </tr>
+                        <tr>
+                            <td><code>team</code></td>
+                            <td>Team interface (alternative to bonding)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Configuring DHCP</h2>
+            <p>Configure an interface for DHCP:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">DHCP configuration</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-key">network_connections</span>:
+  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">eth0</span>
+    <span class="yaml-key">type</span>: <span class="yaml-value">ethernet</span>
+    <span class="yaml-key">interface_name</span>: <span class="yaml-value">eth0</span>
+    <span class="yaml-key">autoconnect</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">up</span>
+    <span class="yaml-key">ip</span>:
+      <span class="yaml-key">dhcp4</span>: <span class="yaml-boolean">true</span></pre>
+                </div>
+            </div>
+            
+            <h2>Managing Firewall Rules</h2>
+            <p>The <span class="term" tabindex="0">ansible.posix.firewalld<span class="tooltip" role="tooltip">A module for managing firewalld rules, allowing you to open ports, add services, and configure zones.</span></span> module manages firewall rules:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Configuring firewall rules</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
                 <div class="code-content">
 <pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Ensure firewalld is running</span>
   <span class="yaml-module">ansible.builtin.service</span>:
@@ -856,243 +1647,244 @@
     <span class="yaml-key">immediate</span>: <span class="yaml-boolean">true</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
 
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Allow custom port</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Allow HTTPS service</span>
+  <span class="yaml-module">ansible.posix.firewalld</span>:
+    <span class="yaml-key">service</span>: <span class="yaml-value">https</span>
+    <span class="yaml-key">permanent</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">immediate</span>: <span class="yaml-boolean">true</span>
+    <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
+
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Open custom port</span>
   <span class="yaml-module">ansible.posix.firewalld</span>:
     <span class="yaml-key">port</span>: <span class="yaml-value">8080/tcp</span>
     <span class="yaml-key">permanent</span>: <span class="yaml-boolean">true</span>
     <span class="yaml-key">immediate</span>: <span class="yaml-boolean">true</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
 
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Add source to trusted zone</span>
+<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure rich rule for specific source</span>
   <span class="yaml-module">ansible.posix.firewalld</span>:
-    <span class="yaml-key">zone</span>: <span class="yaml-value">trusted</span>
-    <span class="yaml-key">source</span>: <span class="yaml-value">192.168.1.0/24</span>
+    <span class="yaml-key">rich_rule</span>: <span class="yaml-string">'rule family="ipv4" source address="10.0.0.0/8" service name="ssh" accept'</span>
     <span class="yaml-key">permanent</span>: <span class="yaml-boolean">true</span>
     <span class="yaml-key">immediate</span>: <span class="yaml-boolean">true</span>
     <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span></pre>
                 </div>
             </div>
             
-            <h3>Key Firewalld Parameters</h3>
+            <h3>Firewalld Module Parameters</h3>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>service</code></td><td>Firewalld service name (http, ssh, etc.)</td></tr>
-                        <tr><td><code>port</code></td><td>Port/protocol (e.g., 8080/tcp)</td></tr>
-                        <tr><td><code>zone</code></td><td>Firewalld zone</td></tr>
-                        <tr><td><code>permanent</code></td><td>Make change persistent</td></tr>
-                        <tr><td><code>immediate</code></td><td>Apply change immediately</td></tr>
+                        <tr>
+                            <td><code>service</code></td>
+                            <td>Predefined service name (http, ssh, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>port</code></td>
+                            <td>Port/protocol (8080/tcp, 53/udp)</td>
+                        </tr>
+                        <tr>
+                            <td><code>zone</code></td>
+                            <td>Firewall zone (public, trusted, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>permanent</code></td>
+                            <td>Save to persistent configuration</td>
+                        </tr>
+                        <tr>
+                            <td><code>immediate</code></td>
+                            <td>Apply to runtime configuration</td>
+                        </tr>
+                        <tr>
+                            <td><code>rich_rule</code></td>
+                            <td>Complex firewall rule</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             
-            <div class="info-box tip">
-                <div class="info-box-title"><span aria-hidden="true">💡</span> Best Practice</div>
-                <p>Always set both <code>permanent: true</code> and <code>immediate: true</code> to ensure changes persist across reboots and take effect immediately.</p>
+            <div class="info-box important">
+                <div class="info-box-title"><span aria-hidden="true">📌</span> Important</div>
+                <p>Always set both <code>permanent: true</code> and <code>immediate: true</code> when configuring firewall rules. This ensures rules persist across reboots and apply immediately.</p>
+            </div>
+            
+            <h2>Using the Firewall System Role</h2>
+            <p>For complex firewall configurations, use the <code>redhat.rhel_system_roles.firewall</code> role:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Using the firewall system role</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure firewall with system role</span>
+  <span class="yaml-key">hosts</span>: <span class="yaml-value">servers</span>
+  <span class="yaml-key">become</span>: <span class="yaml-boolean">true</span>
+  
+  <span class="yaml-key">vars</span>:
+    <span class="yaml-key">firewall</span>:
+      <span class="yaml-dash">-</span> <span class="yaml-key">service</span>:
+          <span class="yaml-dash">-</span> <span class="yaml-value">http</span>
+          <span class="yaml-dash">-</span> <span class="yaml-value">https</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
+      <span class="yaml-dash">-</span> <span class="yaml-key">port</span>:
+          <span class="yaml-dash">-</span> <span class="yaml-string">"8080/tcp"</span>
+          <span class="yaml-dash">-</span> <span class="yaml-string">"8443/tcp"</span>
+        <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
+  
+  <span class="yaml-key">roles</span>:
+    <span class="yaml-dash">-</span> <span class="yaml-value">redhat.rhel_system_roles.firewall</span></pre>
+                </div>
             </div>
             
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('storage')">← Storage</button>
-                <button class="btn btn-primary" onclick="navigateTo('simulator')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause4')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause5')">Continue to Exercise →</button>
             </div>
         </section>
         
-        <!-- Simulator Section -->
-        <section id="simulator" class="section">
-            <h1>Interactive Simulator</h1>
-            <p class="lead">Watch Ansible automate Linux administration tasks in real-time.</p>
-            
-            <div class="simulator">
-                <div class="simulator-title">
-                    <span aria-hidden="true">🖥️</span> Linux Administration Playbook Simulator
+        <!-- Pause Point 5: Managing Network Configuration -->
+        <section id="pause5" class="section">
+            <div class="pause-point">
+                <div class="pause-icon">⏸️</div>
+                <div class="pause-title">Guided Exercise: Managing Network Configuration</div>
+                <div class="pause-subtitle">Practice configuring network interfaces and firewall rules</div>
+                
+                <div class="pause-details">
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">⏱️</div>
+                        <div class="pause-detail-label">Estimated Time:</div>
+                        <div>30 minutes</div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">📂</div>
+                        <div class="pause-detail-label">Lab Directory:</div>
+                        <div><code>~/admin-network</code></div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">🚀</div>
+                        <div class="pause-detail-label">Lab Start Command:</div>
+                        <div><code>lab start admin-network</code></div>
+                    </div>
                 </div>
-                <div class="simulator-controls">
-                    <select class="simulator-select" id="sim-scenario" aria-label="Select scenario">
-                        <option value="users">User Provisioning</option>
-                        <option value="packages">Package Installation</option>
-                        <option value="services">Service Configuration</option>
-                        <option value="firewall">Firewall Setup</option>
-                        <option value="complete">Complete Server Setup</option>
-                    </select>
-                    <button class="simulator-btn" id="sim-run" onclick="runSimulation()">Run Playbook</button>
-                    <button class="simulator-btn" style="background: var(--bg-tertiary);" onclick="clearSim()">Clear</button>
-                </div>
-                <div class="simulator-output" id="sim-output" role="log" aria-live="polite">
-                    <div class="sim-line" style="color: var(--text-muted);">Select a scenario and click "Run Playbook"...</div>
+
+                <div class="pause-skills">
+                    <div class="pause-skills-title">Skills You Will Practice</div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use the <code>redhat.rhel_system_roles.network</code> role</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure static IP addresses and DNS settings</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Manage firewall rules with <code>ansible.posix.firewalld</code></div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Enable services and open ports in the firewall</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure rich rules for fine-grained access control</div>
+                    </div>
                 </div>
             </div>
-            
-            <h2>Understanding Output Colors</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <div class="card-icon" style="color: var(--success);">●</div>
-                    <div class="card-title">OK (Green)</div>
-                    <p class="card-content">Task completed, no changes needed.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="color: var(--accent-yellow);">●</div>
-                    <div class="card-title">Changed (Yellow)</div>
-                    <p class="card-content">Task completed and made changes.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="color: var(--error);">●</div>
-                    <div class="card-title">Failed (Red)</div>
-                    <p class="card-content">Task encountered an error.</p>
-                </div>
+
+            <div class="info-box">
+                <div class="info-box-title">📋 Exercise Overview</div>
+                <p>In this exercise, you will configure network settings on managed hosts using the RHEL network system role. You'll configure static IP addresses, DNS settings, and firewall rules to secure your systems.</p>
             </div>
-            
+
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('firewall')">← Firewall</button>
-                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('network')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue to Lab →</button>
             </div>
         </section>
         
         <!-- Lab Section -->
         <section id="lab" class="section">
-            <h1>Hands-On Lab</h1>
-            <p class="lead">Apply what you've learned by completing this comprehensive lab exercise.</p>
-            
-            <div class="exercise">
-                <div class="exercise-header">
-                    <span class="exercise-badge">Lab Exercise</span>
-                    <span class="exercise-title">Automating Server Provisioning</span>
+            <div class="pause-point">
+                <div class="pause-icon">🔬</div>
+                <div class="pause-title">Lab: Automating Linux Administration Tasks</div>
+                <div class="pause-subtitle">Apply all skills learned in this chapter to automate a complete server setup</div>
+                
+                <div class="pause-details">
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">⏱️</div>
+                        <div class="pause-detail-label">Estimated Time:</div>
+                        <div>45 minutes</div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">📂</div>
+                        <div class="pause-detail-label">Lab Directory:</div>
+                        <div><code>~/admin-review</code></div>
+                    </div>
+                    <div class="pause-detail-row">
+                        <div class="pause-detail-icon">🚀</div>
+                        <div class="pause-detail-label">Lab Start Command:</div>
+                        <div><code>lab start admin-review</code></div>
+                    </div>
                 </div>
-                <div class="exercise-body">
-                    <p>Create a playbook that provisions a new web server with users, packages, services, and firewall rules.</p>
-                    
-                    <h3>Requirements</h3>
-                    <ul style="margin: 16px 0 24px 24px; color: var(--text-secondary);">
-                        <li style="margin-bottom: 8px;">Create developer user accounts with SSH keys</li>
-                        <li style="margin-bottom: 8px;">Install and configure Apache web server</li>
-                        <li style="margin-bottom: 8px;">Configure firewall to allow HTTP/HTTPS</li>
-                        <li style="margin-bottom: 8px;">Set up scheduled backup job</li>
-                    </ul>
-                    
-                    <div class="exercise-steps">
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">1</div>
-                            <div>
-                                <strong>Create project structure</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre>mkdir -p ~/server-provisioning/{files,vars}
-cd ~/server-provisioning</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">2</div>
-                            <div>
-                                <strong>Create vars/users.yml</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre><span class="yaml-key">developers</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">username</span>: <span class="yaml-value">alice</span>
-    <span class="yaml-key">uid</span>: <span class="yaml-number">2001</span>
-    <span class="yaml-key">groups</span>: <span class="yaml-value">developers,wheel</span>
-  <span class="yaml-dash">-</span> <span class="yaml-key">username</span>: <span class="yaml-value">bob</span>
-    <span class="yaml-key">uid</span>: <span class="yaml-number">2002</span>
-    <span class="yaml-key">groups</span>: <span class="yaml-value">developers</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">3</div>
-                            <div>
-                                <strong>Create main playbook provision.yml</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Provision web server</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
-  <span class="yaml-key">become</span>: <span class="yaml-boolean">true</span>
-  <span class="yaml-key">vars_files</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-value">vars/users.yml</span>
 
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create developers group</span>
-      <span class="yaml-module">ansible.builtin.group</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">developers</span>
-        <span class="yaml-key">gid</span>: <span class="yaml-number">2000</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Create developer accounts</span>
-      <span class="yaml-module">ansible.builtin.user</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-string">"{{ item.username }}"</span>
-        <span class="yaml-key">uid</span>: <span class="yaml-string">"{{ item.uid }}"</span>
-        <span class="yaml-key">groups</span>: <span class="yaml-string">"{{ item.groups }}"</span>
-      <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ developers }}"</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install web packages</span>
-      <span class="yaml-module">ansible.builtin.dnf</span>:
-        <span class="yaml-key">name</span>:
-          <span class="yaml-dash">-</span> <span class="yaml-value">httpd</span>
-          <span class="yaml-dash">-</span> <span class="yaml-value">mod_ssl</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start Apache</span>
-      <span class="yaml-module">ansible.builtin.service</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-        <span class="yaml-key">enabled</span>: <span class="yaml-boolean">true</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure firewall</span>
-      <span class="yaml-module">ansible.posix.firewalld</span>:
-        <span class="yaml-key">service</span>: <span class="yaml-string">"{{ item }}"</span>
-        <span class="yaml-key">permanent</span>: <span class="yaml-boolean">true</span>
-        <span class="yaml-key">immediate</span>: <span class="yaml-boolean">true</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">enabled</span>
-      <span class="yaml-key">loop</span>:
-        <span class="yaml-dash">-</span> <span class="yaml-value">http</span>
-        <span class="yaml-dash">-</span> <span class="yaml-value">https</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Schedule daily backup</span>
-      <span class="yaml-module">ansible.builtin.cron</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-string">"Daily backup"</span>
-        <span class="yaml-key">minute</span>: <span class="yaml-string">"0"</span>
-        <span class="yaml-key">hour</span>: <span class="yaml-string">"2"</span>
-        <span class="yaml-key">job</span>: <span class="yaml-string">"/usr/local/bin/backup.sh"</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">4</div>
-                            <div>
-                                <strong>Run the playbook</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre>ansible-navigator run provision.yml -m stdout</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="pause-skills">
+                    <div class="pause-skills-title">Skills You Will Demonstrate</div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Install and configure software packages</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Create and manage user accounts with SSH keys</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure system services and scheduled tasks</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Set up storage volumes and mount points</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Configure network settings and firewall rules</div>
+                    </div>
+                    <div class="pause-skill-item">
+                        <div class="pause-skill-check">✓</div>
+                        <div>Use RHEL System Roles for complex configurations</div>
                     </div>
                 </div>
             </div>
-            
+
+            <div class="info-box important">
+                <div class="info-box-title"><span aria-hidden="true">📌</span> Comprehensive Lab</div>
+                <p>This lab combines all the skills from this chapter. You will create a complete playbook that provisions new servers with users, software, services, storage, and network configuration. Follow the instructions in your lab guide carefully.</p>
+            </div>
+
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('simulator')">← Simulator</button>
-                <button class="btn btn-primary" onclick="navigateTo('quiz')">Take Quiz →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause5')">← Previous</button>
+                <button class="btn btn-primary" onclick="navigateTo('quiz')">Continue to Quiz →</button>
             </div>
         </section>
         
         <!-- Quiz Section -->
         <section id="quiz" class="section">
             <h1>Knowledge Check</h1>
-            <p class="lead">Test your understanding of Linux administration automation.</p>
+            <p class="lead">Test your understanding of automating Linux administration tasks.</p>
             
             <div class="quiz-container" id="quiz-container">
                 <div class="quiz-progress">
                     <div class="quiz-progress-bar">
                         <div class="quiz-progress-fill" id="quiz-progress-fill" style="width: 0%"></div>
                     </div>
-                    <div class="quiz-progress-text" id="quiz-progress-text">Question 1 of 10</div>
+                    <div class="quiz-progress-text" id="quiz-progress-text">Question 1 of 12</div>
                 </div>
                 <div id="quiz-content">
                     <div class="quiz-question" id="quiz-question"></div>
@@ -1121,7 +1913,11 @@ cd ~/server-provisioning</pre>
                 <div class="checklist-title">What You've Learned</div>
                 <div class="checklist-item">
                     <div class="checklist-check checked">✓</div>
-                    <div>Use <code>user</code> and <code>group</code> modules to manage accounts</div>
+                    <div>Install packages with <code>dnf</code>/<code>yum</code> modules and manage repositories</div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-check checked">✓</div>
+                    <div>Create users and groups with the <code>user</code> and <code>group</code> modules</div>
                 </div>
                 <div class="checklist-item">
                     <div class="checklist-check checked">✓</div>
@@ -1137,11 +1933,11 @@ cd ~/server-provisioning</pre>
                 </div>
                 <div class="checklist-item">
                     <div class="checklist-check checked">✓</div>
-                    <div>Install packages using <code>dnf</code>/<code>yum</code> modules</div>
+                    <div>Configure storage using RHEL System Roles</div>
                 </div>
                 <div class="checklist-item">
                     <div class="checklist-check checked">✓</div>
-                    <div>Configure storage using RHEL System Roles</div>
+                    <div>Configure networks using the network system role</div>
                 </div>
                 <div class="checklist-item">
                     <div class="checklist-check checked">✓</div>
@@ -1152,67 +1948,294 @@ cd ~/server-provisioning</pre>
             <h2>Module Quick Reference</h2>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Task</th><th>Module</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Module/Role</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>User management</td><td><code>ansible.builtin.user</code></td></tr>
-                        <tr><td>Group management</td><td><code>ansible.builtin.group</code></td></tr>
-                        <tr><td>SSH keys</td><td><code>ansible.posix.authorized_key</code></td></tr>
-                        <tr><td>Cron jobs</td><td><code>ansible.builtin.cron</code></td></tr>
-                        <tr><td>Services</td><td><code>ansible.builtin.service</code></td></tr>
-                        <tr><td>Packages (RHEL 8+)</td><td><code>ansible.builtin.dnf</code></td></tr>
-                        <tr><td>Firewall</td><td><code>ansible.posix.firewalld</code></td></tr>
-                        <tr><td>Storage</td><td><code>redhat.rhel_system_roles.storage</code></td></tr>
+                        <tr>
+                            <td>Package management (RHEL 8+)</td>
+                            <td><code>ansible.builtin.dnf</code></td>
+                        </tr>
+                        <tr>
+                            <td>Package management (RHEL 7)</td>
+                            <td><code>ansible.builtin.yum</code></td>
+                        </tr>
+                        <tr>
+                            <td>Repository management</td>
+                            <td><code>ansible.builtin.yum_repository</code></td>
+                        </tr>
+                        <tr>
+                            <td>User management</td>
+                            <td><code>ansible.builtin.user</code></td>
+                        </tr>
+                        <tr>
+                            <td>Group management</td>
+                            <td><code>ansible.builtin.group</code></td>
+                        </tr>
+                        <tr>
+                            <td>SSH keys</td>
+                            <td><code>ansible.posix.authorized_key</code></td>
+                        </tr>
+                        <tr>
+                            <td>Cron jobs</td>
+                            <td><code>ansible.builtin.cron</code></td>
+                        </tr>
+                        <tr>
+                            <td>One-time tasks</td>
+                            <td><code>ansible.posix.at</code></td>
+                        </tr>
+                        <tr>
+                            <td>Services (generic)</td>
+                            <td><code>ansible.builtin.service</code></td>
+                        </tr>
+                        <tr>
+                            <td>Services (systemd)</td>
+                            <td><code>ansible.builtin.systemd</code></td>
+                        </tr>
+                        <tr>
+                            <td>Storage</td>
+                            <td><code>redhat.rhel_system_roles.storage</code></td>
+                        </tr>
+                        <tr>
+                            <td>Network</td>
+                            <td><code>redhat.rhel_system_roles.network</code></td>
+                        </tr>
+                        <tr>
+                            <td>Firewall</td>
+                            <td><code>ansible.posix.firewalld</code></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             
             <div class="info-box tip">
                 <div class="info-box-title"><span aria-hidden="true">💡</span> Next Steps</div>
-                <p>Continue with Chapter 10 for a comprehensive review of all topics covered in this course.</p>
+                <p>Continue with Chapter 10 for a comprehensive review of all topics covered in this course, preparing you for the certification exam.</p>
             </div>
             
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('quiz')">← Quiz</button>
+                <button class="btn btn-secondary" onclick="navigateTo('quiz')">← Back to Quiz</button>
                 <button class="btn btn-primary" onclick="navigateTo('welcome')">Review Chapter ↺</button>
             </div>
         </section>
     </main>
     
     <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                question: "Which package state ensures the latest version is installed?",
+                options: ["present", "installed", "latest", "updated"],
+                correct: 2,
+                explanation: "The 'latest' state ensures the most recent version is installed, updating if needed. 'present' just ensures any version is installed."
+            },
+            {
+                question: "What parameter prevents password updates for existing users?",
+                options: ["password_hash: sha512", "update_password: on_create", "force_password: false", "password_mode: keep"],
+                correct: 1,
+                explanation: "update_password: on_create ensures the password is only set when the user is first created, not updated for existing users."
+            },
+            {
+                question: "What module deploys SSH authorized keys?",
+                options: ["ansible.builtin.ssh_key", "ansible.posix.authorized_key", "ansible.builtin.user", "ansible.posix.ssh_auth"],
+                correct: 1,
+                explanation: "The ansible.posix.authorized_key module manages SSH authorized keys for users."
+            },
+            {
+                question: "Which cron parameter schedules a job to run at system boot?",
+                options: ["boot: true", "special_time: reboot", "at_boot: yes", "when: startup"],
+                correct: 1,
+                explanation: "special_time: reboot schedules the job to run each time the system boots."
+            },
+            {
+                question: "What's the difference between service and systemd modules?",
+                options: ["service is for RHEL, systemd for Debian", "service is generic, systemd has systemd-specific features", "They are identical", "service is deprecated"],
+                correct: 1,
+                explanation: "The service module works across init systems; systemd provides systemd-specific features like daemon_reload."
+            },
+            {
+                question: "How do you validate a sudoers file before deployment?",
+                options: ["check_mode: true", "validate: '/usr/sbin/visudo -cf %s'", "syntax_check: sudoers", "test: visudo"],
+                correct: 1,
+                explanation: "The validate parameter runs visudo to check syntax before saving, preventing lockouts from errors."
+            },
+            {
+                question: "Which RHEL System Role handles LVM, partitions, and file systems?",
+                options: ["redhat.rhel_system_roles.lvm", "redhat.rhel_system_roles.disk", "redhat.rhel_system_roles.storage", "redhat.rhel_system_roles.filesystem"],
+                correct: 2,
+                explanation: "The storage system role provides comprehensive storage management including LVM and file systems."
+            },
+            {
+                question: "What makes firewalld changes both persistent and immediate?",
+                options: ["state: enabled", "permanent: true and immediate: true", "persist: true", "runtime: yes"],
+                correct: 1,
+                explanation: "Set both permanent: true for persistence across reboots and immediate: true to apply now."
+            },
+            {
+                question: "How do you prevent duplicate at jobs?",
+                options: ["once: true", "unique: true", "idempotent: yes", "single: true"],
+                correct: 1,
+                explanation: "unique: true prevents scheduling duplicate at jobs if the playbook runs multiple times."
+            },
+            {
+                question: "Which module creates YUM repository configuration files?",
+                options: ["ansible.builtin.dnf", "ansible.builtin.yum_repository", "ansible.builtin.repo_config", "ansible.builtin.package_source"],
+                correct: 1,
+                explanation: "yum_repository creates repository configuration files in /etc/yum.repos.d/."
+            },
+            {
+                question: "What systemd parameter reloads unit file configurations?",
+                options: ["reload_units: true", "daemon_reload: true", "refresh: true", "systemctl_reload: true"],
+                correct: 1,
+                explanation: "daemon_reload: true runs 'systemctl daemon-reload' to recognize new or modified unit files."
+            },
+            {
+                question: "Which RHEL System Role configures network interfaces?",
+                options: ["redhat.rhel_system_roles.networking", "redhat.rhel_system_roles.network", "redhat.rhel_system_roles.interfaces", "redhat.rhel_system_roles.connection"],
+                correct: 1,
+                explanation: "The network system role (redhat.rhel_system_roles.network) manages network connections and interfaces."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedAnswer = null;
+        let score = 0;
+        let answered = false;
+
+        function initQuiz() {
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            answered = false;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = quizQuestions[currentQuestion];
+            document.getElementById('quiz-question').textContent = q.question;
+            document.getElementById('quiz-progress-fill').style.width = ((currentQuestion) / quizQuestions.length * 100) + '%';
+            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
+            
+            const optionsHtml = q.options.map((opt, i) => 
+                `<div class="quiz-option" onclick="selectAnswer(${i})" role="button" tabindex="0">
+                    <div class="quiz-option-letter">${String.fromCharCode(65 + i)}</div>
+                    <div>${opt}</div>
+                </div>`
+            ).join('');
+            document.getElementById('quiz-options').innerHTML = optionsHtml;
+            document.getElementById('quiz-explanation').classList.remove('show');
+            document.getElementById('quiz-btn').disabled = true;
+            document.getElementById('quiz-btn').textContent = 'Check Answer';
+            selectedAnswer = null;
+            answered = false;
+        }
+
+        function selectAnswer(index) {
+            if (answered) return;
+            selectedAnswer = index;
+            document.querySelectorAll('.quiz-option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            document.getElementById('quiz-btn').disabled = false;
+        }
+
+        function handleQuizAction() {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        }
+
+        function checkAnswer() {
+            if (selectedAnswer === null) return;
+            answered = true;
+            const q = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            
+            options.forEach((opt, i) => {
+                if (i === q.correct) opt.classList.add('correct');
+                else if (i === selectedAnswer) opt.classList.add('incorrect');
+            });
+            
+            const isCorrect = selectedAnswer === q.correct;
+            if (isCorrect) score++;
+            
+            const expTitle = document.getElementById('quiz-explanation-title');
+            expTitle.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            expTitle.className = 'quiz-explanation-title ' + (isCorrect ? 'correct' : 'incorrect');
+            document.getElementById('quiz-explanation-text').textContent = q.explanation;
+            document.getElementById('quiz-explanation').classList.add('show');
+            document.getElementById('quiz-btn').textContent = currentQuestion < quizQuestions.length - 1 ? 'Next Question' : 'See Results';
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizQuestions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const percentage = Math.round(score / quizQuestions.length * 100);
+            let scoreClass = 'needs-work';
+            let message = 'Keep studying and try again!';
+            if (percentage >= 80) { scoreClass = 'excellent'; message = 'Excellent work! Ready for the lab!'; }
+            else if (percentage >= 60) { scoreClass = 'good'; message = 'Good job! Review missed topics.'; }
+            
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="quiz-results">
+                    <div class="quiz-score ${scoreClass}">${percentage}%</div>
+                    <p style="font-size: 20px; margin: 20px 0;">${message}</p>
+                    <p>You got ${score} out of ${quizQuestions.length} questions correct.</p>
+                    <button class="quiz-btn" onclick="initQuiz()" style="margin-top: 24px;">Retake Quiz</button>
+                </div>
+            `;
+            document.getElementById('quiz-progress-fill').style.width = '100%';
+        }
+
         // Navigation
-        const sections = ['welcome', 'objectives', 'users', 'ssh', 'cron', 'services', 'packages', 'storage', 'firewall', 'simulator', 'lab', 'quiz', 'summary'];
-        const visitedSections = new Set(['welcome']);
-        
+        const sections = ['welcome', 'objectives', 'software', 'pause1', 'users', 'pause2', 'boot', 'pause3', 'storage', 'pause4', 'network', 'pause5', 'lab', 'quiz', 'summary'];
+        let visitedSections = new Set(['welcome']);
+
         function navigateTo(sectionId) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === sectionId) item.classList.add('active');
+            });
+            
             visitedSections.add(sectionId);
             updateProgress();
-            const navItem = document.querySelector(`[data-section="${sectionId}"]`);
-            if (navItem && sectionId !== 'quiz') setTimeout(() => navItem.classList.add('completed'), 1000);
             window.scrollTo(0, 0);
+            
+            if (sectionId === 'quiz' && !document.querySelector('.quiz-results')) {
+                initQuiz();
+            }
         }
-        
+
         function updateProgress() {
-            const progress = Math.round((visitedSections.size / sections.length) * 100);
+            const progress = Math.round(visitedSections.size / sections.length * 100);
             document.getElementById('progress-fill').style.width = progress + '%';
             document.getElementById('progress-text').textContent = progress + '%';
         }
-        
-        function toggleNav() { document.getElementById('nav').classList.toggle('open'); }
-        
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => navigateTo(item.dataset.section));
-            item.addEventListener('keypress', (e) => { if (e.key === 'Enter') navigateTo(item.dataset.section); });
-        });
-        
+
         function toggleObjective(el) {
             el.classList.toggle('checked');
             el.setAttribute('aria-checked', el.classList.contains('checked'));
         }
-        
+
+        function toggleNav() {
+            document.getElementById('nav').classList.toggle('open');
+        }
+
         function copyCode(btn) {
             const code = btn.closest('.code-block').querySelector('pre').textContent;
             navigator.clipboard.writeText(code).then(() => {
@@ -1220,250 +2243,20 @@ cd ~/server-provisioning</pre>
                 setTimeout(() => btn.textContent = 'Copy', 2000);
             });
         }
-        
-        // Tooltip positioning
-        document.querySelectorAll('.term').forEach(term => {
-            term.addEventListener('mouseenter', function() {
-                const rect = this.getBoundingClientRect();
-                this.classList.remove('tooltip-left', 'tooltip-right', 'tooltip-bottom');
-                if (rect.left < 150) this.classList.add('tooltip-left');
-                else if (window.innerWidth - rect.right < 150) this.classList.add('tooltip-right');
-                if (rect.top < 120) this.classList.add('tooltip-bottom');
+
+        // Event Listeners
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => navigateTo(item.dataset.section));
+            item.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateTo(item.dataset.section);
+                }
             });
         });
-        
-        // Simulator
-        const simulations = {
-            users: [
-                { text: 'PLAY [Provision user accounts] ****************************', cls: 'sim-play' },
-                { text: '' },
-                { text: 'TASK [Gathering Facts] ************************************', cls: 'sim-task' },
-                { text: 'ok: [server1.example.com]', cls: 'sim-ok' },
-                { text: '' },
-                { text: 'TASK [Create developers group] ****************************', cls: 'sim-task' },
-                { text: 'changed: [server1.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Create developer accounts] **************************', cls: 'sim-task' },
-                { text: 'changed: [server1.example.com] => (item=alice)', cls: 'sim-changed' },
-                { text: 'changed: [server1.example.com] => (item=bob)', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Deploy SSH keys] ************************************', cls: 'sim-task' },
-                { text: 'changed: [server1.example.com] => (item=alice)', cls: 'sim-changed' },
-                { text: 'changed: [server1.example.com] => (item=bob)', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'PLAY RECAP *************************************************', cls: 'sim-play' },
-                { text: 'server1.example.com : ok=4    changed=3    failed=0', cls: 'sim-ok' }
-            ],
-            packages: [
-                { text: 'PLAY [Install software packages] **************************', cls: 'sim-play' },
-                { text: '' },
-                { text: 'TASK [Gathering Facts] ************************************', cls: 'sim-task' },
-                { text: 'ok: [webserver.example.com]', cls: 'sim-ok' },
-                { text: '' },
-                { text: 'TASK [Install web packages] *******************************', cls: 'sim-task' },
-                { text: 'changed: [webserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Update all packages] ********************************', cls: 'sim-task' },
-                { text: 'changed: [webserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'PLAY RECAP *************************************************', cls: 'sim-play' },
-                { text: 'webserver.example.com : ok=3    changed=2    failed=0', cls: 'sim-ok' }
-            ],
-            services: [
-                { text: 'PLAY [Configure system services] **************************', cls: 'sim-play' },
-                { text: '' },
-                { text: 'TASK [Gathering Facts] ************************************', cls: 'sim-task' },
-                { text: 'ok: [appserver.example.com]', cls: 'sim-ok' },
-                { text: '' },
-                { text: 'TASK [Deploy configuration] *******************************', cls: 'sim-task' },
-                { text: 'changed: [appserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Start and enable httpd] *****************************', cls: 'sim-task' },
-                { text: 'changed: [appserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'RUNNING HANDLER [restart httpd] ***************************', cls: 'sim-task' },
-                { text: 'changed: [appserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'PLAY RECAP *************************************************', cls: 'sim-play' },
-                { text: 'appserver.example.com : ok=4    changed=3    failed=0', cls: 'sim-ok' }
-            ],
-            firewall: [
-                { text: 'PLAY [Configure firewall rules] ***************************', cls: 'sim-play' },
-                { text: '' },
-                { text: 'TASK [Gathering Facts] ************************************', cls: 'sim-task' },
-                { text: 'ok: [webserver.example.com]', cls: 'sim-ok' },
-                { text: '' },
-                { text: 'TASK [Ensure firewalld is running] ************************', cls: 'sim-task' },
-                { text: 'ok: [webserver.example.com]', cls: 'sim-ok' },
-                { text: '' },
-                { text: 'TASK [Allow HTTP service] *********************************', cls: 'sim-task' },
-                { text: 'changed: [webserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Allow HTTPS service] ********************************', cls: 'sim-task' },
-                { text: 'changed: [webserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'PLAY RECAP *************************************************', cls: 'sim-play' },
-                { text: 'webserver.example.com : ok=4    changed=2    failed=0', cls: 'sim-ok' }
-            ],
-            complete: [
-                { text: 'PLAY [Complete server provisioning] ***********************', cls: 'sim-play' },
-                { text: '' },
-                { text: 'TASK [Gathering Facts] ************************************', cls: 'sim-task' },
-                { text: 'ok: [newserver.example.com]', cls: 'sim-ok' },
-                { text: '' },
-                { text: 'TASK [Create admin group] *********************************', cls: 'sim-task' },
-                { text: 'changed: [newserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Create admin user] **********************************', cls: 'sim-task' },
-                { text: 'changed: [newserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Install required packages] **************************', cls: 'sim-task' },
-                { text: 'changed: [newserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Configure firewall] *********************************', cls: 'sim-task' },
-                { text: 'changed: [newserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Start services] *************************************', cls: 'sim-task' },
-                { text: 'changed: [newserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'TASK [Schedule backup] ************************************', cls: 'sim-task' },
-                { text: 'changed: [newserver.example.com]', cls: 'sim-changed' },
-                { text: '' },
-                { text: 'PLAY RECAP *************************************************', cls: 'sim-play' },
-                { text: 'newserver.example.com : ok=7    changed=6    failed=0', cls: 'sim-ok' }
-            ]
-        };
-        
-        let simRunning = false;
-        
-        function runSimulation() {
-            if (simRunning) return;
-            const scenario = document.getElementById('sim-scenario').value;
-            const sim = simulations[scenario];
-            const output = document.getElementById('sim-output');
-            output.innerHTML = '';
-            simRunning = true;
-            document.getElementById('sim-run').disabled = true;
-            let i = 0;
-            function addLine() {
-                if (i < sim.length) {
-                    const line = sim[i];
-                    const div = document.createElement('div');
-                    div.className = 'sim-line ' + (line.cls || '');
-                    div.textContent = line.text || '\u00A0';
-                    output.appendChild(div);
-                    output.scrollTop = output.scrollHeight;
-                    i++;
-                    setTimeout(addLine, line.text ? 80 : 30);
-                } else {
-                    simRunning = false;
-                    document.getElementById('sim-run').disabled = false;
-                }
-            }
-            addLine();
-        }
-        
-        function clearSim() {
-            document.getElementById('sim-output').innerHTML = '<div class="sim-line" style="color: var(--text-muted);">Select a scenario and click "Run Playbook"...</div>';
-        }
-        
-        // Quiz
-        const quizQuestions = [
-            { question: "Which parameter prevents Ansible from resetting a user's password on subsequent runs?", options: ["password_hash: sha512", "update_password: on_create", "force_password: false", "password_mode: keep"], correct: 1, explanation: "update_password: on_create ensures the password is only set when the user is first created." },
-            { question: "What module deploys SSH authorized keys?", options: ["ansible.builtin.ssh_key", "ansible.posix.authorized_key", "ansible.builtin.user", "ansible.posix.ssh_auth"], correct: 1, explanation: "ansible.posix.authorized_key manages SSH authorized keys." },
-            { question: "Which cron parameter schedules a job to run at system boot?", options: ["boot: true", "special_time: reboot", "at_boot: yes", "when: startup"], correct: 1, explanation: "special_time: reboot schedules the job to run at boot." },
-            { question: "What's the difference between service and systemd modules?", options: ["service is for RHEL, systemd for Debian", "service is generic, systemd has systemd-specific features", "They are identical", "service is deprecated"], correct: 1, explanation: "The service module works across init systems; systemd provides systemd-specific features like daemon_reload." },
-            { question: "Which package state ensures the latest version is installed?", options: ["present", "installed", "latest", "updated"], correct: 2, explanation: "The 'latest' state ensures the most recent version is installed." },
-            { question: "How do you validate a sudoers file before deployment?", options: ["check_mode: true", "validate: '/usr/sbin/visudo -cf %s'", "syntax_check: sudoers", "test: visudo"], correct: 1, explanation: "The validate parameter runs visudo to check syntax before saving." },
-            { question: "Which RHEL System Role handles LVM, partitions, and file systems?", options: ["redhat.rhel_system_roles.lvm", "redhat.rhel_system_roles.disk", "redhat.rhel_system_roles.storage", "redhat.rhel_system_roles.filesystem"], correct: 2, explanation: "The storage system role provides comprehensive storage management." },
-            { question: "What makes firewalld changes both persistent and immediate?", options: ["state: enabled", "permanent: true and immediate: true", "persist: true", "runtime: yes"], correct: 1, explanation: "Set both permanent: true and immediate: true for changes to persist and apply immediately." },
-            { question: "How do you prevent duplicate at jobs?", options: ["once: true", "unique: true", "idempotent: yes", "single: true"], correct: 1, explanation: "unique: true prevents scheduling duplicate at jobs." },
-            { question: "Which module creates YUM repository configuration files?", options: ["ansible.builtin.dnf", "ansible.builtin.yum_repository", "ansible.builtin.repo_config", "ansible.builtin.package_source"], correct: 1, explanation: "yum_repository creates repository configuration files in /etc/yum.repos.d/." }
-        ];
-        
-        let currentQuestion = 0, selectedAnswer = null, quizAnswered = false, score = 0;
-        
-        function initQuiz() {
-            currentQuestion = 0; selectedAnswer = null; quizAnswered = false; score = 0;
-            showQuestion();
-        }
-        
-        function showQuestion() {
-            const q = quizQuestions[currentQuestion];
-            document.getElementById('quiz-question').textContent = q.question;
-            const optionsDiv = document.getElementById('quiz-options');
-            optionsDiv.innerHTML = '';
-            ['A', 'B', 'C', 'D'].forEach((letter, i) => {
-                const div = document.createElement('div');
-                div.className = 'quiz-option';
-                div.innerHTML = `<div class="quiz-option-letter">${letter}</div><div>${q.options[i]}</div>`;
-                div.onclick = () => selectAnswer(i);
-                optionsDiv.appendChild(div);
-            });
-            document.getElementById('quiz-explanation').classList.remove('show');
-            document.getElementById('quiz-btn').textContent = 'Check Answer';
-            document.getElementById('quiz-btn').disabled = true;
-            document.getElementById('quiz-progress-fill').style.width = ((currentQuestion) / quizQuestions.length * 100) + '%';
-            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
-            selectedAnswer = null; quizAnswered = false;
-        }
-        
-        function selectAnswer(index) {
-            if (quizAnswered) return;
-            selectedAnswer = index;
-            document.querySelectorAll('.quiz-option').forEach((opt, i) => opt.classList.toggle('selected', i === index));
-            document.getElementById('quiz-btn').disabled = false;
-        }
-        
-        function handleQuizAction() {
-            if (!quizAnswered) checkAnswer(); else nextQuestion();
-        }
-        
-        function checkAnswer() {
-            const q = quizQuestions[currentQuestion];
-            quizAnswered = true;
-            document.querySelectorAll('.quiz-option').forEach((opt, i) => {
-                opt.classList.remove('selected');
-                if (i === q.correct) opt.classList.add('correct');
-                else if (i === selectedAnswer) opt.classList.add('incorrect');
-            });
-            const expDiv = document.getElementById('quiz-explanation');
-            const titleDiv = document.getElementById('quiz-explanation-title');
-            if (selectedAnswer === q.correct) {
-                score++; titleDiv.textContent = '✓ Correct!'; titleDiv.className = 'quiz-explanation-title correct';
-            } else {
-                titleDiv.textContent = '✗ Incorrect'; titleDiv.className = 'quiz-explanation-title incorrect';
-            }
-            document.getElementById('quiz-explanation-text').textContent = q.explanation;
-            expDiv.classList.add('show');
-            document.getElementById('quiz-btn').textContent = currentQuestion < quizQuestions.length - 1 ? 'Next Question' : 'View Results';
-        }
-        
-        function nextQuestion() {
-            if (currentQuestion < quizQuestions.length - 1) { currentQuestion++; showQuestion(); }
-            else showResults();
-        }
-        
-        function showResults() {
-            const pct = Math.round((score / quizQuestions.length) * 100);
-            let cls = 'needs-work', msg = 'Keep studying!';
-            if (pct >= 80) { cls = 'excellent'; msg = 'Excellent work!'; }
-            else if (pct >= 60) { cls = 'good'; msg = 'Good job!'; }
-            document.getElementById('quiz-content').innerHTML = `
-                <div class="quiz-results">
-                    <div class="quiz-score ${cls}">${pct}%</div>
-                    <h2>${msg}</h2>
-                    <p>You answered ${score} out of ${quizQuestions.length} questions correctly.</p>
-                    <button class="quiz-btn" onclick="initQuiz()" style="margin-top: 24px;">Retake Quiz</button>
-                </div>
-            `;
-            document.getElementById('quiz-progress-fill').style.width = '100%';
-            document.getElementById('quiz-progress-text').textContent = 'Quiz Complete';
-            document.querySelector('[data-section="quiz"]').classList.add('completed');
-        }
-        
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => { initQuiz(); updateProgress(); });
+        updateProgress();
     </script>
 </body>
 </html>
