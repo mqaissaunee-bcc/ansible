@@ -30,6 +30,7 @@
             --tooltip-bg: #FFFFCC;
             --tooltip-text: #1A1A1A;
             --focus-outline: #FFCC00;
+            --pause-bg: #1a0a0a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -76,6 +77,7 @@
         .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
         .nav-item.active { background: rgba(204, 0, 0, 0.15); border-left-color: var(--rh-red); color: var(--text-primary); }
         .nav-item.completed::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--success); color: white; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: -32px; margin-left: -8px; }
+        .nav-item.pause-item { background: rgba(204, 0, 0, 0.08); border-left-color: var(--accent-orange); }
         .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         main { margin-left: 300px; margin-top: 76px; min-height: calc(100vh - 76px); }
         .section { display: none; padding: 48px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
@@ -139,21 +141,12 @@
         td { padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
         tr:last-child td { border-bottom: none; }
         tr:hover { background: var(--bg-tertiary); }
-        .tabs { margin: 32px 0; }
-        .tab-buttons { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; flex-wrap: wrap; }
-        .tab-btn { background: transparent; border: none; padding: 12px 24px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .tab-btn:hover { color: var(--text-primary); }
-        .tab-btn.active { color: var(--rh-red); border-bottom-color: var(--rh-red); }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
         .nav-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color); gap: 16px; flex-wrap: wrap; }
         .btn { padding: 14px 28px; border-radius: 8px; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--rh-red); color: white; border: none; }
         .btn-primary:hover { background: var(--rh-red-dark); transform: translateX(4px); }
         .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background: var(--bg-tertiary); color: var(--text-primary); transform: translateX(-4px); }
-        .diagram { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin: 32px 0; }
-        .diagram-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 24px; color: var(--text-primary); }
         .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0; }
         .comparison-card { background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; }
         .comparison-card.import { border-color: var(--accent-blue); }
@@ -172,6 +165,94 @@
         .flow-step-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; }
         .flow-step-name { font-family: 'Red Hat Display', sans-serif; font-weight: 700; font-size: 18px; }
         .flow-arrow { color: var(--rh-red); font-size: 24px; }
+        .diagram { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin: 32px 0; }
+        .diagram-title { font-family: 'Red Hat Display', sans-serif; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 24px; color: var(--text-primary); }
+        .directory-tree { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 14px; margin: 24px 0; }
+        .tree-line { color: var(--text-secondary); padding: 4px 0; }
+        .tree-folder { color: var(--accent-blue); font-weight: 600; }
+        .tree-file { color: var(--text-secondary); }
+        .tree-comment { color: var(--text-muted); font-style: italic; }
+        
+        /* Pause Point Styles */
+        .pause-section { background: linear-gradient(135deg, var(--pause-bg) 0%, var(--bg-primary) 100%); }
+        .pause-banner {
+            background: linear-gradient(135deg, var(--rh-red) 0%, var(--accent-orange) 100%);
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+            margin: 32px 0;
+            box-shadow: 0 8px 32px rgba(204, 0, 0, 0.3);
+        }
+        .pause-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            display: block;
+        }
+        .pause-label {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+        }
+        .pause-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 16px;
+        }
+        .pause-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+        .pause-instructions {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            text-align: left;
+        }
+        .pause-instructions-title {
+            font-family: 'Red Hat Display', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .pause-instructions ul {
+            margin: 0;
+            padding-left: 24px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .pause-instructions li {
+            margin-bottom: 8px;
+        }
+        .pause-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Red Hat Mono', monospace;
+            font-size: 14px;
+            color: white;
+            margin-top: 16px;
+        }
+        
+        .tabs { margin: 32px 0; }
+        .tab-buttons { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; padding: 12px 24px; color: var(--text-muted); font-family: 'Red Hat Display', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--rh-red); border-bottom-color: var(--rh-red); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        
         .quiz-container { background: var(--bg-secondary); border-radius: 12px; padding: 32px; margin: 32px 0; }
         .quiz-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
         .quiz-progress-bar { flex: 1; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
@@ -196,24 +277,7 @@
         .quiz-btn { background: var(--rh-red); color: white; border: none; padding: 14px 28px; border-radius: 8px; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.2s; width: 100%; }
         .quiz-btn:hover { background: var(--rh-red-dark); }
         .quiz-btn:disabled { background: var(--bg-tertiary); color: var(--text-muted); cursor: not-allowed; }
-        .exercise { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; margin: 32px 0; overflow: hidden; }
-        .exercise-header { background: var(--bg-tertiary); padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
-        .exercise-badge { background: var(--rh-red); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .exercise-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 18px; }
-        .exercise-body { padding: 24px; }
-        .exercise-steps { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
-        .exercise-step { display: flex; gap: 16px; padding: 16px; background: var(--bg-tertiary); border-radius: 8px; }
-        .exercise-step-number { width: 32px; height: 32px; min-width: 32px; background: var(--rh-red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-        .checklist { background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin: 24px 0; }
-        .checklist-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
-        .checklist-item:last-child { border-bottom: none; }
-        .checklist-check { width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: transparent; font-size: 14px; flex-shrink: 0; }
-        .checklist-check.checked { background: var(--success); border-color: var(--success); color: white; }
-        .directory-tree { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; font-family: 'Red Hat Mono', monospace; font-size: 14px; margin: 24px 0; }
-        .tree-line { color: var(--text-secondary); padding: 4px 0; }
-        .tree-folder { color: var(--accent-blue); font-weight: 600; }
-        .tree-file { color: var(--text-secondary); }
-        .tree-comment { color: var(--text-muted); font-style: italic; }
+        
         .simulator-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; margin: 32px 0; overflow: hidden; }
         .simulator-header { background: var(--bg-tertiary); padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         .simulator-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 400px; }
@@ -229,11 +293,11 @@
         .output-line.error { color: var(--error); }
         .output-line.import { color: var(--accent-purple); }
         .demo-title { font-family: 'Red Hat Display', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .demo-controls { display: flex; gap: 8px; }
         .demo-btn { background: var(--rh-red); border: none; color: white; padding: 10px 20px; border-radius: 6px; font-family: 'Red Hat Display', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
         .demo-btn:hover { background: var(--rh-red-dark); }
         .demo-btn.secondary { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); }
         .demo-btn.secondary:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        
         @media (max-width: 1024px) {
             .comparison-grid { grid-template-columns: 1fr; }
             .simulator-body { grid-template-columns: 1fr; }
@@ -248,6 +312,8 @@
             h2 { font-size: 26px; }
             .menu-toggle { display: block; }
             .progress-container { display: none; }
+            .pause-banner { padding: 32px 24px; }
+            .pause-title { font-size: 24px; }
         }
     </style>
 </head>
@@ -278,25 +344,27 @@
             <a href="#" class="nav-item" data-section="objectives" tabindex="0"><span class="nav-icon">🎯</span>Learning Objectives</a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Importing Content</div>
-            <a href="#" class="nav-item" data-section="import-intro" tabindex="0"><span class="nav-icon">📥</span>Introduction to Imports</a>
-            <a href="#" class="nav-item" data-section="import-playbook" tabindex="0"><span class="nav-icon">📚</span>Importing Playbooks</a>
-            <a href="#" class="nav-item" data-section="import-tasks" tabindex="0"><span class="nav-icon">📋</span>Importing Tasks</a>
+            <div class="nav-section-title">Host Patterns</div>
+            <a href="#" class="nav-item" data-section="host-patterns" tabindex="0"><span class="nav-icon">🎯</span>Selecting Hosts</a>
+            <a href="#" class="nav-item pause-item" data-section="pause1" tabindex="0"><span class="nav-icon">⏸️</span>Exercise: Host Patterns</a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Including Content</div>
-            <a href="#" class="nav-item" data-section="include-tasks" tabindex="0"><span class="nav-icon">🔄</span>Including Tasks</a>
+            <div class="nav-section-title">Imports & Includes</div>
+            <a href="#" class="nav-item" data-section="import-intro" tabindex="0"><span class="nav-icon">📥</span>Introduction</a>
+            <a href="#" class="nav-item" data-section="import-tasks" tabindex="0"><span class="nav-icon">📋</span>Import Tasks</a>
+            <a href="#" class="nav-item" data-section="include-tasks" tabindex="0"><span class="nav-icon">🔄</span>Include Tasks</a>
             <a href="#" class="nav-item" data-section="comparison" tabindex="0"><span class="nav-icon">⚖️</span>Import vs Include</a>
+            <a href="#" class="nav-item pause-item" data-section="pause2" tabindex="0"><span class="nav-icon">⏸️</span>Exercise: Imports</a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">Variable Management</div>
             <a href="#" class="nav-item" data-section="host-group-vars" tabindex="0"><span class="nav-icon">📁</span>Host & Group Variables</a>
+            <a href="#" class="nav-item pause-item" data-section="pause3" tabindex="0"><span class="nav-icon">⏸️</span>Lab: Complex Playbooks</a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Practice</div>
+            <div class="nav-section-title">Review</div>
             <a href="#" class="nav-item" data-section="simulator" tabindex="0"><span class="nav-icon">🎮</span>Import Simulator</a>
-            <a href="#" class="nav-item" data-section="lab" tabindex="0"><span class="nav-icon">💻</span>Hands-On Lab</a>
-            <a href="#" class="nav-item" data-section="quiz" tabindex="0"><span class="nav-icon">📋</span>Knowledge Check</a>
+            <a href="#" class="nav-item" data-section="quiz" tabindex="0"><span class="nav-icon">📝</span>Knowledge Check</a>
             <a href="#" class="nav-item" data-section="summary" tabindex="0"><span class="nav-icon">📚</span>Summary</a>
         </div>
     </nav>
@@ -305,18 +373,18 @@
         <!-- Welcome Section -->
         <section id="welcome" class="section active">
             <h1>Managing Complex Playbooks</h1>
-            <p class="lead">Learn how to organize large automation projects using imports, includes, and structured variable files to create maintainable, scalable Ansible solutions.</p>
+            <p class="lead">Learn how to target specific hosts with patterns, organize large automation projects using imports and includes, and structure variable files for maintainable, scalable Ansible solutions.</p>
             
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon">📥</div>
-                    <div class="card-title">Static Imports</div>
-                    <div class="card-content">Import playbooks and tasks at parse time for predictable, pre-processed automation content.</div>
+                    <div class="card-icon">🎯</div>
+                    <div class="card-title">Host Patterns</div>
+                    <div class="card-content">Target specific hosts and groups using wildcards, intersections, and exclusions for precise automation control.</div>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🔄</div>
-                    <div class="card-title">Dynamic Includes</div>
-                    <div class="card-content">Include tasks dynamically at runtime with support for loops and conditional loading.</div>
+                    <div class="card-icon">📥</div>
+                    <div class="card-title">Imports & Includes</div>
+                    <div class="card-content">Break large playbooks into smaller, reusable components using static imports and dynamic includes.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon">📁</div>
@@ -327,7 +395,12 @@
 
             <div class="info-box">
                 <div class="info-box-title">📖 Chapter Overview</div>
-                <p>As Ansible projects grow, keeping all automation in a single playbook becomes unmanageable. This chapter teaches you how to break large playbooks into smaller, reusable components using <span class="term" tabindex="0">import_tasks<span class="tooltip">A module that statically imports task files at parse time, before execution begins.</span></span> and <span class="term" tabindex="0">include_tasks<span class="tooltip">A module that dynamically includes task files at runtime, when the task is reached during execution.</span></span>, how to organize multi-playbook projects with <span class="term" tabindex="0">import_playbook<span class="tooltip">A directive that imports entire playbooks into a master playbook at parse time.</span></span>, and how to manage variables efficiently using special directories.</p>
+                <p>This chapter covers three main topics: First, you'll learn to use <span class="term" tabindex="0">host patterns<span class="tooltip">Expressions used to select which managed hosts from your inventory a play or ad hoc command should target.</span></span> to precisely target hosts in your inventory. Then, you'll master <span class="term" tabindex="0">import_tasks<span class="tooltip">A module that statically imports task files at parse time, before execution begins.</span></span> and <span class="term" tabindex="0">include_tasks<span class="tooltip">A module that dynamically includes task files at runtime, when the task is reached during execution.</span></span> to organize playbooks. Finally, you'll learn to manage variables efficiently using special directories.</p>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title">⏸️ Exercise Pause Points</div>
+                <p>This chapter includes <strong>three hands-on exercises</strong>. Look for the orange pause banners throughout the content indicating when to stop for instructor-led exercises.</p>
             </div>
 
             <div class="nav-buttons">
@@ -346,37 +419,269 @@
                 
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Understand the difference between <strong>static imports</strong> and <strong>dynamic includes</strong> in Ansible</div>
+                    <div class="objective-text">Use <strong>host patterns</strong> to select specific hosts and groups from your inventory</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Use <code>import_playbook</code> to create master playbooks that orchestrate multiple plays</div>
+                    <div class="objective-text">Apply wildcards, intersections, and exclusions in host patterns</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Use <code>import_tasks</code> to incorporate external task files statically at parse time</div>
+                    <div class="objective-text">Understand the difference between <strong>static imports</strong> and <strong>dynamic includes</strong></div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Use <code>include_tasks</code> to dynamically load task files at runtime with loops and conditions</div>
+                    <div class="objective-text">Use <code>import_tasks</code> to incorporate external task files at parse time</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Choose the appropriate method (import vs include) based on your requirements</div>
+                    <div class="objective-text">Use <code>include_tasks</code> to dynamically load task files with loops and conditions</div>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
+                    <div class="objective-text">Choose the appropriate method (import vs include) based on requirements</div>
                 </div>
                 <div class="objective-item">
                     <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
                     <div class="objective-text">Organize variables using <code>host_vars</code> and <code>group_vars</code> directories</div>
                 </div>
-                <div class="objective-item">
-                    <div class="objective-checkbox" onclick="toggleObjective(this)" role="checkbox" aria-checked="false" tabindex="0">✓</div>
-                    <div class="objective-text">Design maintainable project directory structures for complex automation</div>
-                </div>
             </div>
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('welcome')">← Welcome</button>
-                <button class="btn btn-primary" onclick="navigateTo('import-intro')">Continue →</button>
+                <button class="btn btn-primary" onclick="navigateTo('host-patterns')">Continue →</button>
+            </div>
+        </section>
+
+        <!-- Host Patterns Section (NEW) -->
+        <section id="host-patterns" class="section">
+            <h1>Selecting Hosts with Host Patterns</h1>
+            <p class="lead">Host patterns allow you to precisely target which managed hosts from your inventory a play or ad hoc command should affect.</p>
+
+            <h2>What Are Host Patterns?</h2>
+            <p>A <span class="term" tabindex="0">host pattern<span class="tooltip">An expression used in the hosts directive of a play or with ad hoc commands to specify which managed hosts should be targeted.</span></span> is used in the <code>hosts</code> directive of a play to specify which managed hosts the play should run against. You can reference hosts by name, by group, or use special patterns to combine, intersect, or exclude hosts.</p>
+
+            <h2>Basic Host Patterns</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>all</code> or <code>*</code></td>
+                            <td>All hosts in inventory</td>
+                            <td><code>hosts: all</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>hostname</code></td>
+                            <td>Single specific host</td>
+                            <td><code>hosts: web1.example.com</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>groupname</code></td>
+                            <td>All hosts in a group</td>
+                            <td><code>hosts: webservers</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ungrouped</code></td>
+                            <td>Hosts not in any group (except all)</td>
+                            <td><code>hosts: ungrouped</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Wildcard Patterns</h2>
+            <p>Use wildcards to match multiple hosts based on naming patterns:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Wildcard Examples</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Match all hosts starting with 'web'</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">web*</span>
+
+<span class="yaml-comment"># Match hosts like web1, web2, web3, etc.</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">web*.example.com</span>
+
+<span class="yaml-comment"># Match any host in the example.com domain</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">*.example.com</span>
+
+<span class="yaml-comment"># Match hosts with 'db' anywhere in the name</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">*db*</span></pre>
+                </div>
+            </div>
+
+            <h2>List Patterns (OR Logic)</h2>
+            <p>Use a colon (<code>:</code>) to specify multiple patterns. Hosts matching <strong>any</strong> pattern are included:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">List Pattern Examples</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># All hosts in webservers OR dbservers groups</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:dbservers</span>
+
+<span class="yaml-comment"># A specific host OR all hosts in a group</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">web1.example.com:dbservers</span>
+
+<span class="yaml-comment"># Multiple groups combined</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:dbservers:monitoring</span></pre>
+                </div>
+            </div>
+
+            <h2>Intersection Patterns (AND Logic)</h2>
+            <p>Use an ampersand (<code>&</code>) to select hosts that are in <strong>both</strong> groups:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Intersection Pattern Examples</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># Hosts that are in BOTH webservers AND production</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:&production</span>
+
+<span class="yaml-comment"># Hosts in webservers AND datacenter1 AND critical</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:&datacenter1:&critical</span></pre>
+                </div>
+            </div>
+
+            <h2>Exclusion Patterns (NOT Logic)</h2>
+            <p>Use an exclamation mark (<code>!</code>) to exclude hosts from a pattern:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Exclusion Pattern Examples</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># All webservers EXCEPT those in staging</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:!staging</span>
+
+<span class="yaml-comment"># All hosts EXCEPT dbservers</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">all:!dbservers</span>
+
+<span class="yaml-comment"># Production webservers, but not maintenance hosts</span>
+<span class="yaml-key">hosts</span>: <span class="yaml-value">webservers:&production:!maintenance</span></pre>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title">⚠️ Shell Escaping</div>
+                <p>When using host patterns with special characters on the command line, you may need to quote them to prevent shell interpretation: <code>ansible 'webservers:!staging' -m ping</code></p>
+            </div>
+
+            <h2>Testing Host Patterns</h2>
+            <p>Use the <code>--list-hosts</code> option to see which hosts match a pattern without running any tasks:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Testing Host Patterns</span>
+                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-content">
+<pre><span class="yaml-comment"># List hosts that match a pattern</span>
+$ ansible webservers --list-hosts
+  hosts (3):
+    web1.example.com
+    web2.example.com
+    web3.example.com
+
+<span class="yaml-comment"># Test complex patterns</span>
+$ ansible 'webservers:&production' --list-hosts
+  hosts (2):
+    web1.example.com
+    web2.example.com
+
+<span class="yaml-comment"># List hosts in a playbook without running it</span>
+$ ansible-playbook site.yml --list-hosts</pre>
+                </div>
+            </div>
+
+            <h2>Host Pattern Summary</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operator</th>
+                            <th>Meaning</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>:</code></td>
+                            <td>OR (union)</td>
+                            <td><code>web:db</code> = hosts in web OR db</td>
+                        </tr>
+                        <tr>
+                            <td><code>:&</code></td>
+                            <td>AND (intersection)</td>
+                            <td><code>web:&prod</code> = hosts in web AND prod</td>
+                        </tr>
+                        <tr>
+                            <td><code>:!</code></td>
+                            <td>NOT (exclusion)</td>
+                            <td><code>web:!test</code> = web hosts NOT in test</td>
+                        </tr>
+                        <tr>
+                            <td><code>*</code></td>
+                            <td>Wildcard</td>
+                            <td><code>*.example.com</code> = all in domain</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('objectives')">← Objectives</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause1')">Continue →</button>
+            </div>
+        </section>
+
+        <!-- PAUSE POINT 1: Selecting Hosts with Host Patterns -->
+        <section id="pause1" class="section pause-section">
+            <div class="pause-banner">
+                <span class="pause-icon">⏸️</span>
+                <div class="pause-label">Pause Point</div>
+                <div class="pause-title">Guided Exercise: Selecting Hosts with Host Patterns</div>
+                <div class="pause-subtitle">Time to apply what you've learned about host patterns in a hands-on exercise.</div>
+                
+                <div class="pause-instructions">
+                    <div class="pause-instructions-title">In This Exercise, You Will:</div>
+                    <ul>
+                        <li>Create an inventory with multiple host groups</li>
+                        <li>Use wildcard patterns to match hosts by name</li>
+                        <li>Combine groups with OR logic using colons</li>
+                        <li>Use intersection patterns with ampersands for AND logic</li>
+                        <li>Exclude hosts using exclamation marks</li>
+                        <li>Test your patterns with <code>--list-hosts</code></li>
+                    </ul>
+                </div>
+
+                <div class="pause-time">
+                    ⏱️ Estimated time: 15-20 minutes
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Ready to Continue?</div>
+                <p>After completing the guided exercise, click "Continue" to learn about importing and including files in your playbooks.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('host-patterns')">← Host Patterns</button>
+                <button class="btn btn-primary" onclick="navigateTo('import-intro')">Continue to Imports →</button>
             </div>
         </section>
 
@@ -476,122 +781,7 @@
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('objectives')">← Objectives</button>
-                <button class="btn btn-primary" onclick="navigateTo('import-playbook')">Continue →</button>
-            </div>
-        </section>
-
-        <!-- Import Playbook -->
-        <section id="import-playbook" class="section">
-            <h1>Importing Playbooks</h1>
-            <p class="lead">Use <code>import_playbook</code> to combine multiple playbooks into a single master playbook, enabling modular organization of complex automation projects.</p>
-
-            <h2>Understanding import_playbook</h2>
-            <p>The <span class="term" tabindex="0">import_playbook<span class="tooltip">Imports an entire playbook file at parse time. Must be used at the play level, not within a play's tasks section.</span></span> directive allows you to import entire playbooks. This is useful for creating a master "site.yml" that orchestrates your entire infrastructure configuration.</p>
-
-            <div class="info-box warning">
-                <div class="info-box-title">⚠️ Important</div>
-                <p><code>import_playbook</code> must be used at the <strong>play level</strong>, not inside a play's tasks section. It imports complete plays, not individual tasks.</p>
-            </div>
-
-            <h3>Basic Syntax</h3>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">site.yml - Master Playbook</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-comment"># Master playbook that imports all component playbooks</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Apply base configuration to all hosts</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Ensure base packages are installed</span>
-      <span class="yaml-module">ansible.builtin.dnf</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">vim</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-
-<span class="yaml-comment"># Import additional playbooks at the play level</span>
-<span class="yaml-dash">-</span> <span class="yaml-module">ansible.builtin.import_playbook</span>: <span class="yaml-value">webservers.yml</span>
-<span class="yaml-dash">-</span> <span class="yaml-module">ansible.builtin.import_playbook</span>: <span class="yaml-value">dbservers.yml</span>
-<span class="yaml-dash">-</span> <span class="yaml-module">ansible.builtin.import_playbook</span>: <span class="yaml-value">monitoring.yml</span></pre>
-                </div>
-            </div>
-
-            <h3>Imported Playbook Example</h3>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">webservers.yml</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web servers</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
-  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
-
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install Apache</span>
-      <span class="yaml-module">ansible.builtin.dnf</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start and enable Apache</span>
-      <span class="yaml-module">ansible.builtin.service</span>:
-        <span class="yaml-key">name</span>: <span class="yaml-value">httpd</span>
-        <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-        <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span></pre>
-                </div>
-            </div>
-
-            <h2>Execution Flow</h2>
-            <div class="diagram">
-                <div class="diagram-title">How import_playbook Works</div>
-                <div class="flow-diagram">
-                    <div class="flow-step">
-                        <div class="flow-step-label">Step 1</div>
-                        <div class="flow-step-name">Parse site.yml</div>
-                    </div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step">
-                        <div class="flow-step-label">Step 2</div>
-                        <div class="flow-step-name">Import all referenced playbooks</div>
-                    </div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step">
-                        <div class="flow-step-label">Step 3</div>
-                        <div class="flow-step-name">Combine into single execution plan</div>
-                    </div>
-                    <div class="flow-arrow">↓</div>
-                    <div class="flow-step">
-                        <div class="flow-step-label">Step 4</div>
-                        <div class="flow-step-name">Execute plays in order</div>
-                    </div>
-                </div>
-            </div>
-
-            <h2>Use Cases</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <div class="card-icon">🏢</div>
-                    <div class="card-title">Infrastructure as Code</div>
-                    <div class="card-content">Create a site.yml that configures your entire infrastructure with one command: <code>ansible-playbook site.yml</code></div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">👥</div>
-                    <div class="card-title">Team Collaboration</div>
-                    <div class="card-content">Different team members can maintain separate playbooks (webservers.yml, databases.yml) without conflicts.</div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">🎯</div>
-                    <div class="card-title">Selective Execution</div>
-                    <div class="card-content">Run the full site.yml or individual playbooks independently depending on your needs.</div>
-                </div>
-            </div>
-
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('import-intro')">← Introduction</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause1')">← Exercise</button>
                 <button class="btn btn-primary" onclick="navigateTo('import-tasks')">Continue →</button>
             </div>
         </section>
@@ -671,25 +861,6 @@
                 </div>
             </div>
 
-            <h2>Passing Variables to Imported Tasks</h2>
-            <p>You can pass variables to imported task files using the <code>vars</code> keyword:</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">Passing Variables</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Import user creation tasks</span>
-    <span class="yaml-module">ansible.builtin.import_tasks</span>:
-      <span class="yaml-key">file</span>: <span class="yaml-value">tasks/create_user.yml</span>
-    <span class="yaml-key">vars</span>:
-      <span class="yaml-key">username</span>: <span class="yaml-value">webadmin</span>
-      <span class="yaml-key">user_groups</span>: <span class="yaml-value">wheel,apache</span></pre>
-                </div>
-            </div>
-
             <h2>Conditional Imports</h2>
             <p>When you use <code>when</code> with <code>import_tasks</code>, the condition is applied to <strong>each imported task individually</strong>, not to the import itself.</p>
 
@@ -709,34 +880,11 @@
 
             <div class="info-box warning">
                 <div class="info-box-title">⚠️ Condition Behavior</div>
-                <p>With <code>import_tasks</code>, the <code>when</code> condition is copied to <strong>every task</strong> in the imported file. This means each task is evaluated independently, which may have performance implications if the file contains many tasks.</p>
-            </div>
-
-            <h2>Listing Imported Tasks</h2>
-            <p>Since imports are processed at parse time, you can see all tasks using <code>--list-tasks</code>:</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">Command Line</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre><span class="yaml-comment"># List all tasks including imported ones</span>
-$ ansible-playbook main.yml --list-tasks
-
-playbook: main.yml
-
-  play #1 (webservers): Configure web servers   TAGS: []
-    tasks:
-      Install Apache web server                  TAGS: []
-      Copy Apache configuration                  TAGS: []
-      Start and enable Apache                    TAGS: []
-      Configure firewall rules                   TAGS: []</pre>
-                </div>
+                <p>With <code>import_tasks</code>, the <code>when</code> condition is copied to <strong>every task</strong> in the imported file. This means each task is evaluated independently.</p>
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('import-playbook')">← Import Playbook</button>
+                <button class="btn btn-secondary" onclick="navigateTo('import-intro')">← Introduction</button>
                 <button class="btn btn-primary" onclick="navigateTo('include-tasks')">Continue →</button>
             </div>
         </section>
@@ -756,31 +904,8 @@ playbook: main.yml
                 <li style="margin-bottom: 8px;">Tasks are NOT visible in <code>--list-tasks</code></li>
             </ul>
 
-            <h3>Basic Usage</h3>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">Using include_tasks</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure servers</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">all</span>
-  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
-
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Include common tasks</span>
-      <span class="yaml-module">ansible.builtin.include_tasks</span>:
-        <span class="yaml-key">file</span>: <span class="yaml-value">tasks/common.yml</span>
-
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Include environment-specific tasks</span>
-      <span class="yaml-module">ansible.builtin.include_tasks</span>:
-        <span class="yaml-key">file</span>: <span class="yaml-string">"tasks/{{ env_type }}.yml"</span></pre>
-                </div>
-            </div>
-
             <h2>Using Loops with include_tasks</h2>
-            <p>One of the most powerful features of <code>include_tasks</code> is the ability to use loops. This allows you to include multiple task files dynamically.</p>
+            <p>One of the most powerful features of <code>include_tasks</code> is the ability to use loops:</p>
 
             <div class="code-block">
                 <div class="code-header">
@@ -806,11 +931,6 @@ playbook: main.yml
                 </div>
             </div>
 
-            <div class="info-box tip">
-                <div class="info-box-title">💡 Loop Behavior</div>
-                <p>When using a loop, <code>include_tasks</code> includes the file once for each item in the loop. All tasks in the included file are executed before moving to the next loop iteration.</p>
-            </div>
-
             <h2>Variable Filenames</h2>
             <p>Include tasks based on facts or variables for dynamic, adaptive playbooks:</p>
 
@@ -831,51 +951,9 @@ playbook: main.yml
                 </div>
             </div>
 
-            <h2>Conditional Includes</h2>
-            <p>With <code>include_tasks</code>, the <code>when</code> condition is evaluated once. If true, all tasks in the file are executed; if false, the entire file is skipped.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">Conditional Include</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Include development tasks</span>
-    <span class="yaml-module">ansible.builtin.include_tasks</span>:
-      <span class="yaml-key">file</span>: <span class="yaml-value">tasks/development.yml</span>
-    <span class="yaml-key">when</span>: <span class="yaml-string">env == 'development'</span>
-
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Include production hardening</span>
-    <span class="yaml-module">ansible.builtin.include_tasks</span>:
-      <span class="yaml-key">file</span>: <span class="yaml-value">tasks/production_hardening.yml</span>
-    <span class="yaml-key">when</span>: <span class="yaml-string">env == 'production'</span></pre>
-                </div>
-            </div>
-
-            <h2>Runtime Output</h2>
-            <p>When you run a playbook with <code>include_tasks</code>, you'll see the include task itself, followed by the included tasks:</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-title">Execution Output</span>
-                    <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                </div>
-                <div class="code-content">
-<pre>TASK [Include service configuration tasks] *********************
-<span style="color: var(--accent-purple);">included: tasks/apache.yml for server1, server2</span>
-
-TASK [Install Apache] ******************************************
-<span style="color: var(--accent-orange);">changed: [server1]</span>
-<span style="color: var(--accent-orange);">changed: [server2]</span>
-
-TASK [Include service configuration tasks] *********************
-<span style="color: var(--accent-purple);">included: tasks/mysql.yml for server1, server2</span>
-
-TASK [Install MySQL] *******************************************
-<span style="color: var(--accent-orange);">changed: [server1]</span>
-<span style="color: var(--accent-orange);">changed: [server2]</span></pre>
-                </div>
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Loop Behavior</div>
+                <p>When using a loop, <code>include_tasks</code> includes the file once for each item. All tasks in the included file are executed before moving to the next loop iteration.</p>
             </div>
 
             <div class="nav-buttons">
@@ -926,19 +1004,9 @@ TASK [Install MySQL] *******************************************
                             <td>Applied once to include</td>
                         </tr>
                         <tr>
-                            <td><strong>Handler Triggers</strong></td>
-                            <td>✅ Work as expected</td>
-                            <td>⚠️ Use with caution</td>
-                        </tr>
-                        <tr>
                             <td><strong>Syntax Validation</strong></td>
                             <td>✅ Early (parse time)</td>
                             <td>❌ Late (runtime)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Tags</strong></td>
-                            <td>Applied to all tasks</td>
-                            <td>Applied to include only</td>
                         </tr>
                     </tbody>
                 </table>
@@ -947,7 +1015,7 @@ TASK [Install MySQL] *******************************************
             <h2>Decision Guide</h2>
             <div class="diagram">
                 <div class="diagram-title">When to Use Each Method</div>
-                <div class="card-grid">
+                <div class="comparison-grid">
                     <div class="comparison-card import">
                         <div class="comparison-card-header">
                             <span class="comparison-badge static">Use Import</span>
@@ -975,87 +1043,6 @@ TASK [Install MySQL] *******************************************
                 </div>
             </div>
 
-            <h2>Common Patterns</h2>
-            <div class="tabs">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="switchTab(event, 'pattern-os')">OS-Specific Config</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'pattern-env')">Environment Config</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'pattern-services')">Service Loop</button>
-                </div>
-                
-                <div id="pattern-os" class="tab-content active">
-                    <h3>OS-Specific Configuration</h3>
-                    <p>Load different tasks based on the operating system:</p>
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-title">Dynamic OS Selection</span>
-                            <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                        </div>
-                        <div class="code-content">
-<pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-comment"># Use include_tasks because filename is dynamic</span>
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Include OS-specific package tasks</span>
-    <span class="yaml-module">ansible.builtin.include_tasks</span>:
-      <span class="yaml-key">file</span>: <span class="yaml-string">"tasks/packages_{{ ansible_facts['os_family'] | lower }}.yml"</span></pre>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="pattern-env" class="tab-content">
-                    <h3>Environment-Based Configuration</h3>
-                    <p>Apply different settings based on deployment environment:</p>
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-title">Environment Selection</span>
-                            <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                        </div>
-                        <div class="code-content">
-<pre><span class="yaml-key">tasks</span>:
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Import base configuration</span>
-    <span class="yaml-module">ansible.builtin.import_tasks</span>:
-      <span class="yaml-key">file</span>: <span class="yaml-value">tasks/base.yml</span>
-
-  <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Include environment tasks</span>
-    <span class="yaml-module">ansible.builtin.include_tasks</span>:
-      <span class="yaml-key">file</span>: <span class="yaml-string">"tasks/{{ deploy_env }}.yml"</span>
-    <span class="yaml-key">vars</span>:
-      <span class="yaml-key">deploy_env</span>: <span class="yaml-string">"{{ lookup('env', 'DEPLOY_ENV') | default('development') }}"</span></pre>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="pattern-services" class="tab-content">
-                    <h3>Service Configuration Loop</h3>
-                    <p>Configure multiple services using a loop:</p>
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-title">Service Loop Pattern</span>
-                            <button class="code-copy" onclick="copyCode(this)">Copy</button>
-                        </div>
-                        <div class="code-content">
-<pre><span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure LAMP stack</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
-  <span class="yaml-key">vars</span>:
-    <span class="yaml-key">lamp_services</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">apache</span>
-        <span class="yaml-key">port</span>: <span class="yaml-number">80</span>
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">mysql</span>
-        <span class="yaml-key">port</span>: <span class="yaml-number">3306</span>
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">php-fpm</span>
-        <span class="yaml-key">port</span>: <span class="yaml-number">9000</span>
-
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure each service</span>
-      <span class="yaml-module">ansible.builtin.include_tasks</span>:
-        <span class="yaml-key">file</span>: <span class="yaml-string">"tasks/configure_{{ item.name }}.yml"</span>
-      <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ lamp_services }}"</span>
-      <span class="yaml-key">loop_control</span>:
-        <span class="yaml-key">label</span>: <span class="yaml-string">"{{ item.name }}"</span></pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="info-box">
                 <div class="info-box-title">📖 Best Practice</div>
                 <p>Use <code>import_tasks</code> as your default choice for straightforward task organization. Switch to <code>include_tasks</code> only when you need its dynamic capabilities (loops, variable filenames, or runtime conditions).</p>
@@ -1063,7 +1050,43 @@ TASK [Install MySQL] *******************************************
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('include-tasks')">← Include Tasks</button>
-                <button class="btn btn-primary" onclick="navigateTo('host-group-vars')">Continue →</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause2')">Continue →</button>
+            </div>
+        </section>
+
+        <!-- PAUSE POINT 2: Including and Importing Files -->
+        <section id="pause2" class="section pause-section">
+            <div class="pause-banner">
+                <span class="pause-icon">⏸️</span>
+                <div class="pause-label">Pause Point</div>
+                <div class="pause-title">Guided Exercise: Including and Importing Files</div>
+                <div class="pause-subtitle">Practice using import_tasks and include_tasks to organize your playbooks into modular, reusable components.</div>
+                
+                <div class="pause-instructions">
+                    <div class="pause-instructions-title">In This Exercise, You Will:</div>
+                    <ul>
+                        <li>Create external task files containing reusable tasks</li>
+                        <li>Use <code>import_tasks</code> to statically include task files</li>
+                        <li>Use <code>include_tasks</code> with loops for dynamic inclusion</li>
+                        <li>Pass variables to imported and included task files</li>
+                        <li>Compare the behavior of imports vs includes with <code>--list-tasks</code></li>
+                        <li>Use conditional includes based on gathered facts</li>
+                    </ul>
+                </div>
+
+                <div class="pause-time">
+                    ⏱️ Estimated time: 20-25 minutes
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Ready to Continue?</div>
+                <p>After completing the guided exercise, click "Continue" to learn about organizing variables with host_vars and group_vars.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('comparison')">← Comparison</button>
+                <button class="btn btn-primary" onclick="navigateTo('host-group-vars')">Continue to Variables →</button>
             </div>
         </section>
 
@@ -1201,37 +1224,46 @@ TASK [Install MySQL] *******************************************
                 <p>Using subdirectories allows you to keep sensitive data in encrypted <code>vault.yml</code> files while keeping regular variables in plain <code>vars.yml</code> files. Ansible loads all files in the directory automatically.</p>
             </div>
 
-            <h2>Best Practices</h2>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <div class="checklist-check checked">✓</div>
-                    <span>Use <code>group_vars/all.yml</code> for organization-wide defaults</span>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="navigateTo('pause2')">← Exercise</button>
+                <button class="btn btn-primary" onclick="navigateTo('pause3')">Continue →</button>
+            </div>
+        </section>
+
+        <!-- PAUSE POINT 3: Lab - Managing Complex Plays and Playbooks -->
+        <section id="pause3" class="section pause-section">
+            <div class="pause-banner">
+                <span class="pause-icon">🔬</span>
+                <div class="pause-label">Lab Exercise</div>
+                <div class="pause-title">Lab: Managing Complex Plays and Playbooks</div>
+                <div class="pause-subtitle">Apply everything you've learned in a comprehensive hands-on lab that combines host patterns, imports, includes, and variable organization.</div>
+                
+                <div class="pause-instructions">
+                    <div class="pause-instructions-title">In This Lab, You Will:</div>
+                    <ul>
+                        <li>Create a complete project structure with multiple playbooks</li>
+                        <li>Use host patterns to target specific groups and hosts</li>
+                        <li>Organize tasks into separate files using imports and includes</li>
+                        <li>Set up group_vars and host_vars directories</li>
+                        <li>Use <code>import_playbook</code> to create a master site.yml</li>
+                        <li>Implement dynamic includes with loops and variable filenames</li>
+                        <li>Verify your work with syntax checks and list commands</li>
+                    </ul>
                 </div>
-                <div class="checklist-item">
-                    <div class="checklist-check checked">✓</div>
-                    <span>Create group-specific files matching inventory group names</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-check checked">✓</div>
-                    <span>Use <code>host_vars/</code> sparingly for true host-specific settings</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-check checked">✓</div>
-                    <span>Store secrets in separate vault-encrypted files</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-check checked">✓</div>
-                    <span>Use meaningful variable names with prefixes (e.g., <code>web_</code>, <code>db_</code>)</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-check checked">✓</div>
-                    <span>Document variables with comments</span>
+
+                <div class="pause-time">
+                    ⏱️ Estimated time: 30-40 minutes
                 </div>
             </div>
 
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Ready to Continue?</div>
+                <p>After completing the lab, click "Continue" to explore the interactive simulator and test your knowledge with the quiz.</p>
+            </div>
+
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('comparison')">← Comparison</button>
-                <button class="btn btn-primary" onclick="navigateTo('simulator')">Continue →</button>
+                <button class="btn btn-secondary" onclick="navigateTo('host-group-vars')">← Variables</button>
+                <button class="btn btn-primary" onclick="navigateTo('simulator')">Continue to Simulator →</button>
             </div>
         </section>
 
@@ -1243,7 +1275,7 @@ TASK [Install MySQL] *******************************************
             <div class="simulator-container">
                 <div class="simulator-header">
                     <div class="demo-title">🎮 Playbook Execution Simulator</div>
-                    <div class="demo-controls">
+                    <div style="display: flex; gap: 8px;">
                         <button class="demo-btn" onclick="runSimulator()">▶ Run Playbook</button>
                         <button class="demo-btn secondary" onclick="resetSimulator()">↺ Reset</button>
                     </div>
@@ -1295,227 +1327,7 @@ TASK [Install MySQL] *******************************************
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('host-group-vars')">← Variables</button>
-                <button class="btn btn-primary" onclick="navigateTo('lab')">Continue →</button>
-            </div>
-        </section>
-
-        <!-- Hands-On Lab -->
-        <section id="lab" class="section">
-            <h1>Hands-On Lab</h1>
-            <p class="lead">Practice creating organized playbook projects with imports, includes, and variable directories.</p>
-
-            <div class="exercise">
-                <div class="exercise-header">
-                    <span class="exercise-badge">Lab 6.1</span>
-                    <span class="exercise-title">Create a Multi-File Project Structure</span>
-                </div>
-                <div class="exercise-body">
-                    <p>Create a complete project structure with separate task files and variable directories.</p>
-                    
-                    <div class="exercise-steps">
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">1</div>
-                            <div>
-                                <strong>Create the directory structure:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre>mkdir -p ~/ansible-project/{tasks,group_vars,host_vars}
-cd ~/ansible-project</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">2</div>
-                            <div>
-                                <strong>Create the inventory file:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">inventory</span>
-                                    </div>
-                                    <div class="code-content">
-<pre>[webservers]
-web1.example.com
-web2.example.com
-
-[dbservers]
-db1.example.com</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">3</div>
-                            <div>
-                                <strong>Create group variables:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">group_vars/all.yml</span>
-                                    </div>
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-key">admin_user</span>: <span class="yaml-value">ansible</span>
-<span class="yaml-key">ntp_server</span>: <span class="yaml-value">time.example.com</span></pre>
-                                    </div>
-                                </div>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">group_vars/webservers.yml</span>
-                                    </div>
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-key">http_port</span>: <span class="yaml-number">80</span>
-<span class="yaml-key">web_service</span>: <span class="yaml-value">httpd</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">4</div>
-                            <div>
-                                <strong>Create a task file:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">tasks/install_web.yml</span>
-                                    </div>
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Install web server package</span>
-  <span class="yaml-module">ansible.builtin.dnf</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-string">"{{ web_service }}"</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">present</span>
-
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Start web service</span>
-  <span class="yaml-module">ansible.builtin.service</span>:
-    <span class="yaml-key">name</span>: <span class="yaml-string">"{{ web_service }}"</span>
-    <span class="yaml-key">state</span>: <span class="yaml-value">started</span>
-    <span class="yaml-key">enabled</span>: <span class="yaml-value">true</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">5</div>
-                            <div>
-                                <strong>Create the main playbook:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">site.yml</span>
-                                    </div>
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure web servers</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">webservers</span>
-  <span class="yaml-key">become</span>: <span class="yaml-value">true</span>
-
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Import web installation tasks</span>
-      <span class="yaml-module">ansible.builtin.import_tasks</span>:
-        <span class="yaml-key">file</span>: <span class="yaml-value">tasks/install_web.yml</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">6</div>
-                            <div>
-                                <strong>Verify with syntax check and list-tasks:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre>ansible-playbook site.yml --syntax-check
-ansible-playbook site.yml --list-tasks</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="exercise">
-                <div class="exercise-header">
-                    <span class="exercise-badge">Lab 6.2</span>
-                    <span class="exercise-title">Use include_tasks with Loops</span>
-                </div>
-                <div class="exercise-body">
-                    <p>Create a playbook that dynamically includes task files based on a list of services.</p>
-                    
-                    <div class="exercise-steps">
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">1</div>
-                            <div>
-                                <strong>Create service task files:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">tasks/configure_firewall.yml</span>
-                                    </div>
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure firewall for {{ service_name }}</span>
-  <span class="yaml-module">ansible.builtin.debug</span>:
-    <span class="yaml-key">msg</span>: <span class="yaml-string">"Configuring firewall for {{ service_name }} on port {{ service_port }}"</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">2</div>
-                            <div>
-                                <strong>Create the playbook with loop:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-header">
-                                        <span class="code-title">configure_services.yml</span>
-                                    </div>
-                                    <div class="code-content">
-<pre><span class="yaml-dash">---</span>
-<span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure multiple services</span>
-  <span class="yaml-key">hosts</span>: <span class="yaml-value">localhost</span>
-  <span class="yaml-key">vars</span>:
-    <span class="yaml-key">services</span>:
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">http</span>
-        <span class="yaml-key">port</span>: <span class="yaml-number">80</span>
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">https</span>
-        <span class="yaml-key">port</span>: <span class="yaml-number">443</span>
-      <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-value">mysql</span>
-        <span class="yaml-key">port</span>: <span class="yaml-number">3306</span>
-
-  <span class="yaml-key">tasks</span>:
-    <span class="yaml-dash">-</span> <span class="yaml-key">name</span>: <span class="yaml-string">Configure each service</span>
-      <span class="yaml-module">ansible.builtin.include_tasks</span>:
-        <span class="yaml-key">file</span>: <span class="yaml-value">tasks/configure_firewall.yml</span>
-      <span class="yaml-key">loop</span>: <span class="yaml-string">"{{ services }}"</span>
-      <span class="yaml-key">vars</span>:
-        <span class="yaml-key">service_name</span>: <span class="yaml-string">"{{ item.name }}"</span>
-        <span class="yaml-key">service_port</span>: <span class="yaml-string">"{{ item.port }}"</span></pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="exercise-step">
-                            <div class="exercise-step-number">3</div>
-                            <div>
-                                <strong>Run the playbook and observe the output:</strong>
-                                <div class="code-block" style="margin-top: 12px;">
-                                    <div class="code-content">
-<pre>ansible-playbook configure_services.yml</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('simulator')">← Simulator</button>
+                <button class="btn btn-secondary" onclick="navigateTo('pause3')">← Lab</button>
                 <button class="btn btn-primary" onclick="navigateTo('quiz')">Continue →</button>
             </div>
         </section>
@@ -1523,7 +1335,7 @@ ansible-playbook site.yml --list-tasks</pre>
         <!-- Quiz -->
         <section id="quiz" class="section">
             <h1>Knowledge Check</h1>
-            <p class="lead">Test your understanding of imports, includes, and variable organization.</p>
+            <p class="lead">Test your understanding of host patterns, imports, includes, and variable organization.</p>
 
             <div class="quiz-container">
                 <div class="quiz-progress">
@@ -1549,7 +1361,7 @@ ansible-playbook site.yml --list-tasks</pre>
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('lab')">← Lab</button>
+                <button class="btn btn-secondary" onclick="navigateTo('simulator')">← Simulator</button>
                 <button class="btn btn-primary" onclick="navigateTo('summary')">Continue →</button>
             </div>
         </section>
@@ -1557,17 +1369,29 @@ ansible-playbook site.yml --list-tasks</pre>
         <!-- Summary -->
         <section id="summary" class="section">
             <h1>Chapter Summary</h1>
-            <p class="lead">You've learned how to organize complex Ansible projects using imports, includes, and structured variable directories.</p>
+            <p class="lead">You've learned how to select hosts with patterns, organize playbooks with imports and includes, and structure variables for complex Ansible projects.</p>
 
             <h2>Key Concepts</h2>
             <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <div class="card-title">Host Patterns</div>
+                    <div class="card-content">
+                        <ul style="margin: 0; padding-left: 20px;">
+                            <li><code>:</code> for OR (union)</li>
+                            <li><code>:&</code> for AND (intersection)</li>
+                            <li><code>:!</code> for NOT (exclusion)</li>
+                            <li><code>*</code> for wildcards</li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-icon">📥</div>
                     <div class="card-title">Static Imports</div>
                     <div class="card-content">
                         <ul style="margin: 0; padding-left: 20px;">
-                            <li><code>import_playbook</code> for playbooks</li>
-                            <li><code>import_tasks</code> for task files</li>
+                            <li><code>import_playbook</code></li>
+                            <li><code>import_tasks</code></li>
                             <li>Processed at parse time</li>
                             <li>Visible in <code>--list-tasks</code></li>
                         </ul>
@@ -1578,7 +1402,7 @@ ansible-playbook site.yml --list-tasks</pre>
                     <div class="card-title">Dynamic Includes</div>
                     <div class="card-content">
                         <ul style="margin: 0; padding-left: 20px;">
-                            <li><code>include_tasks</code> for task files</li>
+                            <li><code>include_tasks</code></li>
                             <li>Processed at runtime</li>
                             <li>Supports loops</li>
                             <li>Variable filenames</li>
@@ -1605,44 +1429,45 @@ ansible-playbook site.yml --list-tasks</pre>
                     <thead>
                         <tr>
                             <th>Task</th>
-                            <th>Module</th>
-                            <th>Example</th>
+                            <th>Syntax</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Import entire playbook</td>
-                            <td><code>import_playbook</code></td>
-                            <td><code>- ansible.builtin.import_playbook: web.yml</code></td>
+                            <td>Target multiple groups</td>
+                            <td><code>hosts: webservers:dbservers</code></td>
+                        </tr>
+                        <tr>
+                            <td>Intersection of groups</td>
+                            <td><code>hosts: webservers:&production</code></td>
+                        </tr>
+                        <tr>
+                            <td>Exclude a group</td>
+                            <td><code>hosts: all:!maintenance</code></td>
                         </tr>
                         <tr>
                             <td>Import tasks (static)</td>
-                            <td><code>import_tasks</code></td>
                             <td><code>ansible.builtin.import_tasks: tasks/main.yml</code></td>
                         </tr>
                         <tr>
                             <td>Include tasks (dynamic)</td>
-                            <td><code>include_tasks</code></td>
                             <td><code>ansible.builtin.include_tasks: "{{ os }}.yml"</code></td>
                         </tr>
                         <tr>
                             <td>Include with loop</td>
-                            <td><code>include_tasks</code></td>
                             <td><code>include_tasks: file.yml</code> + <code>loop:</code></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <h2>Decision Guide</h2>
-            <div class="info-box">
-                <div class="info-box-title">🎯 When to Use What</div>
+            <h2>Exercises Completed</h2>
+            <div class="info-box tip">
+                <div class="info-box-title">✅ Chapter Exercises</div>
                 <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary);">
-                    <li style="margin-bottom: 8px;"><strong>Use import_tasks</strong> when you always need the tasks and want early syntax validation</li>
-                    <li style="margin-bottom: 8px;"><strong>Use include_tasks</strong> when you need loops or variable filenames</li>
-                    <li style="margin-bottom: 8px;"><strong>Use import_playbook</strong> to organize a master site.yml that calls other playbooks</li>
-                    <li style="margin-bottom: 8px;"><strong>Use group_vars/</strong> for group-specific configuration</li>
-                    <li><strong>Use host_vars/</strong> for host-specific overrides</li>
+                    <li style="margin-bottom: 8px;"><strong>Guided Exercise:</strong> Selecting Hosts with Host Patterns</li>
+                    <li style="margin-bottom: 8px;"><strong>Guided Exercise:</strong> Including and Importing Files</li>
+                    <li><strong>Lab:</strong> Managing Complex Plays and Playbooks</li>
                 </ul>
             </div>
 
@@ -1659,6 +1484,28 @@ ansible-playbook site.yml --list-tasks</pre>
     <script>
         // Quiz Data
         const quizQuestions = [
+            {
+                question: "Which host pattern selects hosts that are in BOTH the webservers AND production groups?",
+                options: [
+                    "hosts: webservers:production",
+                    "hosts: webservers:&production",
+                    "hosts: webservers:!production",
+                    "hosts: webservers+production"
+                ],
+                correct: 1,
+                explanation: "The ampersand (&) operator performs an intersection, selecting only hosts that are members of both groups. The colon alone would be a union (OR), and the exclamation mark excludes hosts."
+            },
+            {
+                question: "Which command shows which hosts match a pattern without executing any tasks?",
+                options: [
+                    "ansible-playbook --check",
+                    "ansible --list-hosts",
+                    "ansible-playbook --syntax-check",
+                    "ansible --test-pattern"
+                ],
+                correct: 1,
+                explanation: "The --list-hosts option displays which hosts match the specified pattern without executing any modules or tasks. This is useful for testing complex host patterns."
+            },
             {
                 question: "When does import_tasks process the external task file?",
                 options: [
@@ -1680,17 +1527,6 @@ ansible-playbook site.yml --list-tasks</pre>
                 ],
                 correct: 2,
                 explanation: "include_tasks is dynamic and processes at runtime, which allows it to use loops. import_tasks and import_playbook cannot use loops because they're processed at parse time."
-            },
-            {
-                question: "Where must import_playbook be used in a playbook?",
-                options: [
-                    "Inside a play's tasks section",
-                    "At the play level (same level as plays)",
-                    "Inside a handlers section",
-                    "Inside a roles section"
-                ],
-                correct: 1,
-                explanation: "import_playbook imports entire playbooks and must be used at the play level, not within a play's tasks section. It's placed at the same level as your play definitions."
             },
             {
                 question: "How does a 'when' condition behave with import_tasks?",
@@ -1715,17 +1551,6 @@ ansible-playbook site.yml --list-tasks</pre>
                 explanation: "Since include_tasks is dynamic and processed at runtime, --list-tasks only shows the include_tasks statement itself. Imported tasks (using import_tasks) are visible because they're processed at parse time."
             },
             {
-                question: "Where should the group_vars directory be located?",
-                options: [
-                    "Inside the /etc/ansible directory only",
-                    "Adjacent to the inventory file or playbook",
-                    "Inside each role directory",
-                    "In the user's home directory"
-                ],
-                correct: 1,
-                explanation: "The group_vars directory should be placed adjacent to your inventory file or playbook. Ansible automatically looks for it in these locations."
-            },
-            {
                 question: "What should a group_vars file be named to apply to the 'webservers' group?",
                 options: [
                     "group_vars/web.yml",
@@ -1748,15 +1573,15 @@ ansible-playbook site.yml --list-tasks</pre>
                 explanation: "host_vars has higher precedence than group_vars. This allows you to set defaults at the group level and override them for specific hosts when needed."
             },
             {
-                question: "What should a task file contain?",
+                question: "Which host pattern excludes hosts in the 'staging' group from all hosts?",
                 options: [
-                    "Complete plays with hosts and vars",
-                    "Only tasks (no play-level attributes)",
-                    "Inventory definitions",
-                    "Role definitions"
+                    "hosts: all-staging",
+                    "hosts: all:&staging",
+                    "hosts: all:!staging",
+                    "hosts: all^staging"
                 ],
-                correct: 1,
-                explanation: "Task files used with import_tasks or include_tasks should contain only tasks. Play-level attributes like hosts, become, and vars belong in the main playbook, not in imported task files."
+                correct: 2,
+                explanation: "The exclamation mark (!) is the exclusion operator. 'all:!staging' selects all hosts except those in the staging group."
             },
             {
                 question: "What is the main advantage of include_tasks over import_tasks?",
@@ -1790,7 +1615,9 @@ ansible-playbook site.yml --list-tasks</pre>
             }
             if (navItem) {
                 navItem.classList.add('active');
-                navItem.classList.add('completed');
+                if (!navItem.classList.contains('pause-item')) {
+                    navItem.classList.add('completed');
+                }
             }
             
             updateProgress();
@@ -1805,8 +1632,8 @@ ansible-playbook site.yml --list-tasks</pre>
         }
 
         function updateProgress() {
-            const total = document.querySelectorAll('.nav-item').length;
-            const visited = visitedSections.size;
+            const total = document.querySelectorAll('.nav-item:not(.pause-item)').length;
+            const visited = [...visitedSections].filter(s => !['pause1', 'pause2', 'pause3'].includes(s)).length;
             const percent = Math.round((visited / total) * 100);
             
             document.getElementById('progress-fill').style.width = percent + '%';
@@ -1908,15 +1735,6 @@ ansible-playbook site.yml --list-tasks</pre>
             document.querySelector('.quiz-container').style.display = 'block';
             document.getElementById('quiz-results').style.display = 'none';
             loadQuestion();
-        }
-
-        // Tab Functions
-        function switchTab(event, tabId) {
-            const tabGroup = event.target.closest('.tabs');
-            tabGroup.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            tabGroup.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
         }
 
         // Utility Functions
