@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ansible Playbook Editor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    /* Terminal-inspired dark theme */
+    --bg-primary: #0a0e14;
+    --bg-secondary: #0d1117;
+    --bg-tertiary: #161b22;
+    --bg-panel: #131820;
+    --bg-hover: #1c2333;
+    --bg-active: #1f2937;
+    --border-primary: #21262d;
+    --border-accent: #f97316;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+    --accent-orange: #f97316;
+    --accent-orange-dim: rgba(249, 115, 22, 0.15);
+    --accent-green: #3fb950;
+    --accent-green-dim: rgba(63, 185, 80, 0.12);
+    --accent-red: #f85149;
+    --accent-red-dim: rgba(248, 81, 73, 0.15);
+    --accent-blue: #58a6ff;
+    --accent-blue-dim: rgba(88, 166, 255, 0.12);
+    --accent-purple: #bc8cff;
+    --accent-yellow: #d29922;
+    --accent-cyan: #39d353;
+    /* Syntax colors */
+    --syn-key: #ff7b72;
+    --syn-value: #e6edf3;
+    --syn-string: #a5d6ff;
+    --syn-comment: #484f58;
+    --syn-jinja: #f0883e;
+    --syn-jinja-bg: rgba(240, 136, 62, 0.08);
+    --syn-module: #d2a8ff;
+    --syn-directive: #ff7b72;
+    --syn-bool: #79c0ff;
+    --syn-number: #79c0ff;
+    --syn-list-marker: #f97316;
+    --indent-guide-1: rgba(249, 115, 22, 0.20);
+    --indent-guide-2: rgba(88, 166, 255, 0.20);
+    --indent-guide-3: rgba(188, 140, 255, 0.20);
+    --indent-guide-4: rgba(63, 185, 80, 0.20);
+    --scrollbar-thumb: #30363d;
+    --scrollbar-track: transparent;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-sans: 'DM Sans', -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Light theme */
+  body.light-theme {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --bg-tertiary: #eef1f5;
+    --bg-panel: #f0f3f7;
+    --bg-hover: #e2e6eb;
+    --bg-active: #d8dce2;
+    --border-primary: #d0d7de;
+    --border-accent: #d35400;
+    --text-primary: #1f2328;
+    --text-secondary: #596069;
+    --text-muted: #8b949e;
+    --accent-orange: #d35400;
+    --accent-orange-dim: rgba(211, 84, 0, 0.10);
+    --accent-green: #1a7f37;
+    --accent-green-dim: rgba(26, 127, 55, 0.10);
+    --accent-red: #cf222e;
+    --accent-red-dim: rgba(207, 34, 46, 0.10);
+    --accent-blue: #0969da;
+    --accent-blue-dim: rgba(9, 105, 218, 0.10);
+    --accent-purple: #8250df;
+    --accent-yellow: #9a6700;
+    --accent-cyan: #1a7f37;
+    --syn-key: #cf222e;
+    --syn-value: #1f2328;
+    --syn-string: #0a3069;
+    --syn-comment: #8b949e;
+    --syn-jinja: #bf5700;
+    --syn-jinja-bg: rgba(191, 87, 0, 0.08);
+    --syn-module: #8250df;
+    --syn-directive: #cf222e;
+    --syn-bool: #0550ae;
+    --syn-number: #0550ae;
+    --syn-list-marker: #d35400;
+    --indent-guide-1: rgba(211, 84, 0, 0.15);
+    --indent-guide-2: rgba(9, 105, 218, 0.15);
+    --indent-guide-3: rgba(130, 80, 223, 0.15);
+    --indent-guide-4: rgba(26, 127, 55, 0.15);
+    --scrollbar-thumb: #c5cad0;
+    --scrollbar-track: transparent;
+  }
+
+  body.light-theme .status-pill.valid {
+    border: 1px solid rgba(26, 127, 55, 0.3);
+  }
+  body.light-theme .status-pill.error {
+    border: 1px solid rgba(207, 34, 46, 0.3);
+  }
+  body.light-theme .status-pill.warning {
+    border: 1px solid rgba(154, 103, 0, 0.3);
+  }
+  body.light-theme .btn-accent {
+    background: #d35400;
+    color: #fff;
+    border-color: #d35400;
+  }
+  body.light-theme .btn-accent:hover {
+    background: #e67e22;
+    border-color: #e67e22;
+    color: #fff;
+  }
+  body.light-theme .toast {
+    background: #1a7f37;
+    color: #fff;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    min-height: 48px;
+    z-index: 100;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-icon {
+    width: 28px; height: 28px;
+    background: var(--accent-orange);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #000;
+    font-family: var(--font-mono);
+  }
+  .logo-text {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+  }
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+  .header-center {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    transition: all 0.3s;
+  }
+  .status-pill.valid {
+    background: var(--accent-green-dim);
+    color: var(--accent-green);
+    border: 1px solid rgba(63, 185, 80, 0.2);
+  }
+  .status-pill.error {
+    background: var(--accent-red-dim);
+    color: var(--accent-red);
+    border: 1px solid rgba(248, 81, 73, 0.2);
+  }
+  .status-pill.warning {
+    background: rgba(210, 153, 34, 0.12);
+    color: var(--accent-yellow);
+    border: 1px solid rgba(210, 153, 34, 0.2);
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+  .btn-accent {
+    background: var(--accent-orange);
+    color: #000;
+    border-color: var(--accent-orange);
+    font-weight: 600;
+  }
+  .btn-accent:hover {
+    background: #fb923c;
+    border-color: #fb923c;
+    color: #000;
+  }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR (Reference Panels) ── */
+  .sidebar {
+    width: 320px;
+    min-width: 280px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.2s;
+  }
+  .sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    border-right: none;
+  }
+  .sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--bg-tertiary);
+  }
+  .sidebar-tab {
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .sidebar-tab:hover { color: var(--text-secondary); }
+  .sidebar-tab.active {
+    color: var(--accent-orange);
+    border-bottom-color: var(--accent-orange);
+  }
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+  .sidebar-panel { display: none; }
+  .sidebar-panel.active { display: block; }
+
+  /* Snippet Cards */
+  .snippet-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .snippet-card:hover {
+    border-color: var(--accent-orange);
+  }
+  .snippet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+  .snippet-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .snippet-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .snippet-tag.task { background: var(--accent-blue-dim); color: var(--accent-blue); }
+  .snippet-tag.handler { background: var(--accent-green-dim); color: var(--accent-green); }
+  .snippet-tag.loop { background: rgba(188, 140, 255, 0.12); color: var(--accent-purple); }
+  .snippet-tag.var { background: var(--accent-orange-dim); color: var(--accent-orange); }
+  .snippet-tag.role { background: rgba(210, 153, 34, 0.12); color: var(--accent-yellow); }
+  .snippet-body {
+    display: none;
+    padding: 0 12px 10px;
+  }
+  .snippet-body.open { display: block; }
+  .snippet-code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre;
+    background: var(--bg-primary);
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+    cursor: pointer;
+    position: relative;
+  }
+  .snippet-code:hover::after {
+    content: 'Click to insert';
+    position: absolute;
+    top: 4px; right: 4px;
+    font-size: 9px;
+    padding: 2px 6px;
+    background: var(--accent-orange);
+    color: #000;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  /* Cheatsheet */
+  .cheat-section {
+    margin-bottom: 16px;
+  }
+  .cheat-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-orange);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .cheat-item {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(33, 38, 45, 0.5);
+  }
+  .cheat-key {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--syn-key);
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+  .cheat-val {
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  /* Jinja2 Reference */
+  .jinja-group { margin-bottom: 16px; }
+  .jinja-group-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--syn-jinja);
+    margin-bottom: 6px;
+  }
+  .jinja-item {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 8px;
+    margin: 3px 0;
+    background: var(--syn-jinja-bg);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .jinja-item:hover {
+    background: rgba(240, 136, 62, 0.18);
+    color: var(--text-primary);
+  }
+
+  /* ── EDITOR AREA ── */
+  .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Toolbar */
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+    min-height: 36px;
+  }
+  .toolbar-left, .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .toolbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-sans);
+  }
+  .toolbar-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+  .toolbar-btn svg { width: 14px; height: 14px; }
+  .toolbar-sep {
+    width: 1px;
+    height: 16px;
+    background: var(--border-primary);
+    margin: 0 4px;
+  }
+  .indent-display {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 3px 8px;
+    background: var(--bg-primary);
+    border-radius: 3px;
+  }
+  .cursor-pos {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Editor Container */
+  .editor-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Line Numbers */
+  .line-numbers {
+    padding: 12px 0;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.65;
+    text-align: right;
+    user-select: none;
+    min-width: 50px;
+    overflow: hidden;
+    border-right: 1px solid var(--border-primary);
+  }
+  .line-num {
+    padding: 0 12px 0 8px;
+    height: 21.45px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .line-num.error-line {
+    background: var(--accent-red-dim);
+    color: var(--accent-red);
+  }
+  .line-num.active-line {
+    color: var(--accent-orange);
+    font-weight: 600;
+  }
+
+  /* Code Wrapper */
+  .code-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: auto;
+  }
+  .code-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    min-height: 100%;
+  }
+
+  /* Indent Guides Layer */
+  .indent-guides {
+    pointer-events: none;
+    z-index: 1;
+    padding: 12px 0;
+  }
+  .indent-guide-line {
+    position: absolute;
+    width: 1px;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+  }
+
+  /* Syntax Highlight Overlay */
+  .highlight-layer {
+    z-index: 2;
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre;
+    pointer-events: none;
+    color: transparent;
+    overflow: hidden;
+  }
+
+  /* Textarea */
+  .code-input {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    min-height: 100%;
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.65;
+    color: transparent;
+    caret-color: var(--accent-orange);
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    z-index: 3;
+    white-space: pre;
+    overflow: hidden;
+    tab-size: 2;
+    -moz-tab-size: 2;
+    spellcheck: false;
+  }
+
+  /* ── ERROR PANEL ── */
+  .error-panel {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-primary);
+    max-height: 180px;
+    overflow-y: auto;
+    display: none;
+  }
+  .error-panel.visible { display: block; }
+  .error-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .error-panel-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .error-count {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+  .error-count.errors { background: var(--accent-red-dim); color: var(--accent-red); }
+  .error-count.warnings { background: rgba(210, 153, 34, 0.15); color: var(--accent-yellow); }
+  .error-list { padding: 4px 0; }
+  .error-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .error-item:hover { background: var(--bg-hover); }
+  .error-icon {
+    flex-shrink: 0;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    margin-top: 1px;
+  }
+  .error-icon.err { background: var(--accent-red-dim); color: var(--accent-red); }
+  .error-icon.warn { background: rgba(210, 153, 34, 0.15); color: var(--accent-yellow); }
+  .error-line-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 50px;
+  }
+  .error-msg {
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 10px 18px;
+    background: var(--accent-green);
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { width: 0; min-width: 0; border-right: none; }
+    .logo-sub { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">A</div>
+      <span class="logo-text">Ansible Editor</span>
+      <span class="logo-sub">Playbook Lint & Format</span>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="status-pill valid" id="statusPill">
+      <span class="status-dot"></span>
+      <span id="statusText">Valid YAML</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn" id="themeToggle" title="Toggle light/dark mode">
+      <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span id="themeLabel">Light</span>
+    </button>
+    <button class="btn" id="toggleSidebar" title="Toggle reference panel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      Refs
+    </button>
+    <button class="btn" id="clearBtn" title="Clear editor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+      Clear
+    </button>
+    <button class="btn" id="pasteBtn" title="Paste from clipboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+      Paste
+    </button>
+    <button class="btn btn-accent" id="copyBtn" title="Copy to clipboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Copy
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-tabs">
+      <div class="sidebar-tab active" data-panel="snippets">Snippets</div>
+      <div class="sidebar-tab" data-panel="cheatsheet">YAML</div>
+      <div class="sidebar-tab" data-panel="jinja">Jinja2</div>
+    </div>
+    <div class="sidebar-content">
+
+      <!-- Snippets Panel -->
+      <div class="sidebar-panel active" id="panel-snippets">
+        <div class="snippet-card" data-snippet="playbook">
+          <div class="snippet-header"><span class="snippet-title">Playbook Skeleton</span><span class="snippet-tag task">play</span></div>
+          <div class="snippet-body"><pre class="snippet-code">---
+- name: Configure web servers
+  hosts: webservers
+  become: yes
+  gather_facts: yes
+  vars:
+    http_port: 80
+
+  tasks:
+    - name: Install packages
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="task">
+          <div class="snippet-header"><span class="snippet-title">Basic Task</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Describe this task
+      ansible.builtin.module_name:
+        param1: value1
+        param2: value2
+      register: result
+      notify: Handler name</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="handler">
+          <div class="snippet-header"><span class="snippet-title">Handler</span><span class="snippet-tag handler">handler</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Restart service
+      ansible.builtin.service:
+        name: service_name
+        state: restarted
+      listen: "restart service"</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="loop">
+          <div class="snippet-header"><span class="snippet-title">Loop Task</span><span class="snippet-tag loop">loop</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Install multiple packages
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - nginx
+        - python3
+        - git</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="when">
+          <div class="snippet-header"><span class="snippet-title">Conditional Task</span><span class="snippet-tag var">when</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Run only on Ubuntu
+      ansible.builtin.command: uname -a
+      when: ansible_os_family == "Debian"
+      register: output
+      changed_when: false</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="block">
+          <div class="snippet-header"><span class="snippet-title">Block / Rescue</span><span class="snippet-tag role">block</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Handle errors gracefully
+      block:
+        - name: Attempt risky task
+          ansible.builtin.command: /opt/risky.sh
+      rescue:
+        - name: Recovery task
+          ansible.builtin.debug:
+            msg: "Task failed, recovering"
+      always:
+        - name: Always run cleanup
+          ansible.builtin.debug:
+            msg: "Cleanup complete"</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="template">
+          <div class="snippet-header"><span class="snippet-title">Template Task</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Deploy configuration file
+      ansible.builtin.template:
+        src: templates/config.j2
+        dest: /etc/app/config.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart app</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="role_include">
+          <div class="snippet-header"><span class="snippet-title">Include Role</span><span class="snippet-tag role">role</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Apply database role
+      ansible.builtin.include_role:
+        name: database
+      vars:
+        db_name: production
+        db_user: admin</pre></div>
+        </div>
+      </div>
+
+      <!-- Cheatsheet Panel -->
+      <div class="sidebar-panel" id="panel-cheatsheet">
+        <div class="cheat-section">
+          <div class="cheat-title">YAML Indentation Rules</div>
+          <div class="cheat-item"><span class="cheat-key">Spaces only</span><span class="cheat-val">Never use tabs. Ansible uses 2-space indent.</span></div>
+          <div class="cheat-item"><span class="cheat-key">Consistent</span><span class="cheat-val">Same indent level for siblings in a list or map.</span></div>
+          <div class="cheat-item"><span class="cheat-key">List items</span><span class="cheat-val">- marker counts as indent. Content aligns after "- ".</span></div>
+          <div class="cheat-item"><span class="cheat-key">Nested maps</span><span class="cheat-val">Each nesting adds 2 spaces.</span></div>
+        </div>
+        <div class="cheat-section">
+          <div class="cheat-title">Common Structures</div>
+          <div class="cheat-item"><span class="cheat-key">key: value</span><span class="cheat-val">Basic key-value pair</span></div>
+          <div class="cheat-item"><span class="cheat-key">- item</span><span class="cheat-val">List/sequence item</span></div>
+          <div class="cheat-item"><span class="cheat-key">key:</span><span class="cheat-val">Map with nested content below</span></div>
+          <div class="cheat-item"><span class="cheat-key">key: |</span><span class="cheat-val">Literal block scalar (preserves newlines)</span></div>
+          <div class="cheat-item"><span class="cheat-key">key: ></span><span class="cheat-val">Folded scalar (joins lines)</span></div>
+          <div class="cheat-item"><span class="cheat-key">&anchor</span><span class="cheat-val">Define anchor for reuse</span></div>
+          <div class="cheat-item"><span class="cheat-key">*anchor</span><span class="cheat-val">Reference an anchor</span></div>
+          <div class="cheat-item"><span class="cheat-key">---</span><span class="cheat-val">Document start marker</span></div>
+        </div>
+        <div class="cheat-section">
+          <div class="cheat-title">Ansible Directives</div>
+          <div class="cheat-item"><span class="cheat-key">hosts:</span><span class="cheat-val">Target host group</span></div>
+          <div class="cheat-item"><span class="cheat-key">become:</span><span class="cheat-val">Privilege escalation (yes/no)</span></div>
+          <div class="cheat-item"><span class="cheat-key">gather_facts:</span><span class="cheat-val">Collect system info (yes/no)</span></div>
+          <div class="cheat-item"><span class="cheat-key">vars:</span><span class="cheat-val">Define play/task variables</span></div>
+          <div class="cheat-item"><span class="cheat-key">tasks:</span><span class="cheat-val">List of tasks to execute</span></div>
+          <div class="cheat-item"><span class="cheat-key">handlers:</span><span class="cheat-val">Triggered tasks (notify)</span></div>
+          <div class="cheat-item"><span class="cheat-key">roles:</span><span class="cheat-val">Include roles</span></div>
+          <div class="cheat-item"><span class="cheat-key">when:</span><span class="cheat-val">Conditional execution</span></div>
+          <div class="cheat-item"><span class="cheat-key">loop:</span><span class="cheat-val">Iterate over items</span></div>
+          <div class="cheat-item"><span class="cheat-key">register:</span><span class="cheat-val">Store task output</span></div>
+          <div class="cheat-item"><span class="cheat-key">notify:</span><span class="cheat-val">Trigger handler</span></div>
+          <div class="cheat-item"><span class="cheat-key">tags:</span><span class="cheat-val">Label tasks for selective run</span></div>
+        </div>
+        <div class="cheat-section">
+          <div class="cheat-title">Keyboard Shortcuts</div>
+          <div class="cheat-item"><span class="cheat-key">Tab</span><span class="cheat-val">Indent selected or current line</span></div>
+          <div class="cheat-item"><span class="cheat-key">Shift+Tab</span><span class="cheat-val">Unindent selected or current line</span></div>
+          <div class="cheat-item"><span class="cheat-key">Enter</span><span class="cheat-val">Auto-indent new line</span></div>
+          <div class="cheat-item"><span class="cheat-key">Ctrl+/</span><span class="cheat-val">Toggle comment</span></div>
+          <div class="cheat-item"><span class="cheat-key">Ctrl+D</span><span class="cheat-val">Duplicate line</span></div>
+        </div>
+      </div>
+
+      <!-- Jinja2 Panel -->
+      <div class="sidebar-panel" id="panel-jinja">
+        <div class="jinja-group">
+          <div class="jinja-group-title">Variable Syntax</div>
+          <div class="jinja-item" data-insert="{{ variable_name }}">{{ variable_name }}</div>
+          <div class="jinja-item" data-insert="{{ ansible_hostname }}">{{ ansible_hostname }}</div>
+          <div class="jinja-item" data-insert="{{ hostvars[host].var }}">{{ hostvars[host].var }}</div>
+          <div class="jinja-item" data-insert="{{ groups['webservers'] }}">{{ groups['webservers'] }}</div>
+          <div class="jinja-item" data-insert="{{ inventory_hostname }}">{{ inventory_hostname }}</div>
+        </div>
+        <div class="jinja-group">
+          <div class="jinja-group-title">Common Filters</div>
+          <div class="jinja-item" data-insert="{{ var | default('value') }}">| default('value')</div>
+          <div class="jinja-item" data-insert="{{ var | lower }}">| lower</div>
+          <div class="jinja-item" data-insert="{{ var | upper }}">| upper</div>
+          <div class="jinja-item" data-insert="{{ var | trim }}">| trim</div>
+          <div class="jinja-item" data-insert="{{ var | replace('a','b') }}">| replace('a','b')</div>
+          <div class="jinja-item" data-insert="{{ var | regex_replace(pat, rep) }}">| regex_replace</div>
+          <div class="jinja-item" data-insert="{{ var | join(',') }}">| join(',')</div>
+          <div class="jinja-item" data-insert="{{ var | length }}">| length</div>
+          <div class="jinja-item" data-insert="{{ var | to_json }}">| to_json</div>
+          <div class="jinja-item" data-insert="{{ var | to_yaml }}">| to_yaml</div>
+          <div class="jinja-item" data-insert="{{ var | from_json }}">| from_json</div>
+          <div class="jinja-item" data-insert="{{ var | bool }}">| bool</div>
+          <div class="jinja-item" data-insert="{{ var | int }}">| int</div>
+          <div class="jinja-item" data-insert="{{ var | string }}">| string</div>
+          <div class="jinja-item" data-insert="{{ var | basename }}">| basename</div>
+          <div class="jinja-item" data-insert="{{ var | dirname }}">| dirname</div>
+        </div>
+        <div class="jinja-group">
+          <div class="jinja-group-title">Lookups</div>
+          <div class="jinja-item" data-insert="{{ lookup('env', 'HOME') }}">lookup('env', 'VAR')</div>
+          <div class="jinja-item" data-insert="{{ lookup('file', '/path') }}">lookup('file', 'path')</div>
+          <div class="jinja-item" data-insert="{{ lookup('pipe', 'cmd') }}">lookup('pipe', 'cmd')</div>
+          <div class="jinja-item" data-insert="{{ lookup('password', '/dev/null') }}">lookup('password', ...)</div>
+        </div>
+        <div class="jinja-group">
+          <div class="jinja-group-title">Control Structures</div>
+          <div class="jinja-item" data-insert="{% if condition %}...{% endif %}">{% if %}...{% endif %}</div>
+          <div class="jinja-item" data-insert="{% for item in list %}...{% endfor %}">{% for %}...{% endfor %}</div>
+          <div class="jinja-item" data-insert="{% set var = value %}">{% set var = value %}</div>
+          <div class="jinja-item" data-insert="{# comment #}">{# comment #}</div>
+        </div>
+        <div class="jinja-group">
+          <div class="jinja-group-title">Tests</div>
+          <div class="jinja-item" data-insert="{% if var is defined %}">is defined</div>
+          <div class="jinja-item" data-insert="{% if var is undefined %}">is undefined</div>
+          <div class="jinja-item" data-insert="{% if var is none %}">is none</div>
+          <div class="jinja-item" data-insert="{% if var is string %}">is string</div>
+          <div class="jinja-item" data-insert="{% if var is number %}">is number</div>
+          <div class="jinja-item" data-insert="{% if var is mapping %}">is mapping</div>
+          <div class="jinja-item" data-insert="{% if var is iterable %}">is iterable</div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- EDITOR -->
+  <section class="editor-area">
+    <div class="editor-toolbar">
+      <div class="toolbar-left">
+        <span class="indent-display" id="indentDisplay">2 spaces</span>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" id="formatBtn" title="Fix indentation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="7" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+          Format
+        </button>
+        <button class="toolbar-btn" id="commentBtn" title="Toggle comment (Ctrl+/)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Comment
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <span class="cursor-pos" id="cursorPos">Ln 1, Col 1</span>
+      </div>
+    </div>
+
+    <div class="editor-container" id="editorContainer">
+      <div class="line-numbers" id="lineNumbers"></div>
+      <div class="code-wrapper" id="codeWrapper">
+        <div class="highlight-layer code-layer" id="highlightLayer"></div>
+        <textarea class="code-input code-layer" id="codeInput" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="# Paste or type your Ansible playbook YAML here...
+---
+- name: My Playbook
+  hosts: all
+  tasks:
+    - name: First task
+      ansible.builtin.debug:
+        msg: Hello World"></textarea>
+      </div>
+    </div>
+
+    <!-- Error Panel -->
+    <div class="error-panel" id="errorPanel">
+      <div class="error-panel-header">
+        <div class="error-panel-title">
+          Problems
+          <span class="error-count errors" id="errorCount">0</span>
+          <span class="error-count warnings" id="warningCount">0</span>
+        </div>
+        <button class="toolbar-btn" id="closeErrors" style="padding:2px 6px;">✕</button>
+      </div>
+      <div class="error-list" id="errorList"></div>
+    </div>
+  </section>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── ELEMENTS ──
+  const codeInput = document.getElementById('codeInput');
+  const highlightLayer = document.getElementById('highlightLayer');
+  const lineNumbers = document.getElementById('lineNumbers');
+  const codeWrapper = document.getElementById('codeWrapper');
+  const statusPill = document.getElementById('statusPill');
+  const statusText = document.getElementById('statusText');
+  const cursorPos = document.getElementById('cursorPos');
+  const errorPanel = document.getElementById('errorPanel');
+  const errorList = document.getElementById('errorList');
+  const errorCount = document.getElementById('errorCount');
+  const warningCount = document.getElementById('warningCount');
+  const sidebar = document.getElementById('sidebar');
+  const toast = document.getElementById('toast');
+
+  const INDENT = 2;
+  let debounceTimer = null;
+
+  // ── Ansible module and directive lists ──
+  const ANSIBLE_MODULES = new Set([
+    'ansible.builtin.apt','ansible.builtin.yum','ansible.builtin.dnf','ansible.builtin.package',
+    'ansible.builtin.pip','ansible.builtin.service','ansible.builtin.systemd','ansible.builtin.command',
+    'ansible.builtin.shell','ansible.builtin.raw','ansible.builtin.script','ansible.builtin.copy',
+    'ansible.builtin.template','ansible.builtin.file','ansible.builtin.lineinfile',
+    'ansible.builtin.blockinfile','ansible.builtin.replace','ansible.builtin.stat',
+    'ansible.builtin.find','ansible.builtin.fetch','ansible.builtin.get_url',
+    'ansible.builtin.uri','ansible.builtin.user','ansible.builtin.group',
+    'ansible.builtin.cron','ansible.builtin.mount','ansible.builtin.hostname',
+    'ansible.builtin.sysctl','ansible.builtin.iptables','ansible.builtin.firewalld',
+    'ansible.builtin.debug','ansible.builtin.fail','ansible.builtin.assert',
+    'ansible.builtin.pause','ansible.builtin.wait_for','ansible.builtin.wait_for_connection',
+    'ansible.builtin.set_fact','ansible.builtin.include_vars','ansible.builtin.include_tasks',
+    'ansible.builtin.import_tasks','ansible.builtin.include_role','ansible.builtin.import_role',
+    'ansible.builtin.meta','ansible.builtin.add_host','ansible.builtin.group_by',
+    'ansible.builtin.git','ansible.builtin.unarchive','ansible.builtin.archive',
+    'ansible.builtin.synchronize','ansible.builtin.setup','ansible.builtin.gather_facts',
+    'ansible.builtin.reboot','ansible.builtin.apt_key','ansible.builtin.apt_repository',
+    // Short form modules
+    'apt','yum','dnf','package','pip','service','systemd','command','shell','raw',
+    'script','copy','template','file','lineinfile','blockinfile','replace','stat',
+    'find','fetch','get_url','uri','user','group','cron','mount','hostname',
+    'sysctl','iptables','firewalld','debug','fail','assert','pause',
+    'wait_for','wait_for_connection','set_fact','include_vars','include_tasks',
+    'import_tasks','include_role','import_role','meta','add_host','group_by',
+    'git','unarchive','archive','synchronize','setup','gather_facts','reboot',
+    'apt_key','apt_repository'
+  ]);
+
+  const ANSIBLE_DIRECTIVES = new Set([
+    'name','hosts','become','become_user','become_method','gather_facts',
+    'connection','collections','environment','strategy','serial','max_fail_percentage',
+    'any_errors_fatal','ignore_errors','ignore_unreachable','no_log',
+    'vars','vars_files','vars_prompt','tasks','handlers','roles','pre_tasks','post_tasks',
+    'when','loop','loop_control','with_items','with_list','with_dict','with_fileglob',
+    'with_together','with_nested','with_sequence','with_random_choice',
+    'register','notify','listen','changed_when','failed_when','until','retries','delay',
+    'tags','block','rescue','always','delegate_to','delegate_facts','run_once',
+    'check_mode','diff','async','poll','throttle',
+    'state','present','absent','started','stopped','restarted','enabled','disabled',
+    'src','dest','content','owner','group','mode','recurse','force','backup',
+    'msg','var','verbosity'
+  ]);
+
+  // ── SYNTAX HIGHLIGHTING ──
+  function escapeHTML(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function highlightLine(line) {
+    // Comments
+    if (/^\s*#/.test(line)) {
+      return `<span style="color:var(--syn-comment);font-style:italic">${escapeHTML(line)}</span>`;
+    }
+
+    // Document markers
+    if (/^\s*---\s*$/.test(line) || /^\s*\.\.\.\s*$/.test(line)) {
+      return `<span style="color:var(--accent-orange);font-weight:600">${escapeHTML(line)}</span>`;
+    }
+
+    let result = '';
+    let i = 0;
+    const raw = line;
+
+    // Preserve leading whitespace
+    const leadMatch = raw.match(/^(\s*)/);
+    if (leadMatch && leadMatch[1]) {
+      result += leadMatch[1];
+      i = leadMatch[1].length;
+    }
+
+    // Check for list marker
+    let afterListMarker = false;
+    if (raw[i] === '-' && (i + 1 >= raw.length || raw[i + 1] === ' ')) {
+      result += `<span style="color:var(--syn-list-marker);font-weight:700">-</span>`;
+      i++;
+      if (raw[i] === ' ') { result += ' '; i++; }
+      afterListMarker = true;
+    }
+
+    // Tokenize rest of the line
+    const rest = raw.slice(i);
+
+    // Key-value detection
+    const kvMatch = rest.match(/^([A-Za-z_][\w.]*)\s*:\s*(.*)/);
+    if (kvMatch) {
+      const key = kvMatch[1];
+      const val = kvMatch[2];
+      let keyColor = 'var(--syn-key)';
+
+      if (ANSIBLE_DIRECTIVES.has(key)) {
+        keyColor = 'var(--syn-directive)';
+      }
+
+      // Check if value is a module name
+      let valHTML = highlightValue(val);
+
+      // Check if key itself is a module name (as a key)
+      if (ANSIBLE_MODULES.has(key)) {
+        keyColor = 'var(--syn-module)';
+      }
+
+      result += `<span style="color:${keyColor}">${escapeHTML(key)}</span>`;
+      result += `<span style="color:var(--text-muted)">:</span> `;
+      result += valHTML;
+    } else {
+      result += highlightValue(rest);
+    }
+
+    return result;
+  }
+
+  function highlightValue(val) {
+    if (!val || !val.trim()) return escapeHTML(val);
+
+    let result = '';
+    let i = 0;
+
+    while (i < val.length) {
+      // Jinja2 expressions {{ ... }}
+      if (val[i] === '{' && val[i + 1] === '{') {
+        const end = val.indexOf('}}', i + 2);
+        if (end !== -1) {
+          const expr = val.slice(i, end + 2);
+          result += `<span style="color:var(--syn-jinja);background:var(--syn-jinja-bg);border-radius:2px;padding:0 2px">${escapeHTML(expr)}</span>`;
+          i = end + 2;
+          continue;
+        }
+      }
+      // Jinja2 statements {% ... %}
+      if (val[i] === '{' && val[i + 1] === '%') {
+        const end = val.indexOf('%}', i + 2);
+        if (end !== -1) {
+          const expr = val.slice(i, end + 2);
+          result += `<span style="color:var(--syn-jinja);background:var(--syn-jinja-bg);border-radius:2px;padding:0 2px">${escapeHTML(expr)}</span>`;
+          i = end + 2;
+          continue;
+        }
+      }
+      // Jinja2 comments {# ... #}
+      if (val[i] === '{' && val[i + 1] === '#') {
+        const end = val.indexOf('#}', i + 2);
+        if (end !== -1) {
+          const expr = val.slice(i, end + 2);
+          result += `<span style="color:var(--syn-comment);font-style:italic">${escapeHTML(expr)}</span>`;
+          i = end + 2;
+          continue;
+        }
+      }
+
+      // Quoted strings
+      if (val[i] === '"' || val[i] === "'") {
+        const quote = val[i];
+        let end = i + 1;
+        while (end < val.length && val[end] !== quote) {
+          if (val[end] === '\\') end++;
+          end++;
+        }
+        if (end < val.length) end++;
+        const str = val.slice(i, end);
+        // Check for Jinja inside string
+        result += `<span style="color:var(--syn-string)">${highlightJinjaInString(str)}</span>`;
+        i = end;
+        continue;
+      }
+
+      // Booleans
+      const boolMatch = val.slice(i).match(/^(true|false|yes|no|True|False|Yes|No)\b/);
+      if (boolMatch && (i === 0 || /[\s,\[]/.test(val[i-1]))) {
+        result += `<span style="color:var(--syn-bool);font-weight:500">${escapeHTML(boolMatch[1])}</span>`;
+        i += boolMatch[1].length;
+        continue;
+      }
+
+      // Numbers
+      const numMatch = val.slice(i).match(/^(\d+\.?\d*)\b/);
+      if (numMatch && (i === 0 || /[\s,\[:]/.test(val[i-1]))) {
+        result += `<span style="color:var(--syn-number)">${escapeHTML(numMatch[1])}</span>`;
+        i += numMatch[1].length;
+        continue;
+      }
+
+      // Inline comment
+      if (val[i] === '#' && (i === 0 || val[i-1] === ' ')) {
+        result += `<span style="color:var(--syn-comment);font-style:italic">${escapeHTML(val.slice(i))}</span>`;
+        break;
+      }
+
+      result += `<span style="color:var(--syn-value)">${escapeHTML(val[i])}</span>`;
+      i++;
+    }
+
+    return result;
+  }
+
+  function highlightJinjaInString(str) {
+    return escapeHTML(str).replace(/\{\{.*?\}\}/g, m =>
+      `</span><span style="color:var(--syn-jinja);background:var(--syn-jinja-bg);border-radius:2px;padding:0 2px">${m}</span><span style="color:var(--syn-string)">`
+    );
+  }
+
+  function updateHighlighting() {
+    const text = codeInput.value;
+    const lines = text.split('\n');
+    const highlighted = lines.map(line => highlightLine(line)).join('\n');
+    highlightLayer.innerHTML = highlighted + '\n';
+  }
+
+  // ── LINE NUMBERS & INDENT GUIDES ──
+  function updateLineNumbers() {
+    const lines = codeInput.value.split('\n');
+    const errors = currentErrors;
+    const activeLine = getActiveLine();
+
+    let html = '';
+    for (let i = 0; i < lines.length; i++) {
+      const isError = errors.some(e => e.line === i + 1 && e.type === 'error');
+      const isActive = (i + 1) === activeLine;
+      let cls = 'line-num';
+      if (isError) cls += ' error-line';
+      if (isActive) cls += ' active-line';
+      html += `<div class="${cls}">${i + 1}</div>`;
+    }
+    lineNumbers.innerHTML = html;
+  }
+
+  function getActiveLine() {
+    const pos = codeInput.selectionStart;
+    const text = codeInput.value.substring(0, pos);
+    return text.split('\n').length;
+  }
+
+  // ── CURSOR POSITION ──
+  function updateCursorPos() {
+    const pos = codeInput.selectionStart;
+    const text = codeInput.value.substring(0, pos);
+    const lines = text.split('\n');
+    const line = lines.length;
+    const col = lines[lines.length - 1].length + 1;
+    cursorPos.textContent = `Ln ${line}, Col ${col}`;
+  }
+
+  // ── SCROLL SYNC ──
+  function syncScroll() {
+    highlightLayer.scrollTop = codeWrapper.scrollTop;
+    highlightLayer.scrollLeft = codeWrapper.scrollLeft;
+    lineNumbers.scrollTop = codeWrapper.scrollTop;
+  }
+
+  codeWrapper.addEventListener('scroll', syncScroll);
+
+  // ── AUTO INDENT ──
+  function handleEnter(e) {
+    e.preventDefault();
+    const start = codeInput.selectionStart;
+    const text = codeInput.value;
+    const before = text.substring(0, start);
+    const after = text.substring(codeInput.selectionEnd);
+
+    const currentLine = before.split('\n').pop();
+    const currentIndent = currentLine.match(/^(\s*)/)[1];
+    let newIndent = currentIndent;
+
+    // Increase indent after key: (colon at end), list items, block directives
+    const trimmed = currentLine.trim();
+    if (/:\s*$/.test(trimmed) || /:\s*[|>]\s*$/.test(trimmed)) {
+      newIndent = currentIndent + ' '.repeat(INDENT);
+    }
+    // After a list marker, maintain alignment
+    else if (/^\s*-\s+\S/.test(currentLine)) {
+      const dashPos = currentLine.indexOf('-');
+      newIndent = ' '.repeat(dashPos + 2);
+    }
+    // After just a dash
+    else if (/^\s*-\s*$/.test(currentLine)) {
+      newIndent = currentIndent + '  ';
+    }
+
+    const insertion = '\n' + newIndent;
+    codeInput.value = before + insertion + after;
+    codeInput.selectionStart = codeInput.selectionEnd = start + insertion.length;
+    triggerUpdate();
+  }
+
+  // ── TAB HANDLING ──
+  function handleTab(e, shift) {
+    e.preventDefault();
+    const start = codeInput.selectionStart;
+    const end = codeInput.selectionEnd;
+    const text = codeInput.value;
+
+    // Get selection range by lines
+    const beforeStart = text.substring(0, start);
+    const firstLine = beforeStart.split('\n').length - 1;
+    const beforeEnd = text.substring(0, end);
+    const lastLine = beforeEnd.split('\n').length - 1;
+
+    const lines = text.split('\n');
+    const spaces = ' '.repeat(INDENT);
+    let newStart = start;
+    let newEnd = end;
+
+    for (let i = firstLine; i <= lastLine; i++) {
+      if (shift) {
+        // Unindent
+        if (lines[i].startsWith(spaces)) {
+          lines[i] = lines[i].substring(INDENT);
+          if (i === firstLine) newStart = Math.max(start - INDENT, getLineStart(text, firstLine));
+          newEnd -= INDENT;
+        } else {
+          // Remove whatever leading spaces exist
+          const leading = lines[i].match(/^(\s*)/)[1].length;
+          if (leading > 0) {
+            lines[i] = lines[i].substring(leading);
+            if (i === firstLine) newStart = Math.max(start - leading, getLineStart(text, firstLine));
+            newEnd -= leading;
+          }
+        }
+      } else {
+        // Indent
+        lines[i] = spaces + lines[i];
+        if (i === firstLine) newStart += INDENT;
+        newEnd += INDENT;
+      }
+    }
+
+    codeInput.value = lines.join('\n');
+    codeInput.selectionStart = newStart;
+    codeInput.selectionEnd = newEnd;
+    triggerUpdate();
+  }
+
+  function getLineStart(text, lineNum) {
+    const lines = text.split('\n');
+    let pos = 0;
+    for (let i = 0; i < lineNum; i++) pos += lines[i].length + 1;
+    return pos;
+  }
+
+  // ── TOGGLE COMMENT ──
+  function toggleComment() {
+    const start = codeInput.selectionStart;
+    const end = codeInput.selectionEnd;
+    const text = codeInput.value;
+    const beforeStart = text.substring(0, start);
+    const firstLine = beforeStart.split('\n').length - 1;
+    const beforeEnd = text.substring(0, end);
+    const lastLine = beforeEnd.split('\n').length - 1;
+
+    const lines = text.split('\n');
+    const allCommented = lines.slice(firstLine, lastLine + 1).every(l => /^\s*#/.test(l) || l.trim() === '');
+
+    for (let i = firstLine; i <= lastLine; i++) {
+      if (lines[i].trim() === '') continue;
+      if (allCommented) {
+        lines[i] = lines[i].replace(/^(\s*)#\s?/, '$1');
+      } else {
+        const indent = lines[i].match(/^(\s*)/)[1];
+        lines[i] = indent + '# ' + lines[i].trimStart();
+      }
+    }
+
+    codeInput.value = lines.join('\n');
+    codeInput.selectionStart = start;
+    codeInput.selectionEnd = end;
+    triggerUpdate();
+  }
+
+  // ── DUPLICATE LINE ──
+  function duplicateLine() {
+    const pos = codeInput.selectionStart;
+    const text = codeInput.value;
+    const lines = text.split('\n');
+    const lineIdx = text.substring(0, pos).split('\n').length - 1;
+    const line = lines[lineIdx];
+    lines.splice(lineIdx + 1, 0, line);
+    codeInput.value = lines.join('\n');
+    codeInput.selectionStart = codeInput.selectionEnd = pos + line.length + 1;
+    triggerUpdate();
+  }
+
+  // ── VALIDATION ──
+  let currentErrors = [];
+
+  function validate() {
+    const text = codeInput.value;
+    const lines = text.split('\n');
+    const errors = [];
+
+    // Track bracket/quote state
+    let openBrackets = { '(': 0, '[': 0, '{': 0 };
+    let bracketStack = [];
+    let jinjaOpen = 0;
+    let jinjaStmtOpen = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const lineNum = i + 1;
+      const trimmed = line.trim();
+
+      // Skip empty lines and comments
+      if (!trimmed || trimmed.startsWith('#')) continue;
+
+      // ── TAB CHECK ──
+      if (/\t/.test(line)) {
+        errors.push({ line: lineNum, type: 'error', msg: 'Tab character detected — use spaces only in YAML' });
+      }
+
+      // ── TRAILING WHITESPACE ──
+      if (/\s+$/.test(line) && trimmed) {
+        errors.push({ line: lineNum, type: 'warning', msg: 'Trailing whitespace' });
+      }
+
+      // ── ODD INDENTATION ──
+      const indent = line.match(/^(\s*)/)[1].length;
+      if (indent % INDENT !== 0 && !trimmed.startsWith('#')) {
+        errors.push({ line: lineNum, type: 'warning', msg: `Indentation is ${indent} spaces (expected multiple of ${INDENT})` });
+      }
+
+      // ── BRACKET / QUOTE MATCHING ──
+      let inSingleQuote = false;
+      let inDoubleQuote = false;
+
+      for (let j = 0; j < line.length; j++) {
+        const ch = line[j];
+        const prev = j > 0 ? line[j - 1] : '';
+        const next = j < line.length - 1 ? line[j + 1] : '';
+
+        // Handle quotes (skip if escaped)
+        if (ch === "'" && !inDoubleQuote && prev !== '\\') {
+          inSingleQuote = !inSingleQuote;
+          continue;
+        }
+        if (ch === '"' && !inSingleQuote && prev !== '\\') {
+          inDoubleQuote = !inDoubleQuote;
+          continue;
+        }
+
+        // Skip inside quotes
+        if (inSingleQuote || inDoubleQuote) continue;
+
+        // Skip if it's a comment
+        if (ch === '#' && (j === 0 || line[j - 1] === ' ')) break;
+
+        // Jinja2 {{ }}
+        if (ch === '{' && next === '{') {
+          jinjaOpen++;
+          j++; continue;
+        }
+        if (ch === '}' && next === '}') {
+          jinjaOpen--;
+          if (jinjaOpen < 0) {
+            errors.push({ line: lineNum, type: 'error', msg: 'Unexpected closing }}  — no matching opening {{' });
+            jinjaOpen = 0;
+          }
+          j++; continue;
+        }
+
+        // Jinja2 {% %}
+        if (ch === '{' && next === '%') {
+          jinjaStmtOpen++;
+          j++; continue;
+        }
+        if (ch === '%' && next === '}') {
+          jinjaStmtOpen--;
+          if (jinjaStmtOpen < 0) {
+            errors.push({ line: lineNum, type: 'error', msg: 'Unexpected closing %} — no matching opening {%' });
+            jinjaStmtOpen = 0;
+          }
+          j++; continue;
+        }
+
+        // Regular brackets
+        if (ch === '(' || ch === '[') {
+          bracketStack.push({ char: ch, line: lineNum });
+          openBrackets[ch]++;
+        }
+        if (ch === ')' || ch === ']') {
+          const expected = ch === ')' ? '(' : '[';
+          if (bracketStack.length > 0 && bracketStack[bracketStack.length - 1].char === expected) {
+            bracketStack.pop();
+            openBrackets[expected]--;
+          } else {
+            errors.push({ line: lineNum, type: 'error', msg: `Unmatched closing '${ch}'` });
+          }
+        }
+      }
+
+      // Unclosed quotes on this line (simple check)
+      if (inSingleQuote) {
+        errors.push({ line: lineNum, type: 'error', msg: "Unclosed single quote '" });
+      }
+      if (inDoubleQuote) {
+        errors.push({ line: lineNum, type: 'error', msg: 'Unclosed double quote "' });
+      }
+
+      // ── DUPLICATE KEY DETECTION ──
+      // (Simple: consecutive lines with same key at same indent)
+      if (i > 0) {
+        const prevLine = lines[i - 1].trim();
+        const prevKey = prevLine.match(/^([A-Za-z_][\w.]*)\s*:/);
+        const currKey = trimmed.match(/^([A-Za-z_][\w.]*)\s*:/);
+        const prevIndent = lines[i - 1].match(/^(\s*)/)[1].length;
+        if (prevKey && currKey && prevKey[1] === currKey[1] && prevIndent === indent) {
+          errors.push({ line: lineNum, type: 'warning', msg: `Possible duplicate key: "${currKey[1]}"` });
+        }
+      }
+
+      // ── ANSIBLE-SPECIFIC ──
+      // name value should not be empty
+      if (/^\s*-?\s*name:\s*$/.test(line)) {
+        errors.push({ line: lineNum, type: 'warning', msg: 'Task name is empty — provide a descriptive name' });
+      }
+
+      // Detect old-style module usage without FQCN (warning only)
+      const moduleKeyMatch = trimmed.match(/^([a-z_]+):\s/);
+      if (moduleKeyMatch && ANSIBLE_MODULES.has(moduleKeyMatch[1]) && !moduleKeyMatch[1].includes('.')) {
+        const shortName = moduleKeyMatch[1];
+        if (!ANSIBLE_DIRECTIVES.has(shortName)) {
+          errors.push({ line: lineNum, type: 'warning', msg: `Consider using FQCN: ansible.builtin.${shortName}` });
+        }
+      }
+    }
+
+    // Check remaining unclosed brackets
+    for (const item of bracketStack) {
+      errors.push({ line: item.line, type: 'error', msg: `Unclosed '${item.char}' — missing matching ${item.char === '(' ? ')' : ']'}` });
+    }
+    if (jinjaOpen > 0) {
+      errors.push({ line: lines.length, type: 'error', msg: `${jinjaOpen} unclosed {{ — missing matching }}` });
+    }
+    if (jinjaStmtOpen > 0) {
+      errors.push({ line: lines.length, type: 'error', msg: `${jinjaStmtOpen} unclosed {%  — missing matching %}` });
+    }
+
+    currentErrors = errors;
+    updateErrorPanel(errors);
+    updateStatus(errors);
+  }
+
+  function updateErrorPanel(errors) {
+    const errCount = errors.filter(e => e.type === 'error').length;
+    const warnCount = errors.filter(e => e.type === 'warning').length;
+
+    errorCount.textContent = errCount;
+    warningCount.textContent = warnCount;
+
+    if (errors.length === 0) {
+      errorPanel.classList.remove('visible');
+      return;
+    }
+
+    errorPanel.classList.add('visible');
+    errorList.innerHTML = errors.map(e => `
+      <div class="error-item" data-line="${e.line}">
+        <div class="error-icon ${e.type === 'error' ? 'err' : 'warn'}">${e.type === 'error' ? '✕' : '!'}</div>
+        <span class="error-line-num">Ln ${e.line}</span>
+        <span class="error-msg">${e.msg}</span>
+      </div>
+    `).join('');
+
+    // Click to jump to line
+    errorList.querySelectorAll('.error-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const line = parseInt(item.dataset.line);
+        jumpToLine(line);
+      });
+    });
+  }
+
+  function jumpToLine(lineNum) {
+    const lines = codeInput.value.split('\n');
+    let pos = 0;
+    for (let i = 0; i < lineNum - 1 && i < lines.length; i++) {
+      pos += lines[i].length + 1;
+    }
+    codeInput.focus();
+    codeInput.selectionStart = codeInput.selectionEnd = pos;
+    // Scroll into view
+    const lineHeight = 21.45;
+    codeWrapper.scrollTop = (lineNum - 5) * lineHeight;
+    triggerUpdate();
+  }
+
+  function updateStatus(errors) {
+    const errCount = errors.filter(e => e.type === 'error').length;
+    const warnCount = errors.filter(e => e.type === 'warning').length;
+    const text = codeInput.value.trim();
+
+    if (!text) {
+      statusPill.className = 'status-pill valid';
+      statusText.textContent = 'Ready';
+    } else if (errCount > 0) {
+      statusPill.className = 'status-pill error';
+      statusText.textContent = `${errCount} error${errCount > 1 ? 's' : ''}`;
+    } else if (warnCount > 0) {
+      statusPill.className = 'status-pill warning';
+      statusText.textContent = `${warnCount} warning${warnCount > 1 ? 's' : ''}`;
+    } else {
+      statusPill.className = 'status-pill valid';
+      statusText.textContent = 'Valid YAML';
+    }
+  }
+
+  // ── MAIN UPDATE ──
+  function triggerUpdate() {
+    updateHighlighting();
+    updateLineNumbers();
+    updateCursorPos();
+    syncScroll();
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(validate, 300);
+  }
+
+  // ── EVENT LISTENERS ──
+  codeInput.addEventListener('input', triggerUpdate);
+  codeInput.addEventListener('click', () => { updateCursorPos(); updateLineNumbers(); });
+  codeInput.addEventListener('keyup', () => { updateCursorPos(); updateLineNumbers(); });
+
+  codeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      handleEnter(e);
+    } else if (e.key === 'Tab') {
+      handleTab(e, e.shiftKey);
+    } else if (e.key === '/' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      toggleComment();
+    } else if (e.key === 'd' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      duplicateLine();
+    }
+  });
+
+  // Auto-close brackets and Jinja
+  codeInput.addEventListener('keydown', (e) => {
+    const pairs = { '{': '}', '[': ']', '(': ')', '"': '"', "'": "'" };
+    if (pairs[e.key]) {
+      const start = codeInput.selectionStart;
+      const end = codeInput.selectionEnd;
+      const text = codeInput.value;
+
+      // For Jinja: {{ auto-completes to {{ }}
+      if (e.key === '{' && start > 0 && text[start - 1] === '{') {
+        // Don't double-close, the second { will be typed normally
+      }
+
+      // Auto-close if no selection
+      if (start === end && (e.key === '[' || e.key === '(')) {
+        e.preventDefault();
+        const insertion = e.key + pairs[e.key];
+        codeInput.value = text.substring(0, start) + insertion + text.substring(end);
+        codeInput.selectionStart = codeInput.selectionEnd = start + 1;
+        triggerUpdate();
+      }
+    }
+  });
+
+  // ── HEADER BUTTONS ──
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(codeInput.value).then(() => showToast('Copied to clipboard'));
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if (codeInput.value && !confirm('Clear all content?')) return;
+    codeInput.value = '';
+    triggerUpdate();
+  });
+
+  document.getElementById('toggleSidebar').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  document.getElementById('closeErrors').addEventListener('click', () => {
+    errorPanel.classList.remove('visible');
+  });
+
+  document.getElementById('commentBtn').addEventListener('click', toggleComment);
+
+  document.getElementById('formatBtn').addEventListener('click', () => {
+    // Basic format: convert tabs to spaces, trim trailing whitespace
+    const lines = codeInput.value.split('\n');
+    const formatted = lines.map(l => l.replace(/\t/g, '  ').replace(/\s+$/, '')).join('\n');
+    codeInput.value = formatted;
+    triggerUpdate();
+    showToast('Formatted: tabs → spaces, trailing whitespace removed');
+  });
+
+  // ── SIDEBAR TABS ──
+  document.querySelectorAll('.sidebar-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`panel-${tab.dataset.panel}`).classList.add('active');
+    });
+  });
+
+  // ── SNIPPET CARDS ──
+  document.querySelectorAll('.snippet-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const body = header.nextElementSibling;
+      body.classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.snippet-code').forEach(code => {
+    code.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const snippet = code.textContent;
+      insertAtCursor(snippet);
+      showToast('Snippet inserted');
+    });
+  });
+
+  // ── JINJA INSERT ──
+  document.querySelectorAll('.jinja-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const text = item.dataset.insert;
+      insertAtCursor(text);
+      showToast('Inserted');
+    });
+  });
+
+  function insertAtCursor(text) {
+    const start = codeInput.selectionStart;
+    const before = codeInput.value.substring(0, start);
+    const after = codeInput.value.substring(codeInput.selectionEnd);
+    codeInput.value = before + text + after;
+    codeInput.selectionStart = codeInput.selectionEnd = start + text.length;
+    codeInput.focus();
+    triggerUpdate();
+  }
+
+  // ── TOAST ──
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // ── PASTE BUTTON ──
+  document.getElementById('pasteBtn').addEventListener('click', () => {
+    navigator.clipboard.readText().then(text => {
+      if (text) {
+        insertAtCursor(text);
+        showToast('Pasted from clipboard');
+      } else {
+        showToast('Clipboard is empty');
+      }
+    }).catch(() => {
+      showToast('Clipboard access denied — use Ctrl+V');
+    });
+  });
+
+  // ── THEME TOGGLE ──
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIconMoon = document.getElementById('themeIconMoon');
+  const themeIconSun = document.getElementById('themeIconSun');
+  const themeLabel = document.getElementById('themeLabel');
+
+  function setTheme(mode) {
+    if (mode === 'light') {
+      document.body.classList.add('light-theme');
+      themeIconMoon.style.display = 'none';
+      themeIconSun.style.display = 'block';
+      themeLabel.textContent = 'Dark';
+      localStorage.setItem('ansible-editor-theme', 'light');
+    } else {
+      document.body.classList.remove('light-theme');
+      themeIconMoon.style.display = 'block';
+      themeIconSun.style.display = 'none';
+      themeLabel.textContent = 'Light';
+      localStorage.setItem('ansible-editor-theme', 'dark');
+    }
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.contains('light-theme');
+    setTheme(isLight ? 'dark' : 'light');
+  });
+
+  // Restore saved theme
+  const savedTheme = localStorage.getItem('ansible-editor-theme');
+  if (savedTheme === 'light') setTheme('light');
+
+  // ── INITIAL STATE ──
+  triggerUpdate();
+
+})();
+</script>
+</body>
+</html>
