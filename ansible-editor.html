@@ -33,7 +33,7 @@
     --accent-cyan: #39d353;
     /* Syntax colors */
     --syn-key: #ff7b72;
-    --syn-value: #a5d6ff;
+    --syn-value: #e6edf3;
     --syn-string: #a5d6ff;
     --syn-comment: #484f58;
     --syn-jinja: #f0883e;
@@ -1415,7 +1415,7 @@
   }
 
   function highlightValue(val) {
-    if (!val || !val.trim()) return escapeHTML(val);
+    if (!val || !val.trim()) return `<span style="color:var(--syn-value)">${escapeHTML(val)}</span>`;
 
     let result = '';
     let i = 0;
@@ -1490,7 +1490,7 @@
         break;
       }
 
-      result += escapeHTML(val[i]);
+      result += `<span style="color:var(--syn-value)">${escapeHTML(val[i])}</span>`;
       i++;
     }
 
