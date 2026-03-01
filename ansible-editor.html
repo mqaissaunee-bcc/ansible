@@ -477,6 +477,9 @@
     top: 0; left: 0;
     width: 100%;
     min-height: 100%;
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
   }
 
   /* Indent Guides Layer */
@@ -504,6 +507,15 @@
     pointer-events: none;
     color: transparent;
     overflow: hidden;
+    tab-size: 2;
+    -moz-tab-size: 2;
+    word-spacing: 0;
+    letter-spacing: 0;
+    -webkit-text-size-adjust: none;
+    font-kerning: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    font-variant-ligatures: none;
   }
 
   /* Textarea */
@@ -527,7 +539,13 @@
     overflow: hidden;
     tab-size: 2;
     -moz-tab-size: 2;
-    spellcheck: false;
+    word-spacing: 0;
+    letter-spacing: 0;
+    -webkit-text-size-adjust: none;
+    font-kerning: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    font-variant-ligatures: none;
   }
 
   /* ── ERROR PANEL ── */
@@ -1480,7 +1498,7 @@
 
     // Document markers
     if (/^\s*---\s*$/.test(line) || /^\s*\.\.\.\s*$/.test(line)) {
-      return `<span style="color:var(--accent-orange);font-weight:600">${escapeHTML(line)}</span>`;
+      return `<span style="color:var(--accent-orange)">${escapeHTML(line)}</span>`;
     }
 
     let result = '';
@@ -1497,7 +1515,7 @@
     // Check for list marker
     let afterListMarker = false;
     if (raw[i] === '-' && (i + 1 >= raw.length || raw[i + 1] === ' ')) {
-      result += `<span style="color:var(--syn-list-marker);font-weight:700">-</span>`;
+      result += `<span style="color:var(--syn-list-marker)">-</span>`;
       i++;
       if (raw[i] === ' ') { result += ' '; i++; }
       afterListMarker = true;
@@ -1507,10 +1525,10 @@
     const rest = raw.slice(i);
 
     // Key-value detection
-    const kvMatch = rest.match(/^([A-Za-z_][\w.]*)\s*:\s*(.*)/);
+    const kvMatch = rest.match(/^([A-Za-z_][\w.]*)\s*(:)\s*(.*)/);
     if (kvMatch) {
       const key = kvMatch[1];
-      const val = kvMatch[2];
+      const val = kvMatch[3];
       let keyColor = 'var(--syn-key)';
 
       if (ANSIBLE_DIRECTIVES.has(key)) {
@@ -1525,8 +1543,12 @@
         keyColor = 'var(--syn-module)';
       }
 
+      // Reconstruct exactly: key + everything between key and value
+      const afterKey = rest.slice(key.length); // ": value" or ":  value" etc
+      const colonAndSpace = afterKey.slice(0, afterKey.length - val.length);
+
       result += `<span style="color:${keyColor}">${escapeHTML(key)}</span>`;
-      result += `<span style="color:var(--text-muted)">:</span> `;
+      result += `<span style="color:var(--text-muted)">${escapeHTML(colonAndSpace)}</span>`;
       result += valHTML;
     } else {
       result += highlightValue(rest);
@@ -1547,7 +1569,7 @@
         const end = val.indexOf('}}', i + 2);
         if (end !== -1) {
           const expr = val.slice(i, end + 2);
-          result += `<span style="color:var(--syn-jinja);background:var(--syn-jinja-bg);border-radius:2px;padding:0 2px">${escapeHTML(expr)}</span>`;
+          result += `<span style="color:var(--syn-jinja);background:var(--syn-jinja-bg)">${escapeHTML(expr)}</span>`;
           i = end + 2;
           continue;
         }
@@ -1557,7 +1579,7 @@
         const end = val.indexOf('%}', i + 2);
         if (end !== -1) {
           const expr = val.slice(i, end + 2);
-          result += `<span style="color:var(--syn-jinja);background:var(--syn-jinja-bg);border-radius:2px;padding:0 2px">${escapeHTML(expr)}</span>`;
+          result += `<span style="color:var(--syn-jinja);background:var(--syn-jinja-bg)">${escapeHTML(expr)}</span>`;
           i = end + 2;
           continue;
         }
@@ -1592,7 +1614,7 @@
       // Booleans
       const boolMatch = val.slice(i).match(/^(true|false|yes|no|True|False|Yes|No)\b/);
       if (boolMatch && (i === 0 || /[\s,\[]/.test(val[i-1]))) {
-        result += `<span style="color:var(--syn-bool);font-weight:500">${escapeHTML(boolMatch[1])}</span>`;
+        result += `<span style="color:var(--syn-bool)">${escapeHTML(boolMatch[1])}</span>`;
         i += boolMatch[1].length;
         continue;
       }
@@ -1611,8 +1633,21 @@
         break;
       }
 
-      result += `<span style="color:var(--syn-value)">${escapeHTML(val[i])}</span>`;
-      i++;
+      // Batch consecutive plain text characters into one span
+      let plainStart = i;
+      while (i < val.length) {
+        if (val[i] === '{' && (val[i+1] === '{' || val[i+1] === '%' || val[i+1] === '#')) break;
+        if (val[i] === '"' || val[i] === "'") break;
+        if (val[i] === '#' && (i === 0 || val[i-1] === ' ')) break;
+        const bTest = val.slice(i).match(/^(true|false|yes|no|True|False|Yes|No)\b/);
+        if (bTest && (i === 0 || /[\s,\[]/.test(val[i-1]))) break;
+        const nTest = val.slice(i).match(/^(\d+\.?\d*)\b/);
+        if (nTest && (i === 0 || /[\s,\[:]/.test(val[i-1]))) break;
+        i++;
+      }
+      if (i > plainStart) {
+        result += `<span style="color:var(--syn-value)">${escapeHTML(val.slice(plainStart, i))}</span>`;
+      }
     }
 
     return result;
@@ -1620,7 +1655,7 @@
 
   function highlightJinjaInString(str) {
     return escapeHTML(str).replace(/\{\{.*?\}\}/g, m =>
-      `</span><span style="color:var(--syn-jinja);background:var(--syn-jinja-bg);border-radius:2px;padding:0 2px">${m}</span><span style="color:var(--syn-string)">`
+      `</span><span style="color:var(--syn-jinja);background:var(--syn-jinja-bg)">${m}</span><span style="color:var(--syn-string)">`
     );
   }
 
@@ -1665,7 +1700,17 @@
     cursorPos.textContent = `Ln ${line}, Col ${col}`;
   }
 
-  // ── SCROLL SYNC ──
+  // ── SCROLL SYNC & AUTO-RESIZE ──
+  function autoResize() {
+    // Reset height to recalculate
+    codeInput.style.height = 'auto';
+    const scrollH = codeInput.scrollHeight;
+    const wrapperH = codeWrapper.clientHeight;
+    const newH = Math.max(scrollH, wrapperH) + 'px';
+    codeInput.style.height = newH;
+    highlightLayer.style.height = newH;
+  }
+
   function syncScroll() {
     highlightLayer.scrollTop = codeWrapper.scrollTop;
     highlightLayer.scrollLeft = codeWrapper.scrollLeft;
@@ -2030,6 +2075,7 @@
   // ── MAIN UPDATE ──
   function triggerUpdate() {
     updateHighlighting();
+    autoResize();
     updateLineNumbers();
     updateCursorPos();
     syncScroll();
@@ -2178,12 +2224,107 @@
   document.getElementById('commentBtn').addEventListener('click', toggleComment);
 
   document.getElementById('formatBtn').addEventListener('click', () => {
-    // Basic format: convert tabs to spaces, trim trailing whitespace
-    const lines = codeInput.value.split('\n');
-    const formatted = lines.map(l => l.replace(/\t/g, '  ').replace(/\s+$/, '')).join('\n');
-    codeInput.value = formatted;
+    const text = codeInput.value;
+    if (!text.trim()) { showToast('Nothing to format'); return; }
+
+    const lines = text.split('\n');
+    const result = [];
+    let indentStack = [0]; // stack of expected indent levels
+    let prevIndent = 0;
+    let prevWasBlockOpener = false; // previous line ended with : (block opener)
+    let prevWasListItem = false;
+    let prevListIndent = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+
+      // Step 1: tabs → spaces, trim trailing whitespace
+      line = line.replace(/\t/g, '  ').replace(/\s+$/, '');
+
+      // Blank lines: preserve as-is
+      if (!line.trim()) {
+        result.push('');
+        continue;
+      }
+
+      // Comments: keep relative indent but normalize to 2-space grid
+      if (/^\s*#/.test(line)) {
+        const currentRaw = line.match(/^(\s*)/)[1].length;
+        const snapped = Math.round(currentRaw / INDENT) * INDENT;
+        result.push(' '.repeat(snapped) + line.trim());
+        continue;
+      }
+
+      // Document markers: always column 0
+      if (/^\s*---\s*$/.test(line) || /^\s*\.\.\.\s*$/.test(line)) {
+        result.push(line.trim());
+        indentStack = [0];
+        prevIndent = 0;
+        prevWasBlockOpener = false;
+        prevWasListItem = false;
+        continue;
+      }
+
+      const trimmed = line.trim();
+      const currentRawIndent = line.match(/^(\s*)/)[1].length;
+      const isListItem = trimmed.startsWith('- ') || trimmed === '-';
+
+      // Determine what indent this line SHOULD have
+      let targetIndent;
+
+      if (prevWasBlockOpener) {
+        // After a block opener (line ending with :), indent one level deeper
+        targetIndent = prevIndent + INDENT;
+      } else if (currentRawIndent > prevIndent && !prevWasBlockOpener) {
+        // Indented deeper without a block opener — snap to nearest grid
+        targetIndent = Math.round(currentRawIndent / INDENT) * INDENT;
+      } else if (currentRawIndent < prevIndent) {
+        // Dedented — snap to nearest grid but don't go below 0
+        targetIndent = Math.max(0, Math.round(currentRawIndent / INDENT) * INDENT);
+      } else {
+        // Same level as previous
+        targetIndent = prevIndent;
+      }
+
+      // Top-level play items (- name:, - hosts: at root list) stay at 0
+      if (isListItem && currentRawIndent <= INDENT && i > 0 && 
+          lines.slice(0, i).some(l => /^\s*---/.test(l))) {
+        // Check if this looks like a play-level list item
+        const afterDash = trimmed.slice(2);
+        if (/^(name|hosts|become|gather_facts|vars|tasks|handlers|roles|pre_tasks|post_tasks|collections|environment|strategy|serial|connection):/.test(afterDash)) {
+          targetIndent = 0;
+        }
+      }
+
+      // Snap to grid
+      targetIndent = Math.round(targetIndent / INDENT) * INDENT;
+
+      const formatted = ' '.repeat(targetIndent) + trimmed;
+      result.push(formatted);
+
+      // Track state for next line
+      prevIndent = targetIndent;
+      // A line is a block opener if it ends with : (possibly followed by whitespace)
+      // but NOT if it has a value after the colon (like "name: foo")
+      const kvMatch = trimmed.replace(/^-\s*/, '').match(/^([A-Za-z_][\w.]*)\s*:\s*(.*)/);
+      if (kvMatch) {
+        const value = kvMatch[2].trim();
+        prevWasBlockOpener = (value === '' || value === '|' || value === '>' || value === '|-' || value === '>-');
+      } else {
+        prevWasBlockOpener = false;
+      }
+
+      if (isListItem) {
+        prevWasListItem = true;
+        prevListIndent = targetIndent;
+      } else {
+        prevWasListItem = false;
+      }
+    }
+
+    codeInput.value = result.join('\n');
     triggerUpdate();
-    showToast('Formatted: tabs → spaces, trailing whitespace removed');
+    showToast('Formatted: indentation normalized to 2-space grid');
   });
 
   // ── SIDEBAR TABS ──
@@ -2467,6 +2608,9 @@
 
   // ── INITIAL STATE ──
   triggerUpdate();
+
+  // Keep textarea sized on window resize
+  window.addEventListener('resize', autoResize);
 
 })();
 </script>
