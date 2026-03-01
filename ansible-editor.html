@@ -727,6 +727,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
       Clear
     </button>
+    <button class="btn" id="undoBtn" title="Undo last change (Ctrl+Z)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+      Undo
+    </button>
     <button class="btn" id="pasteBtn" title="Paste from clipboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
       Paste
@@ -851,6 +855,253 @@
       vars:
         db_name: production
         db_user: admin</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="vars_section">
+          <div class="snippet-header"><span class="snippet-title">Variables Section</span><span class="snippet-tag var">vars</span></div>
+          <div class="snippet-body"><pre class="snippet-code">  vars:
+    http_port: 80
+    https_port: 443
+    server_name: webserver01
+    max_connections: 1000
+    enable_ssl: true
+    packages:
+      - httpd
+      - mod_ssl
+      - firewalld
+    config_paths:
+      apache: /etc/httpd/conf/httpd.conf
+      ssl: /etc/httpd/conf.d/ssl.conf</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="vars_files">
+          <div class="snippet-header"><span class="snippet-title">External Variable Files</span><span class="snippet-tag var">vars</span></div>
+          <div class="snippet-body"><pre class="snippet-code">  vars_files:
+    - vars/common.yml
+    - vars/{{ ansible_os_family }}.yml
+    - vars/secrets.yml</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="vars_prompt">
+          <div class="snippet-header"><span class="snippet-title">Interactive Prompts</span><span class="snippet-tag var">vars</span></div>
+          <div class="snippet-body"><pre class="snippet-code">  vars_prompt:
+    - name: username
+      prompt: "Enter the username"
+      private: no
+    - name: password
+      prompt: "Enter the password"
+      private: yes
+      encrypt: sha512_crypt</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="register_debug">
+          <div class="snippet-header"><span class="snippet-title">Register &amp; Debug</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Check service status
+      ansible.builtin.command: systemctl status httpd
+      register: service_result
+      changed_when: false
+      failed_when: false
+
+    - name: Display result
+      ansible.builtin.debug:
+        msg: "Status: {{ service_result.rc }}"
+
+    - name: Show full output
+      ansible.builtin.debug:
+        var: service_result.stdout_lines</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="file_management">
+          <div class="snippet-header"><span class="snippet-title">File Management</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Create directory structure
+      ansible.builtin.file:
+        path: /opt/app/config
+        state: directory
+        owner: appuser
+        group: appgroup
+        mode: '0755'
+        recurse: yes
+
+    - name: Copy configuration file
+      ansible.builtin.copy:
+        src: files/app.conf
+        dest: /opt/app/config/app.conf
+        owner: appuser
+        group: appgroup
+        mode: '0644'
+        backup: yes
+      notify: Restart application</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="lineinfile">
+          <div class="snippet-header"><span class="snippet-title">Line in File</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Ensure line exists in config
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+        backup: yes
+      notify: Restart sshd
+
+    - name: Add line after match
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        insertafter: '^127\.0\.0\.1'
+        line: '192.168.1.100 appserver'</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="user_management">
+          <div class="snippet-header"><span class="snippet-title">User Management</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Create application user
+      ansible.builtin.user:
+        name: appuser
+        comment: "Application Service Account"
+        uid: 1050
+        group: appgroup
+        groups: wheel,developers
+        append: yes
+        shell: /bin/bash
+        home: /home/appuser
+        create_home: yes
+        state: present
+
+    - name: Create application group
+      ansible.builtin.group:
+        name: appgroup
+        gid: 1050
+        state: present</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="service_mgmt">
+          <div class="snippet-header"><span class="snippet-title">Service Management</span><span class="snippet-tag handler">handler</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Ensure service is running and enabled
+      ansible.builtin.systemd:
+        name: httpd
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Wait for service to be ready
+      ansible.builtin.wait_for:
+        port: 80
+        delay: 5
+        timeout: 30</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="firewall">
+          <div class="snippet-header"><span class="snippet-title">Firewall Rules</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Open HTTP port in firewall
+      ansible.posix.firewalld:
+        port: "{{ http_port }}/tcp"
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Allow HTTPS service
+      ansible.posix.firewalld:
+        service: https
+        permanent: yes
+        immediate: yes
+        state: enabled</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="set_fact">
+          <div class="snippet-header"><span class="snippet-title">Set Facts</span><span class="snippet-tag var">vars</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Set deployment timestamp
+      ansible.builtin.set_fact:
+        deploy_time: "{{ ansible_date_time.iso8601 }}"
+        app_version: "2.1.0"
+
+    - name: Build dynamic config
+      ansible.builtin.set_fact:
+        app_url: "https://{{ server_name }}:{{ https_port }}"
+        log_path: "/var/log/{{ app_name }}/app.log"</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="include_vars">
+          <div class="snippet-header"><span class="snippet-title">Include Variables</span><span class="snippet-tag var">vars</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Load OS-specific variables
+      ansible.builtin.include_vars:
+        file: "vars/{{ ansible_os_family }}.yml"
+
+    - name: Load variables from directory
+      ansible.builtin.include_vars:
+        dir: vars/overrides
+        extensions:
+          - yml
+          - yaml</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="notify_handlers">
+          <div class="snippet-header"><span class="snippet-title">Multiple Handlers</span><span class="snippet-tag handler">handler</span></div>
+          <div class="snippet-body"><pre class="snippet-code">  handlers:
+    - name: Restart httpd
+      ansible.builtin.systemd:
+        name: httpd
+        state: restarted
+
+    - name: Restart firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        state: restarted
+
+    - name: Reload sshd
+      ansible.builtin.systemd:
+        name: sshd
+        state: reloaded
+
+    - name: Run post-deploy script
+      ansible.builtin.command: /opt/app/post-deploy.sh
+      listen: "deploy complete"</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="loop_dict">
+          <div class="snippet-header"><span class="snippet-title">Loop with Dictionary</span><span class="snippet-tag loop">loop</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Create multiple users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        state: present
+      loop:
+        - { name: 'alice', groups: 'wheel' }
+        - { name: 'bob', groups: 'developers' }
+        - { name: 'carol', groups: 'developers,wheel' }
+      loop_control:
+        label: "{{ item.name }}"</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="assert_validate">
+          <div class="snippet-header"><span class="snippet-title">Assert &amp; Validate</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - http_port is defined
+          - http_port | int > 0
+          - server_name | length > 0
+        fail_msg: "Required variables are missing"
+        success_msg: "All variables validated"</pre></div>
+        </div>
+
+        <div class="snippet-card" data-snippet="tags_example">
+          <div class="snippet-header"><span class="snippet-title">Tags Example</span><span class="snippet-tag task">task</span></div>
+          <div class="snippet-body"><pre class="snippet-code">    - name: Install packages
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"
+      tags:
+        - install
+        - packages
+        - never
+
+    - name: Configure application
+      ansible.builtin.template:
+        src: app.conf.j2
+        dest: /etc/app/app.conf
+      tags:
+        - configure
+        - always</pre></div>
         </div>
       </div>
 
@@ -1692,7 +1943,49 @@
 
   // ── HEADER BUTTONS ──
   document.getElementById('copyBtn').addEventListener('click', () => {
-    navigator.clipboard.writeText(codeInput.value).then(() => showToast('Copied to clipboard'));
+    const start = codeInput.selectionStart;
+    const end = codeInput.selectionEnd;
+    const textToCopy = (start !== end) ? codeInput.value.substring(start, end) : codeInput.value;
+    const label = (start !== end) ? 'Selection copied' : 'All content copied';
+    navigator.clipboard.writeText(textToCopy).then(() => showToast(label));
+  });
+
+  // ── UNDO SYSTEM ──
+  const undoStack = [];
+  const redoStack = [];
+  let lastSavedValue = codeInput.value;
+
+  function pushUndo() {
+    const current = codeInput.value;
+    if (current !== lastSavedValue) {
+      undoStack.push(lastSavedValue);
+      if (undoStack.length > 100) undoStack.shift();
+      redoStack.length = 0;
+      lastSavedValue = current;
+    }
+  }
+
+  function performUndo() {
+    if (undoStack.length === 0) { showToast('Nothing to undo'); return; }
+    redoStack.push(codeInput.value);
+    const prev = undoStack.pop();
+    lastSavedValue = prev;
+    codeInput.value = prev;
+    triggerUpdate();
+    showToast('Undone');
+  }
+
+  // Capture state before each input change
+  codeInput.addEventListener('beforeinput', pushUndo);
+
+  document.getElementById('undoBtn').addEventListener('click', performUndo);
+
+  // Also support Ctrl+Z for undo via our system
+  codeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+      e.preventDefault();
+      performUndo();
+    }
   });
 
   document.getElementById('clearBtn').addEventListener('click', () => {
