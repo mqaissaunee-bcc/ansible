@@ -33,7 +33,7 @@
     --accent-cyan: #39d353;
     /* Syntax colors */
     --syn-key: #ff7b72;
-    --syn-value: #e6edf3;
+    --syn-value: #a5d6ff;
     --syn-string: #a5d6ff;
     --syn-comment: #484f58;
     --syn-jinja: #f0883e;
@@ -54,73 +54,6 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  /* Light theme */
-  body.light-theme {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f6f8fa;
-    --bg-tertiary: #eef1f5;
-    --bg-panel: #f0f3f7;
-    --bg-hover: #e2e6eb;
-    --bg-active: #d8dce2;
-    --border-primary: #d0d7de;
-    --border-accent: #d35400;
-    --text-primary: #1f2328;
-    --text-secondary: #596069;
-    --text-muted: #8b949e;
-    --accent-orange: #d35400;
-    --accent-orange-dim: rgba(211, 84, 0, 0.10);
-    --accent-green: #1a7f37;
-    --accent-green-dim: rgba(26, 127, 55, 0.10);
-    --accent-red: #cf222e;
-    --accent-red-dim: rgba(207, 34, 46, 0.10);
-    --accent-blue: #0969da;
-    --accent-blue-dim: rgba(9, 105, 218, 0.10);
-    --accent-purple: #8250df;
-    --accent-yellow: #9a6700;
-    --accent-cyan: #1a7f37;
-    --syn-key: #cf222e;
-    --syn-value: #1f2328;
-    --syn-string: #0a3069;
-    --syn-comment: #8b949e;
-    --syn-jinja: #bf5700;
-    --syn-jinja-bg: rgba(191, 87, 0, 0.08);
-    --syn-module: #8250df;
-    --syn-directive: #cf222e;
-    --syn-bool: #0550ae;
-    --syn-number: #0550ae;
-    --syn-list-marker: #d35400;
-    --indent-guide-1: rgba(211, 84, 0, 0.15);
-    --indent-guide-2: rgba(9, 105, 218, 0.15);
-    --indent-guide-3: rgba(130, 80, 223, 0.15);
-    --indent-guide-4: rgba(26, 127, 55, 0.15);
-    --scrollbar-thumb: #c5cad0;
-    --scrollbar-track: transparent;
-  }
-
-  body.light-theme .status-pill.valid {
-    border: 1px solid rgba(26, 127, 55, 0.3);
-  }
-  body.light-theme .status-pill.error {
-    border: 1px solid rgba(207, 34, 46, 0.3);
-  }
-  body.light-theme .status-pill.warning {
-    border: 1px solid rgba(154, 103, 0, 0.3);
-  }
-  body.light-theme .btn-accent {
-    background: #d35400;
-    color: #fff;
-    border-color: #d35400;
-  }
-  body.light-theme .btn-accent:hover {
-    background: #e67e22;
-    border-color: #e67e22;
-    color: #fff;
-  }
-  body.light-theme .toast {
-    background: #1a7f37;
-    color: #fff;
-  }
 
   body {
     font-family: var(--font-sans);
@@ -689,6 +622,66 @@
     transform: translateY(0);
   }
 
+  /* Toolbar active state */
+  .toolbar-btn.active {
+    background: var(--accent-orange-dim);
+    color: var(--accent-orange);
+  }
+
+  /* ── HOVER TOOLTIP ── */
+  .editor-tooltip {
+    position: fixed;
+    z-index: 200;
+    max-width: 360px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-orange);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .editor-tooltip.show { opacity: 1; pointer-events: auto; }
+  .editor-tooltip .tt-title {
+    font-weight: 700; color: var(--accent-orange); margin-bottom: 4px;
+    font-family: var(--font-mono); font-size: 13px;
+  }
+  .editor-tooltip .tt-body { color: var(--text-secondary); }
+  .editor-tooltip .tt-link {
+    display: inline-block; margin-top: 6px; color: var(--accent-blue);
+    font-size: 11px; cursor: pointer; text-decoration: underline;
+  }
+
+  /* ── EXPLAIN PANEL ── */
+  .explain-panel {
+    display: none;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-primary);
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .explain-panel.visible { display: block; }
+  .explain-panel h3 {
+    font-size: 13px; font-weight: 700; color: var(--accent-orange);
+    margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .explain-item {
+    margin-bottom: 10px; padding-left: 12px;
+    border-left: 2px solid var(--border-primary);
+  }
+  .explain-item .explain-key {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--syn-key); font-weight: 600;
+  }
+  .explain-item .explain-desc {
+    font-size: 12px; color: var(--text-secondary); margin-top: 2px;
+  }
+
   /* Responsive */
   @media (max-width: 900px) {
     .sidebar { width: 0; min-width: 0; border-right: none; }
@@ -714,11 +707,6 @@
     </div>
   </div>
   <div class="header-right">
-    <button class="btn" id="themeToggle" title="Toggle light/dark mode">
-      <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-      <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <span id="themeLabel">Light</span>
-    </button>
     <button class="btn" id="toggleSidebar" title="Toggle reference panel">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
       Refs
@@ -726,14 +714,6 @@
     <button class="btn" id="clearBtn" title="Clear editor">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
       Clear
-    </button>
-    <button class="btn" id="undoBtn" title="Undo last change (Ctrl+Z)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-      Undo
-    </button>
-    <button class="btn" id="pasteBtn" title="Paste from clipboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
-      Paste
     </button>
     <button class="btn btn-accent" id="copyBtn" title="Copy to clipboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -856,253 +836,6 @@
         db_name: production
         db_user: admin</pre></div>
         </div>
-
-        <div class="snippet-card" data-snippet="vars_section">
-          <div class="snippet-header"><span class="snippet-title">Variables Section</span><span class="snippet-tag var">vars</span></div>
-          <div class="snippet-body"><pre class="snippet-code">  vars:
-    http_port: 80
-    https_port: 443
-    server_name: webserver01
-    max_connections: 1000
-    enable_ssl: true
-    packages:
-      - httpd
-      - mod_ssl
-      - firewalld
-    config_paths:
-      apache: /etc/httpd/conf/httpd.conf
-      ssl: /etc/httpd/conf.d/ssl.conf</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="vars_files">
-          <div class="snippet-header"><span class="snippet-title">External Variable Files</span><span class="snippet-tag var">vars</span></div>
-          <div class="snippet-body"><pre class="snippet-code">  vars_files:
-    - vars/common.yml
-    - vars/{{ ansible_os_family }}.yml
-    - vars/secrets.yml</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="vars_prompt">
-          <div class="snippet-header"><span class="snippet-title">Interactive Prompts</span><span class="snippet-tag var">vars</span></div>
-          <div class="snippet-body"><pre class="snippet-code">  vars_prompt:
-    - name: username
-      prompt: "Enter the username"
-      private: no
-    - name: password
-      prompt: "Enter the password"
-      private: yes
-      encrypt: sha512_crypt</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="register_debug">
-          <div class="snippet-header"><span class="snippet-title">Register &amp; Debug</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Check service status
-      ansible.builtin.command: systemctl status httpd
-      register: service_result
-      changed_when: false
-      failed_when: false
-
-    - name: Display result
-      ansible.builtin.debug:
-        msg: "Status: {{ service_result.rc }}"
-
-    - name: Show full output
-      ansible.builtin.debug:
-        var: service_result.stdout_lines</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="file_management">
-          <div class="snippet-header"><span class="snippet-title">File Management</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Create directory structure
-      ansible.builtin.file:
-        path: /opt/app/config
-        state: directory
-        owner: appuser
-        group: appgroup
-        mode: '0755'
-        recurse: yes
-
-    - name: Copy configuration file
-      ansible.builtin.copy:
-        src: files/app.conf
-        dest: /opt/app/config/app.conf
-        owner: appuser
-        group: appgroup
-        mode: '0644'
-        backup: yes
-      notify: Restart application</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="lineinfile">
-          <div class="snippet-header"><span class="snippet-title">Line in File</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Ensure line exists in config
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^PermitRootLogin'
-        line: 'PermitRootLogin no'
-        state: present
-        backup: yes
-      notify: Restart sshd
-
-    - name: Add line after match
-      ansible.builtin.lineinfile:
-        path: /etc/hosts
-        insertafter: '^127\.0\.0\.1'
-        line: '192.168.1.100 appserver'</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="user_management">
-          <div class="snippet-header"><span class="snippet-title">User Management</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Create application user
-      ansible.builtin.user:
-        name: appuser
-        comment: "Application Service Account"
-        uid: 1050
-        group: appgroup
-        groups: wheel,developers
-        append: yes
-        shell: /bin/bash
-        home: /home/appuser
-        create_home: yes
-        state: present
-
-    - name: Create application group
-      ansible.builtin.group:
-        name: appgroup
-        gid: 1050
-        state: present</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="service_mgmt">
-          <div class="snippet-header"><span class="snippet-title">Service Management</span><span class="snippet-tag handler">handler</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Ensure service is running and enabled
-      ansible.builtin.systemd:
-        name: httpd
-        state: started
-        enabled: yes
-        daemon_reload: yes
-
-    - name: Wait for service to be ready
-      ansible.builtin.wait_for:
-        port: 80
-        delay: 5
-        timeout: 30</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="firewall">
-          <div class="snippet-header"><span class="snippet-title">Firewall Rules</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Open HTTP port in firewall
-      ansible.posix.firewalld:
-        port: "{{ http_port }}/tcp"
-        permanent: yes
-        immediate: yes
-        state: enabled
-
-    - name: Allow HTTPS service
-      ansible.posix.firewalld:
-        service: https
-        permanent: yes
-        immediate: yes
-        state: enabled</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="set_fact">
-          <div class="snippet-header"><span class="snippet-title">Set Facts</span><span class="snippet-tag var">vars</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Set deployment timestamp
-      ansible.builtin.set_fact:
-        deploy_time: "{{ ansible_date_time.iso8601 }}"
-        app_version: "2.1.0"
-
-    - name: Build dynamic config
-      ansible.builtin.set_fact:
-        app_url: "https://{{ server_name }}:{{ https_port }}"
-        log_path: "/var/log/{{ app_name }}/app.log"</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="include_vars">
-          <div class="snippet-header"><span class="snippet-title">Include Variables</span><span class="snippet-tag var">vars</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Load OS-specific variables
-      ansible.builtin.include_vars:
-        file: "vars/{{ ansible_os_family }}.yml"
-
-    - name: Load variables from directory
-      ansible.builtin.include_vars:
-        dir: vars/overrides
-        extensions:
-          - yml
-          - yaml</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="notify_handlers">
-          <div class="snippet-header"><span class="snippet-title">Multiple Handlers</span><span class="snippet-tag handler">handler</span></div>
-          <div class="snippet-body"><pre class="snippet-code">  handlers:
-    - name: Restart httpd
-      ansible.builtin.systemd:
-        name: httpd
-        state: restarted
-
-    - name: Restart firewalld
-      ansible.builtin.systemd:
-        name: firewalld
-        state: restarted
-
-    - name: Reload sshd
-      ansible.builtin.systemd:
-        name: sshd
-        state: reloaded
-
-    - name: Run post-deploy script
-      ansible.builtin.command: /opt/app/post-deploy.sh
-      listen: "deploy complete"</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="loop_dict">
-          <div class="snippet-header"><span class="snippet-title">Loop with Dictionary</span><span class="snippet-tag loop">loop</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Create multiple users
-      ansible.builtin.user:
-        name: "{{ item.name }}"
-        groups: "{{ item.groups }}"
-        state: present
-      loop:
-        - { name: 'alice', groups: 'wheel' }
-        - { name: 'bob', groups: 'developers' }
-        - { name: 'carol', groups: 'developers,wheel' }
-      loop_control:
-        label: "{{ item.name }}"</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="assert_validate">
-          <div class="snippet-header"><span class="snippet-title">Assert &amp; Validate</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Validate required variables
-      ansible.builtin.assert:
-        that:
-          - http_port is defined
-          - http_port | int > 0
-          - server_name | length > 0
-        fail_msg: "Required variables are missing"
-        success_msg: "All variables validated"</pre></div>
-        </div>
-
-        <div class="snippet-card" data-snippet="tags_example">
-          <div class="snippet-header"><span class="snippet-title">Tags Example</span><span class="snippet-tag task">task</span></div>
-          <div class="snippet-body"><pre class="snippet-code">    - name: Install packages
-      ansible.builtin.dnf:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ packages }}"
-      tags:
-        - install
-        - packages
-        - never
-
-    - name: Configure application
-      ansible.builtin.template:
-        src: app.conf.j2
-        dest: /etc/app/app.conf
-      tags:
-        - configure
-        - always</pre></div>
-        </div>
       </div>
 
       <!-- Cheatsheet Panel -->
@@ -1222,6 +955,15 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Comment
         </button>
+        <button class="toolbar-btn" id="wrapBtn" title="Toggle line wrapping">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/></svg>
+          Wrap
+        </button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" id="explainBtn" title="Explain this playbook's structure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Explain
+        </button>
       </div>
       <div class="toolbar-right">
         <span class="cursor-pos" id="cursorPos">Ln 1, Col 1</span>
@@ -1243,6 +985,15 @@
       </div>
     </div>
 
+    <!-- Explain Panel -->
+    <div class="explain-panel" id="explainPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="margin:0">Playbook Breakdown</h3>
+        <button class="toolbar-btn" id="closeExplain" style="padding:2px 6px;">✕</button>
+      </div>
+      <div id="explainContent"></div>
+    </div>
+
     <!-- Error Panel -->
     <div class="error-panel" id="errorPanel">
       <div class="error-panel-header">
@@ -1256,6 +1007,13 @@
       <div class="error-list" id="errorList"></div>
     </div>
   </section>
+</div>
+
+<!-- Tooltip -->
+<div class="editor-tooltip" id="editorTooltip">
+  <div class="tt-title" id="ttTitle"></div>
+  <div class="tt-body" id="ttBody"></div>
+  <a class="tt-link" id="ttLink" target="_blank" rel="noopener noreferrer"></a>
 </div>
 
 <!-- Toast -->
@@ -1282,6 +1040,60 @@
 
   const INDENT = 2;
   let debounceTimer = null;
+  let wordWrap = false;
+
+  const explainPanel = document.getElementById('explainPanel');
+  const explainContent = document.getElementById('explainContent');
+  const editorTooltip = document.getElementById('editorTooltip');
+
+  // ── DIRECTIVE DOCUMENTATION (for tooltips & explain) ──
+  const DIRECTIVE_DOCS = {
+    name: { desc: 'A human-readable label for the play or task. Shows in output during execution.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' },
+    hosts: { desc: 'Defines which managed hosts in your inventory this play targets.', url: 'https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html' },
+    become: { desc: 'Enables privilege escalation (typically to root) for the play or task.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html' },
+    become_user: { desc: 'The user to switch to when using privilege escalation. Default is root.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html' },
+    become_method: { desc: 'The method used for privilege escalation (sudo, su, pbrun, etc.).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html' },
+    gather_facts: { desc: 'Whether to run the setup module to collect facts about the managed host before executing tasks.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html' },
+    vars: { desc: 'Define variables for use within this play or task scope.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html' },
+    vars_files: { desc: 'Load variables from external YAML files.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html' },
+    vars_prompt: { desc: 'Interactively prompt for variable values at playbook runtime.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html' },
+    tasks: { desc: 'The main list of actions to perform on the target hosts, executed in order.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' },
+    handlers: { desc: 'Tasks that run only when notified by other tasks. Commonly used for service restarts.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html' },
+    roles: { desc: 'Include reusable role content organized in a standard directory structure.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html' },
+    when: { desc: 'Conditional expression. Task only runs when this evaluates to true.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_conditionals.html' },
+    loop: { desc: 'Iterate over a list. Each item is available as {{ item }}.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html' },
+    loop_control: { desc: 'Fine-tune loop behavior: custom label, index variable, pause between iterations.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html' },
+    register: { desc: 'Capture the return data from a task into a variable for later use.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html' },
+    notify: { desc: 'Trigger a handler by name when this task reports a change.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html' },
+    listen: { desc: 'A handler responds to this notification topic (alternative to direct name matching).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html' },
+    changed_when: { desc: 'Override the default "changed" detection with custom logic.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html' },
+    failed_when: { desc: 'Override the default failure detection for a task.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html' },
+    ignore_errors: { desc: 'Continue execution even if this task fails.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html' },
+    block: { desc: 'Group tasks together. Enables error handling with rescue and always sections.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html' },
+    rescue: { desc: 'Tasks that run when a task in the block fails (like try/catch).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html' },
+    always: { desc: 'Tasks that always run, regardless of block success or failure (like finally).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html' },
+    tags: { desc: 'Label tasks for selective execution with --tags or --skip-tags.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html' },
+    delegate_to: { desc: 'Run this task on a different host than the current play target.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_delegation.html' },
+    run_once: { desc: 'Execute this task only once for the entire play, regardless of how many hosts match.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_delegation.html' },
+    environment: { desc: 'Set environment variables for this play or task.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_environment.html' },
+    collections: { desc: 'List of Ansible collections to search for modules, roles, and plugins.', url: 'https://docs.ansible.com/ansible/latest/collections_guide/index.html' },
+    connection: { desc: 'Connection type to use (ssh, local, docker, etc.).', url: 'https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html' },
+    serial: { desc: 'Control how many hosts to process at once (rolling updates).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html' },
+    strategy: { desc: 'Execution strategy: linear (default), free, or debug.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html' },
+    until: { desc: 'Retry a task until this condition is true.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html' },
+    retries: { desc: 'Number of retry attempts when using until.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html' },
+    delay: { desc: 'Seconds to wait between retry attempts.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html' },
+    no_log: { desc: 'Suppress task output from logs (useful for sensitive data like passwords).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' },
+    async: { desc: 'Run task asynchronously with a specified timeout in seconds.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_async.html' },
+    poll: { desc: 'How often to check back on an async task (0 = fire and forget).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_async.html' },
+    pre_tasks: { desc: 'Tasks that run before the roles section.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' },
+    post_tasks: { desc: 'Tasks that run after the roles and tasks sections.', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' },
+    state: { desc: 'Desired state of the resource (present, absent, started, stopped, etc.).', url: 'https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' },
+    src: { desc: 'Source file path on the control node.', url: 'https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html' },
+    dest: { desc: 'Destination file path on the managed host.', url: 'https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html' },
+    mode: { desc: 'File permission mode (e.g., 0644, u+rwx).', url: 'https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html' },
+    owner: { desc: 'File owner user name.', url: 'https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html' },
+  };
 
   // ── Ansible module and directive lists ──
   const ANSIBLE_MODULES = new Set([
@@ -1472,7 +1284,7 @@
         break;
       }
 
-      result += `<span style="color:var(--syn-value)">${escapeHTML(val[i])}</span>`;
+      result += escapeHTML(val[i]);
       i++;
     }
 
@@ -1917,75 +1729,57 @@
     }
   });
 
-  // Auto-close brackets and Jinja
+  // Auto-close brackets, quotes, and Jinja
   codeInput.addEventListener('keydown', (e) => {
-    const pairs = { '{': '}', '[': ']', '(': ')', '"': '"', "'": "'" };
-    if (pairs[e.key]) {
-      const start = codeInput.selectionStart;
-      const end = codeInput.selectionEnd;
-      const text = codeInput.value;
+    const start = codeInput.selectionStart;
+    const end = codeInput.selectionEnd;
+    const text = codeInput.value;
+    const charAfter = text[end] || '';
 
-      // For Jinja: {{ auto-completes to {{ }}
-      if (e.key === '{' && start > 0 && text[start - 1] === '{') {
-        // Don't double-close, the second { will be typed normally
-      }
+    // Skip-over closing character if it matches what's already there
+    const closers = { '}': true, ']': true, ')': true, '"': true, "'": true };
+    if (closers[e.key] && charAfter === e.key) {
+      e.preventDefault();
+      codeInput.selectionStart = codeInput.selectionEnd = end + 1;
+      triggerUpdate();
+      return;
+    }
 
-      // Auto-close if no selection
-      if (start === end && (e.key === '[' || e.key === '(')) {
+    const bracketPairs = { '{': '}', '[': ']', '(': ')' };
+    const quotePairs = { '"': '"', "'": "'" };
+
+    // Auto-close brackets
+    if (bracketPairs[e.key]) {
+      e.preventDefault();
+      const selected = text.substring(start, end);
+      const insertion = e.key + selected + bracketPairs[e.key];
+      codeInput.value = text.substring(0, start) + insertion + text.substring(end);
+      codeInput.selectionStart = start + 1;
+      codeInput.selectionEnd = start + 1 + selected.length;
+      triggerUpdate();
+      return;
+    }
+
+    // Auto-close quotes (only if not inside a word)
+    if (quotePairs[e.key]) {
+      const charBefore = start > 0 ? text[start - 1] : '';
+      const isAlphanumBefore = /[\w]/.test(charBefore);
+      if (!isAlphanumBefore) {
         e.preventDefault();
-        const insertion = e.key + pairs[e.key];
+        const selected = text.substring(start, end);
+        const insertion = e.key + selected + quotePairs[e.key];
         codeInput.value = text.substring(0, start) + insertion + text.substring(end);
-        codeInput.selectionStart = codeInput.selectionEnd = start + 1;
+        codeInput.selectionStart = start + 1;
+        codeInput.selectionEnd = start + 1 + selected.length;
         triggerUpdate();
+        return;
       }
     }
   });
 
   // ── HEADER BUTTONS ──
   document.getElementById('copyBtn').addEventListener('click', () => {
-    const start = codeInput.selectionStart;
-    const end = codeInput.selectionEnd;
-    const textToCopy = (start !== end) ? codeInput.value.substring(start, end) : codeInput.value;
-    const label = (start !== end) ? 'Selection copied' : 'All content copied';
-    navigator.clipboard.writeText(textToCopy).then(() => showToast(label));
-  });
-
-  // ── UNDO SYSTEM ──
-  const undoStack = [];
-  const redoStack = [];
-  let lastSavedValue = codeInput.value;
-
-  function pushUndo() {
-    const current = codeInput.value;
-    if (current !== lastSavedValue) {
-      undoStack.push(lastSavedValue);
-      if (undoStack.length > 100) undoStack.shift();
-      redoStack.length = 0;
-      lastSavedValue = current;
-    }
-  }
-
-  function performUndo() {
-    if (undoStack.length === 0) { showToast('Nothing to undo'); return; }
-    redoStack.push(codeInput.value);
-    const prev = undoStack.pop();
-    lastSavedValue = prev;
-    codeInput.value = prev;
-    triggerUpdate();
-    showToast('Undone');
-  }
-
-  // Capture state before each input change
-  codeInput.addEventListener('beforeinput', pushUndo);
-
-  document.getElementById('undoBtn').addEventListener('click', performUndo);
-
-  // Also support Ctrl+Z for undo via our system
-  codeInput.addEventListener('keydown', (e) => {
-    if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
-      e.preventDefault();
-      performUndo();
-    }
+    navigator.clipboard.writeText(codeInput.value).then(() => showToast('Copied to clipboard'));
   });
 
   document.getElementById('clearBtn').addEventListener('click', () => {
@@ -2066,50 +1860,123 @@
     setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
-  // ── PASTE BUTTON ──
-  document.getElementById('pasteBtn').addEventListener('click', () => {
-    navigator.clipboard.readText().then(text => {
-      if (text) {
-        insertAtCursor(text);
-        showToast('Pasted from clipboard');
-      } else {
-        showToast('Clipboard is empty');
-      }
-    }).catch(() => {
-      showToast('Clipboard access denied — use Ctrl+V');
-    });
+  // ── WORD WRAP TOGGLE ──
+  document.getElementById('wrapBtn').addEventListener('click', () => {
+    wordWrap = !wordWrap;
+    document.getElementById('wrapBtn').classList.toggle('active', wordWrap);
+    codeInput.style.whiteSpace = wordWrap ? 'pre-wrap' : 'pre';
+    codeInput.style.wordBreak = wordWrap ? 'break-all' : 'normal';
+    highlightLayer.style.whiteSpace = wordWrap ? 'pre-wrap' : 'pre';
+    highlightLayer.style.wordBreak = wordWrap ? 'break-all' : 'normal';
+    showToast(wordWrap ? 'Word wrap ON' : 'Word wrap OFF');
   });
 
-  // ── THEME TOGGLE ──
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIconMoon = document.getElementById('themeIconMoon');
-  const themeIconSun = document.getElementById('themeIconSun');
-  const themeLabel = document.getElementById('themeLabel');
+  // ── EXPLAIN PLAYBOOK ──
+  function explainPlaybook() {
+    const text = codeInput.value.trim();
+    if (!text) { showToast('Nothing to explain — editor is empty'); return; }
+    const lines = text.split('\n');
+    let html = '';
+    const seen = new Set();
 
-  function setTheme(mode) {
-    if (mode === 'light') {
-      document.body.classList.add('light-theme');
-      themeIconMoon.style.display = 'none';
-      themeIconSun.style.display = 'block';
-      themeLabel.textContent = 'Dark';
-      localStorage.setItem('ansible-editor-theme', 'light');
-    } else {
-      document.body.classList.remove('light-theme');
-      themeIconMoon.style.display = 'block';
-      themeIconSun.style.display = 'none';
-      themeLabel.textContent = 'Light';
-      localStorage.setItem('ansible-editor-theme', 'dark');
+    // Count summary stats
+    let taskCount = 0, handlerCount = 0, varCount = 0;
+    let inHandlers = false;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (/^handlers:\s*$/.test(trimmed)) inHandlers = true;
+      if (/^tasks:\s*$/.test(trimmed) || /^pre_tasks:\s*$/.test(trimmed) || /^post_tasks:\s*$/.test(trimmed)) inHandlers = false;
+      if (/^\s*-\s*name:/.test(line)) { if (inHandlers) handlerCount++; else taskCount++; }
+      if (/^\s{2,4}[A-Za-z_][\w]*:/.test(line) && /vars:/.test(text)) varCount++;
     }
+
+    html += '<div style="margin-bottom:14px;padding:10px;background:var(--bg-tertiary);border-radius:6px;font-size:12px;color:var(--text-secondary);">';
+    html += `<strong style="color:var(--text-primary);">Summary:</strong> `;
+    html += `${taskCount} task${taskCount !== 1 ? 's' : ''}, ${handlerCount} handler${handlerCount !== 1 ? 's' : ''}`;
+    html += '</div>';
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const kvMatch = trimmed.replace(/^-\s*/, '').match(/^([A-Za-z_][\w.]*)\s*:/);
+      if (kvMatch) {
+        const key = kvMatch[1];
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const doc = DIRECTIVE_DOCS[key];
+        if (doc) {
+          html += '<div class="explain-item">';
+          html += '<div class="explain-key">' + key + ':</div>';
+          html += '<div class="explain-desc">' + doc.desc + '</div>';
+          html += '</div>';
+        } else if (ANSIBLE_MODULES.has(key)) {
+          const shortName = key.includes('.') ? key.split('.').pop() : key;
+          html += '<div class="explain-item">';
+          html += '<div class="explain-key" style="color:var(--syn-module)">' + key + ':</div>';
+          html += '<div class="explain-desc">Ansible module — manages <em>' + shortName + '</em> resources on target hosts.</div>';
+          html += '</div>';
+        }
+      }
+    }
+    if (html.indexOf('explain-item') === -1) html += '<div style="color:var(--text-muted);">No recognized directives or modules found.</div>';
+    explainContent.innerHTML = html;
+    explainPanel.classList.toggle('visible');
   }
 
-  themeToggle.addEventListener('click', () => {
-    const isLight = document.body.classList.contains('light-theme');
-    setTheme(isLight ? 'dark' : 'light');
+  document.getElementById('explainBtn').addEventListener('click', explainPlaybook);
+  document.getElementById('closeExplain').addEventListener('click', () => explainPanel.classList.remove('visible'));
+
+  // ── HOVER TOOLTIPS ON YAML KEYS ──
+  let tooltipTimer = null;
+
+  codeInput.addEventListener('mousemove', (e) => {
+    clearTimeout(tooltipTimer);
+    editorTooltip.classList.remove('show');
+
+    tooltipTimer = setTimeout(() => {
+      const rect = codeWrapper.getBoundingClientRect();
+      const y = e.clientY - rect.top + codeWrapper.scrollTop;
+      const lineIdx = Math.floor((y - 12) / 21.45);
+      const lines = codeInput.value.split('\n');
+      if (lineIdx < 0 || lineIdx >= lines.length) return;
+
+      const line = lines[lineIdx].trim().replace(/^-\s*/, '');
+      const kvMatch = line.match(/^([A-Za-z_][\w.]*)\s*:/);
+      if (!kvMatch) return;
+
+      const key = kvMatch[1];
+      const doc = DIRECTIVE_DOCS[key];
+      if (!doc) return;
+
+      document.getElementById('ttTitle').textContent = key + ':';
+      document.getElementById('ttBody').textContent = doc.desc;
+      const link = document.getElementById('ttLink');
+      if (doc.url) {
+        link.textContent = 'View Ansible docs \u2192';
+        link.href = doc.url;
+        link.style.display = 'inline-block';
+      } else {
+        link.style.display = 'none';
+      }
+
+      // Position tooltip avoiding screen bleed
+      let tx = e.clientX + 14;
+      let ty = e.clientY + 14;
+      editorTooltip.classList.add('show');
+      const ttRect = editorTooltip.getBoundingClientRect();
+      if (tx + ttRect.width > window.innerWidth - 10) tx = e.clientX - ttRect.width - 14;
+      if (ty + ttRect.height > window.innerHeight - 10) ty = e.clientY - ttRect.height - 14;
+      if (tx < 10) tx = 10;
+      if (ty < 10) ty = 10;
+      editorTooltip.style.left = tx + 'px';
+      editorTooltip.style.top = ty + 'px';
+    }, 450);
   });
 
-  // Restore saved theme
-  const savedTheme = localStorage.getItem('ansible-editor-theme');
-  if (savedTheme === 'light') setTheme('light');
+  codeInput.addEventListener('mouseleave', () => {
+    clearTimeout(tooltipTimer);
+    editorTooltip.classList.remove('show');
+  });
 
   // ── INITIAL STATE ──
   triggerUpdate();
