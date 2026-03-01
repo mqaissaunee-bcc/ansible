@@ -2080,7 +2080,16 @@
   }
 
   // ── EVENT LISTENERS ──
-  codeInput.addEventListener('input', triggerUpdate);
+  codeInput.addEventListener('input', () => {
+    // Normalize Windows \r\n to Unix \n on any input/paste
+    if (codeInput.value.includes('\r')) {
+      const pos = codeInput.selectionStart;
+      const diff = (codeInput.value.match(/\r/g) || []).length;
+      codeInput.value = codeInput.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      codeInput.selectionStart = codeInput.selectionEnd = Math.max(0, pos - diff);
+    }
+    triggerUpdate();
+  });
   codeInput.addEventListener('click', () => { updateCursorPos(); updateLineNumbers(); });
   codeInput.addEventListener('keyup', () => { updateCursorPos(); updateLineNumbers(); });
 
@@ -2184,7 +2193,9 @@
   document.getElementById('copyBtn').addEventListener('click', () => {
     const start = codeInput.selectionStart;
     const end = codeInput.selectionEnd;
-    const textToCopy = (start !== end) ? codeInput.value.substring(start, end) : codeInput.value;
+    let textToCopy = (start !== end) ? codeInput.value.substring(start, end) : codeInput.value;
+    // Normalize to Unix line endings for terminal/editor compatibility
+    textToCopy = textToCopy.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const label = (start !== end) ? 'Selection copied' : 'All content copied';
     navigator.clipboard.writeText(textToCopy).then(() => showToast(label));
   });
@@ -2193,7 +2204,8 @@
   document.getElementById('pasteBtn').addEventListener('click', () => {
     navigator.clipboard.readText().then(text => {
       if (text) {
-        insertAtCursor(text);
+        // Normalize to Unix line endings
+        insertAtCursor(text.replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
         showToast('Pasted from clipboard');
       } else {
         showToast('Clipboard is empty');
