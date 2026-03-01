@@ -682,6 +682,111 @@
     font-size: 12px; color: var(--text-secondary); margin-top: 2px;
   }
 
+  /* ── SNIPPETS MODAL ── */
+  .snippet-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+  .snippet-modal-overlay.visible { display: flex; }
+  .snippet-modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 92%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+  .snippet-modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .snippet-modal-header input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    outline: none;
+  }
+  .snippet-modal-header input:focus {
+    border-color: var(--accent-orange);
+  }
+  .snippet-modal-header input::placeholder {
+    color: var(--text-muted);
+  }
+  .snippet-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+  .snippet-modal-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .snippet-modal-card:hover {
+    border-color: var(--accent-orange);
+  }
+  .snippet-modal-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .snippet-modal-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .snippet-modal-card-preview {
+    display: none;
+    padding: 0 14px 10px;
+  }
+  .snippet-modal-card-preview.open { display: block; }
+  .snippet-modal-card-preview pre {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre;
+    background: var(--bg-primary);
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .snippet-modal-insert-hint {
+    font-size: 10px;
+    color: var(--accent-orange);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .snippet-modal-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
   /* Responsive */
   @media (max-width: 900px) {
     .sidebar { width: 0; min-width: 0; border-right: none; }
@@ -1161,6 +1266,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Comment
         </button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" id="snippetModalBtn" title="Insert snippet (popup)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+          Snippets
+        </button>
         <button class="toolbar-btn" id="wrapBtn" title="Toggle line wrapping">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/></svg>
           Wrap
@@ -1220,6 +1330,17 @@
   <div class="tt-title" id="ttTitle"></div>
   <div class="tt-body" id="ttBody"></div>
   <a class="tt-link" id="ttLink" target="_blank" rel="noopener noreferrer"></a>
+</div>
+
+<!-- Snippets Modal -->
+<div class="snippet-modal-overlay" id="snippetModalOverlay">
+  <div class="snippet-modal">
+    <div class="snippet-modal-header">
+      <input type="text" id="snippetSearch" placeholder="Search snippets..." aria-label="Search snippets">
+      <button class="toolbar-btn" id="closeSnippetModal" style="font-size:16px;padding:4px 8px;">✕</button>
+    </div>
+    <div class="snippet-modal-body" id="snippetModalBody"></div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -2234,6 +2355,114 @@
   codeInput.addEventListener('mouseleave', () => {
     clearTimeout(tooltipTimer);
     editorTooltip.classList.remove('show');
+  });
+
+  // ── SNIPPETS MODAL ──
+  const snippetModalOverlay = document.getElementById('snippetModalOverlay');
+  const snippetModalBody = document.getElementById('snippetModalBody');
+  const snippetSearch = document.getElementById('snippetSearch');
+
+  // Collect all snippets from the sidebar into a data array
+  const snippetData = [];
+  document.querySelectorAll('.sidebar-panel#panel-snippets .snippet-card').forEach(card => {
+    const title = card.querySelector('.snippet-title')?.textContent || '';
+    const tag = card.querySelector('.snippet-tag')?.textContent || '';
+    const code = card.querySelector('.snippet-code')?.textContent || '';
+    snippetData.push({ title, tag, code });
+  });
+
+  function renderSnippetModal(filter) {
+    const query = (filter || '').toLowerCase();
+    const filtered = snippetData.filter(s =>
+      s.title.toLowerCase().includes(query) ||
+      s.tag.toLowerCase().includes(query) ||
+      s.code.toLowerCase().includes(query)
+    );
+
+    if (filtered.length === 0) {
+      snippetModalBody.innerHTML = '<div class="snippet-modal-empty">No snippets match your search.</div>';
+      return;
+    }
+
+    snippetModalBody.innerHTML = filtered.map((s, idx) => {
+      const tagClass = s.tag.toLowerCase().replace(/[^a-z]/g, '');
+      return `<div class="snippet-modal-card" data-idx="${idx}">
+        <div class="snippet-modal-card-header">
+          <span class="snippet-modal-card-title">${s.title}</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="snippet-tag ${tagClass}">${s.tag}</span>
+            <span class="snippet-modal-insert-hint">Click to insert</span>
+          </span>
+        </div>
+        <div class="snippet-modal-card-preview" id="snippetPreview${idx}">
+          <pre>${escapeHTML(s.code)}</pre>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Toggle preview on header click, insert on double-click or insert-hint click
+    snippetModalBody.querySelectorAll('.snippet-modal-card').forEach(card => {
+      const idx = parseInt(card.dataset.idx);
+      const matchedSnippet = filtered[idx];
+      const preview = card.querySelector('.snippet-modal-card-preview');
+      const header = card.querySelector('.snippet-modal-card-header');
+
+      // Single click: toggle preview
+      header.addEventListener('click', (e) => {
+        // Close other previews
+        snippetModalBody.querySelectorAll('.snippet-modal-card-preview.open').forEach(p => {
+          if (p !== preview) p.classList.remove('open');
+        });
+        preview.classList.toggle('open');
+      });
+
+      // Double click on card: insert and close
+      card.addEventListener('dblclick', () => {
+        insertSnippetAndClose(matchedSnippet.code);
+      });
+
+      // Click the insert hint
+      card.querySelector('.snippet-modal-insert-hint').addEventListener('click', (e) => {
+        e.stopPropagation();
+        insertSnippetAndClose(matchedSnippet.code);
+      });
+    });
+  }
+
+  function insertSnippetAndClose(code) {
+    snippetModalOverlay.classList.remove('visible');
+    insertAtCursor(code);
+    showToast('Snippet inserted');
+  }
+
+  function openSnippetModal() {
+    snippetSearch.value = '';
+    renderSnippetModal('');
+    snippetModalOverlay.classList.add('visible');
+    setTimeout(() => snippetSearch.focus(), 50);
+  }
+
+  function closeSnippetModal() {
+    snippetModalOverlay.classList.remove('visible');
+    codeInput.focus();
+  }
+
+  document.getElementById('snippetModalBtn').addEventListener('click', openSnippetModal);
+  document.getElementById('closeSnippetModal').addEventListener('click', closeSnippetModal);
+
+  // Close on overlay click (outside the modal)
+  snippetModalOverlay.addEventListener('click', (e) => {
+    if (e.target === snippetModalOverlay) closeSnippetModal();
+  });
+
+  // Close on Escape
+  snippetSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSnippetModal();
+  });
+
+  // Live search
+  snippetSearch.addEventListener('input', () => {
+    renderSnippetModal(snippetSearch.value);
   });
 
   // ── INITIAL STATE ──
