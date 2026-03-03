@@ -700,6 +700,90 @@
     font-size: 12px; color: var(--text-secondary); margin-top: 2px;
   }
 
+  /* ── QUICK ONE-LINERS (collapsible) ── */
+  .oneliners-section {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-primary);
+  }
+  .oneliners-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent-orange);
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 4px;
+    border-radius: 4px;
+    transition: background 0.12s;
+    user-select: none;
+  }
+  .oneliners-title:hover {
+    background: var(--bg-hover);
+  }
+  .oneliners-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-primary);
+  }
+  .oneliners-chevron {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    stroke: var(--accent-orange);
+  }
+  .oneliners-section.collapsed .oneliners-chevron {
+    transform: rotate(-90deg);
+  }
+  .oneliners-body {
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s ease;
+    max-height: 800px;
+    opacity: 1;
+    margin-top: 8px;
+  }
+  .oneliners-section.collapsed .oneliners-body {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .oneliner {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    padding: 5px 8px;
+    margin: 3px 0;
+    background: var(--bg-tertiary);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+  .oneliner:hover {
+    border-color: var(--accent-orange);
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+  .oneliner-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-right: 6px;
+    display: inline;
+  }
+
   /* ── SNIPPETS MODAL ── */
   .snippet-modal-overlay {
     display: none;
@@ -805,6 +889,97 @@
     font-size: 13px;
   }
 
+  /* ── LIGHT THEME ── */
+  body.light-theme {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --bg-tertiary: #eef1f5;
+    --bg-panel: #f0f3f7;
+    --bg-hover: #e2e6eb;
+    --bg-active: #d8dce2;
+    --border-primary: #d0d7de;
+    --border-accent: #d35400;
+    --text-primary: #1f2328;
+    --text-secondary: #596069;
+    --text-muted: #8b949e;
+    --accent-orange: #d35400;
+    --accent-orange-dim: rgba(211, 84, 0, 0.10);
+    --accent-green: #1a7f37;
+    --accent-green-dim: rgba(26, 127, 55, 0.10);
+    --accent-red: #cf222e;
+    --accent-red-dim: rgba(207, 34, 46, 0.10);
+    --accent-blue: #0969da;
+    --accent-blue-dim: rgba(9, 105, 218, 0.10);
+    --accent-purple: #8250df;
+    --accent-yellow: #9a6700;
+    --accent-cyan: #1a7f37;
+    --syn-key: #cf222e;
+    --syn-value: #1f2328;
+    --syn-string: #0a3069;
+    --syn-comment: #8b949e;
+    --syn-jinja: #bf5700;
+    --syn-jinja-bg: rgba(191, 87, 0, 0.08);
+    --syn-module: #8250df;
+    --syn-directive: #cf222e;
+    --syn-bool: #0550ae;
+    --syn-number: #0550ae;
+    --syn-list-marker: #d35400;
+    --indent-guide-1: rgba(211, 84, 0, 0.15);
+    --indent-guide-2: rgba(9, 105, 218, 0.15);
+    --indent-guide-3: rgba(130, 80, 223, 0.15);
+    --indent-guide-4: rgba(26, 127, 55, 0.15);
+    --scrollbar-thumb: #c5cad0;
+    --scrollbar-track: transparent;
+  }
+  body.light-theme .status-pill.valid { border-color: rgba(26, 127, 55, 0.3); }
+  body.light-theme .status-pill.error { border-color: rgba(207, 34, 46, 0.3); }
+  body.light-theme .status-pill.warning { border-color: rgba(154, 103, 0, 0.3); }
+  body.light-theme .btn-accent { background: #d35400; color: #fff; border-color: #d35400; }
+  body.light-theme .btn-accent:hover { background: #e67e22; border-color: #e67e22; color: #fff; }
+  body.light-theme .toast { background: #1a7f37; color: #fff; }
+
+  /* ── FIND/REPLACE BAR ── */
+  .find-bar {
+    display: none;
+    position: absolute;
+    top: 0; right: 20px;
+    z-index: 50;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    min-width: 360px;
+  }
+  .find-bar.visible { display: block; }
+  .find-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .find-bar-row:last-child { margin-bottom: 0; }
+  .find-bar input {
+    flex: 1;
+    padding: 5px 10px;
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    outline: none;
+  }
+  .find-bar input:focus { border-color: var(--accent-orange); }
+  .find-bar-info {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    min-width: 50px;
+    text-align: center;
+  }
+
   /* Responsive */
   @media (max-width: 900px) {
     .sidebar { width: 0; min-width: 0; border-right: none; }
@@ -830,6 +1005,22 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="btn" id="themeToggle" title="Toggle light/dark mode">
+      <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span id="themeLabel">Light</span>
+    </button>
+    <div class="toolbar-sep" style="display:inline-block;width:1px;height:16px;background:var(--border-primary);margin:0 4px;vertical-align:middle;"></div>
+    <button class="btn" id="loadFileBtn" title="Open a .yml file">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Open
+    </button>
+    <button class="btn" id="downloadBtn" title="Save as .yml (Ctrl+S)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Save .yml
+    </button>
+    <input type="file" id="fileInput" accept=".yml,.yaml,.txt" style="display:none">
+    <div class="toolbar-sep" style="display:inline-block;width:1px;height:16px;background:var(--border-primary);margin:0 4px;vertical-align:middle;"></div>
     <button class="btn" id="toggleSidebar" title="Toggle reference panel">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
       Refs
@@ -867,6 +1058,46 @@
 
       <!-- Snippets Panel -->
       <div class="sidebar-panel active" id="panel-snippets">
+        <div class="oneliners-section" id="onelinersSection">
+          <div class="oneliners-title" id="onelinersToggle">
+            <svg class="oneliners-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            Quick Insert — RHEL One-Liners
+          </div>
+          <div class="oneliners-body" id="onelinersBody">
+          <div class="oneliner" data-line="      ansible.builtin.dnf:&#10;        name: httpd&#10;        state: present"><span class="oneliner-label">PKG</span>dnf: name=httpd state=present</div>
+          <div class="oneliner" data-line="      ansible.builtin.dnf:&#10;        name: &quot;{{ item }}&quot;&#10;        state: present&#10;      loop:&#10;        - httpd&#10;        - firewalld&#10;        - mod_ssl"><span class="oneliner-label">PKG</span>dnf: install multiple packages (loop)</div>
+          <div class="oneliner" data-line="      ansible.builtin.dnf:&#10;        name: '*'&#10;        state: latest"><span class="oneliner-label">PKG</span>dnf: update all packages</div>
+          <div class="oneliner" data-line="      ansible.builtin.systemd:&#10;        name: httpd&#10;        state: started&#10;        enabled: yes"><span class="oneliner-label">SVC</span>systemd: start &amp; enable httpd</div>
+          <div class="oneliner" data-line="      ansible.builtin.systemd:&#10;        name: httpd&#10;        state: restarted"><span class="oneliner-label">SVC</span>systemd: restart httpd</div>
+          <div class="oneliner" data-line="      ansible.builtin.systemd:&#10;        daemon_reload: yes"><span class="oneliner-label">SVC</span>systemd: daemon-reload</div>
+          <div class="oneliner" data-line="      ansible.posix.firewalld:&#10;        service: http&#10;        permanent: yes&#10;        immediate: yes&#10;        state: enabled"><span class="oneliner-label">FW</span>firewalld: allow http service</div>
+          <div class="oneliner" data-line="      ansible.posix.firewalld:&#10;        service: https&#10;        permanent: yes&#10;        immediate: yes&#10;        state: enabled"><span class="oneliner-label">FW</span>firewalld: allow https service</div>
+          <div class="oneliner" data-line="      ansible.posix.firewalld:&#10;        port: 8080/tcp&#10;        permanent: yes&#10;        immediate: yes&#10;        state: enabled"><span class="oneliner-label">FW</span>firewalld: open port 8080/tcp</div>
+          <div class="oneliner" data-line="      ansible.builtin.file:&#10;        path: /opt/app&#10;        state: directory&#10;        owner: root&#10;        group: root&#10;        mode: '0755'"><span class="oneliner-label">FILE</span>file: create directory</div>
+          <div class="oneliner" data-line="      ansible.builtin.copy:&#10;        src: files/app.conf&#10;        dest: /etc/app/app.conf&#10;        owner: root&#10;        group: root&#10;        mode: '0644'&#10;        backup: yes"><span class="oneliner-label">FILE</span>copy: deploy config file</div>
+          <div class="oneliner" data-line="      ansible.builtin.template:&#10;        src: templates/app.conf.j2&#10;        dest: /etc/app/app.conf&#10;        owner: root&#10;        group: root&#10;        mode: '0644'"><span class="oneliner-label">FILE</span>template: deploy Jinja2 template</div>
+          <div class="oneliner" data-line="      ansible.builtin.lineinfile:&#10;        path: /etc/selinux/config&#10;        regexp: '^SELINUX='&#10;        line: 'SELINUX=enforcing'"><span class="oneliner-label">FILE</span>lineinfile: set SELinux enforcing</div>
+          <div class="oneliner" data-line="      ansible.builtin.lineinfile:&#10;        path: /etc/ssh/sshd_config&#10;        regexp: '^PermitRootLogin'&#10;        line: 'PermitRootLogin no'&#10;        backup: yes"><span class="oneliner-label">FILE</span>lineinfile: disable root SSH</div>
+          <div class="oneliner" data-line="      ansible.builtin.user:&#10;        name: appuser&#10;        state: present&#10;        groups: wheel&#10;        append: yes"><span class="oneliner-label">USER</span>user: create with wheel group</div>
+          <div class="oneliner" data-line="      ansible.builtin.seboolean:&#10;        name: httpd_can_network_connect&#10;        state: yes&#10;        persistent: yes"><span class="oneliner-label">SE</span>seboolean: httpd network connect</div>
+          <div class="oneliner" data-line="      ansible.builtin.debug:&#10;        msg: &quot;{{ ansible_hostname }}&quot;"><span class="oneliner-label">DBG</span>debug: show hostname</div>
+          <div class="oneliner" data-line="      ansible.builtin.debug:&#10;        var: result"><span class="oneliner-label">DBG</span>debug: show registered var</div>
+          <div class="oneliner" data-line="      ansible.builtin.command: id&#10;      register: result&#10;      changed_when: false"><span class="oneliner-label">CMD</span>command: run + register</div>
+          <div class="oneliner" data-line="      ansible.builtin.uri:&#10;        url: http://localhost&#10;        return_content: yes&#10;      register: webpage"><span class="oneliner-label">NET</span>uri: HTTP health check</div>
+          <div class="oneliner" data-line="      ansible.builtin.wait_for:&#10;        port: 80&#10;        delay: 5&#10;        timeout: 30"><span class="oneliner-label">NET</span>wait_for: port 80 ready</div>
+          <div class="oneliner" data-line="      ansible.builtin.cron:&#10;        name: &quot;Log rotation&quot;&#10;        minute: &quot;0&quot;&#10;        hour: &quot;2&quot;&#10;        job: &quot;/usr/sbin/logrotate /etc/logrotate.d/app&quot;"><span class="oneliner-label">SYS</span>cron: schedule log rotation</div>
+          <div class="oneliner" data-line="      ansible.builtin.reboot:&#10;        reboot_timeout: 300"><span class="oneliner-label">SYS</span>reboot: with timeout</div>
+          <div class="oneliner" data-line="      ansible.builtin.hostname:&#10;        name: &quot;{{ inventory_hostname }}&quot;"><span class="oneliner-label">SYS</span>hostname: set from inventory</div>
+          <div class="oneliner" data-line="      ansible.builtin.get_url:&#10;        url: https://example.com/app.tar.gz&#10;        dest: /tmp/app.tar.gz&#10;        mode: '0644'"><span class="oneliner-label">NET</span>get_url: download file</div>
+          <div class="oneliner" data-line="      ansible.builtin.unarchive:&#10;        src: /tmp/app.tar.gz&#10;        dest: /opt/app&#10;        remote_src: yes"><span class="oneliner-label">FILE</span>unarchive: extract remote archive</div>
+          <div class="oneliner" data-line="      ansible.builtin.yum_repository:&#10;        name: epel&#10;        description: EPEL Repository&#10;        baseurl: https://dl.fedoraproject.org/pub/epel/$releasever/$basearch/&#10;        gpgcheck: yes&#10;        enabled: yes"><span class="oneliner-label">PKG</span>yum_repository: add EPEL repo</div>
+          <div class="oneliner" data-line="      ansible.builtin.seboolean:&#10;        name: httpd_can_network_connect_db&#10;        state: yes&#10;        persistent: yes"><span class="oneliner-label">SE</span>seboolean: httpd database connect</div>
+          <div class="oneliner" data-line="      ansible.builtin.seboolean:&#10;        name: httpd_use_nfs&#10;        state: yes&#10;        persistent: yes"><span class="oneliner-label">SE</span>seboolean: httpd use NFS</div>
+          <div class="oneliner" data-line="      ansible.posix.sefcontext:&#10;        target: '/opt/app(/.*)?'&#10;        setype: httpd_sys_content_t&#10;        state: present"><span class="oneliner-label">SE</span>sefcontext: set file context</div>
+          <div class="oneliner" data-line="      ansible.builtin.command: restorecon -Rv /opt/app&#10;      changed_when: false"><span class="oneliner-label">SE</span>restorecon: apply file contexts</div>
+          </div>
+        </div>
+
         <div class="snippet-card"><div class="snippet-header"><span class="snippet-title">Playbook Skeleton</span><span class="snippet-tag task">play</span></div><div class="snippet-body"><pre class="snippet-code">---
 - name: Configure web servers
   hosts: webservers
@@ -877,14 +1108,14 @@
 
   tasks:
     - name: Install packages
-      ansible.builtin.apt:
-        name: nginx
+      ansible.builtin.dnf:
+        name: httpd
         state: present
 
   handlers:
-    - name: Restart nginx
+    - name: Restart httpd
       ansible.builtin.service:
-        name: nginx
+        name: httpd
         state: restarted</pre></div></div>
 
         <div class="snippet-card"><div class="snippet-header"><span class="snippet-title">Variables Section</span><span class="snippet-tag var">vars</span></div><div class="snippet-body"><pre class="snippet-code">  vars:
@@ -929,12 +1160,12 @@
       listen: "restart service"</pre></div></div>
 
         <div class="snippet-card"><div class="snippet-header"><span class="snippet-title">Loop Task</span><span class="snippet-tag loop">loop</span></div><div class="snippet-body"><pre class="snippet-code">    - name: Install multiple packages
-      ansible.builtin.apt:
+      ansible.builtin.dnf:
         name: "{{ item }}"
         state: present
       loop:
-        - nginx
-        - python3
+        - httpd
+        - python3-pip
         - git</pre></div></div>
 
         <div class="snippet-card"><div class="snippet-header"><span class="snippet-title">Loop with Dictionary</span><span class="snippet-tag loop">loop</span></div><div class="snippet-body"><pre class="snippet-code">    - name: Create multiple users
@@ -949,9 +1180,9 @@
       loop_control:
         label: "{{ item.name }}"</pre></div></div>
 
-        <div class="snippet-card"><div class="snippet-header"><span class="snippet-title">Conditional Task</span><span class="snippet-tag var">when</span></div><div class="snippet-body"><pre class="snippet-code">    - name: Run only on Ubuntu
+        <div class="snippet-card"><div class="snippet-header"><span class="snippet-title">Conditional Task</span><span class="snippet-tag var">when</span></div><div class="snippet-body"><pre class="snippet-code">    - name: Run only on RHEL systems
       ansible.builtin.command: uname -a
-      when: ansible_os_family == "Debian"
+      when: ansible_os_family == "RedHat"
       register: output
       changed_when: false</pre></div></div>
 
@@ -1280,6 +1511,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Comment
         </button>
+        <button class="toolbar-btn" id="findToggleBtn" title="Find &amp; Replace (Ctrl+F)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Find
+        </button>
         <div class="toolbar-sep"></div>
         <button class="toolbar-btn" id="snippetModalBtn" title="Insert snippet (popup)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
@@ -1297,6 +1532,22 @@
       </div>
       <div class="toolbar-right">
         <span class="cursor-pos" id="cursorPos">Ln 1, Col 1</span>
+      </div>
+    </div>
+
+    <!-- Find/Replace Bar -->
+    <div class="find-bar" id="findBar">
+      <div class="find-bar-row">
+        <input type="text" id="findInput" placeholder="Find..." aria-label="Find text">
+        <span class="find-bar-info" id="findInfo">0/0</span>
+        <button class="toolbar-btn" id="findPrevBtn" title="Previous match">&#9650;</button>
+        <button class="toolbar-btn" id="findNextBtn" title="Next match">&#9660;</button>
+        <button class="toolbar-btn" id="closeFindBtn" title="Close find bar">✕</button>
+      </div>
+      <div class="find-bar-row">
+        <input type="text" id="replaceInput" placeholder="Replace..." aria-label="Replace text">
+        <button class="toolbar-btn" id="replaceOneBtn" title="Replace current">Replace</button>
+        <button class="toolbar-btn" id="replaceAllBtn" title="Replace all">All</button>
       </div>
     </div>
 
@@ -2217,12 +2468,18 @@
 
   document.getElementById('clearBtn').addEventListener('click', () => {
     if (codeInput.value && !confirm('Clear all content?')) return;
+    pushUndo();
     codeInput.value = '';
     triggerUpdate();
   });
 
   document.getElementById('toggleSidebar').addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
+  });
+
+  // ── ONE-LINERS ACCORDION ──
+  document.getElementById('onelinersToggle').addEventListener('click', () => {
+    document.getElementById('onelinersSection').classList.toggle('collapsed');
   });
 
   document.getElementById('closeErrors').addEventListener('click', () => {
@@ -2363,6 +2620,16 @@
     });
   });
 
+  // ── ONE-LINER INSERT ──
+  document.querySelectorAll('.oneliner').forEach(el => {
+    el.addEventListener('click', () => {
+      // data-line uses &#10; for newlines in the HTML attribute
+      const text = el.dataset.line;
+      insertAtCursor(text);
+      showToast('Inserted');
+    });
+  });
+
   // ── JINJA INSERT ──
   document.querySelectorAll('.jinja-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -2373,6 +2640,7 @@
   });
 
   function insertAtCursor(text) {
+    pushUndo();
     const start = codeInput.selectionStart;
     const before = codeInput.value.substring(0, start);
     const after = codeInput.value.substring(codeInput.selectionEnd);
@@ -2514,11 +2782,20 @@
 
   // Collect all snippets from the sidebar into a data array
   const snippetData = [];
+
+  // Add one-liners first
+  document.querySelectorAll('.oneliner').forEach(el => {
+    const label = el.querySelector('.oneliner-label')?.textContent || '';
+    const desc = el.textContent.replace(label, '').trim();
+    snippetData.push({ title: desc, tag: label.trim(), code: el.dataset.line, isOneliner: true });
+  });
+
+  // Add full snippet cards
   document.querySelectorAll('.sidebar-panel#panel-snippets .snippet-card').forEach(card => {
     const title = card.querySelector('.snippet-title')?.textContent || '';
     const tag = card.querySelector('.snippet-tag')?.textContent || '';
     const code = card.querySelector('.snippet-code')?.textContent || '';
-    snippetData.push({ title, tag, code });
+    snippetData.push({ title, tag, code, isOneliner: false });
   });
 
   function renderSnippetModal(filter) {
@@ -2535,6 +2812,11 @@
     }
 
     snippetModalBody.innerHTML = filtered.map((s, idx) => {
+      if (s.isOneliner) {
+        return `<div class="oneliner" style="margin:3px 0;" data-midx="${idx}">
+          <span class="oneliner-label">${s.tag}</span>${s.title}
+        </div>`;
+      }
       const tagClass = s.tag.toLowerCase().replace(/[^a-z]/g, '');
       return `<div class="snippet-modal-card" data-idx="${idx}">
         <div class="snippet-modal-card-header">
@@ -2550,28 +2832,32 @@
       </div>`;
     }).join('');
 
-    // Toggle preview on header click, insert on double-click or insert-hint click
+    // One-liners: single click to insert and close
+    snippetModalBody.querySelectorAll('.oneliner[data-midx]').forEach(el => {
+      const idx = parseInt(el.dataset.midx);
+      el.addEventListener('click', () => {
+        insertSnippetAndClose(filtered[idx].code);
+      });
+    });
+
+    // Full snippets: toggle preview on header click, insert on double-click or insert-hint click
     snippetModalBody.querySelectorAll('.snippet-modal-card').forEach(card => {
       const idx = parseInt(card.dataset.idx);
       const matchedSnippet = filtered[idx];
       const preview = card.querySelector('.snippet-modal-card-preview');
       const header = card.querySelector('.snippet-modal-card-header');
 
-      // Single click: toggle preview
       header.addEventListener('click', (e) => {
-        // Close other previews
         snippetModalBody.querySelectorAll('.snippet-modal-card-preview.open').forEach(p => {
           if (p !== preview) p.classList.remove('open');
         });
         preview.classList.toggle('open');
       });
 
-      // Double click on card: insert and close
       card.addEventListener('dblclick', () => {
         insertSnippetAndClose(matchedSnippet.code);
       });
 
-      // Click the insert hint
       card.querySelector('.snippet-modal-insert-hint').addEventListener('click', (e) => {
         e.stopPropagation();
         insertSnippetAndClose(matchedSnippet.code);
@@ -2613,6 +2899,192 @@
   // Live search
   snippetSearch.addEventListener('input', () => {
     renderSnippetModal(snippetSearch.value);
+  });
+
+  // ── THEME TOGGLE ──
+  const themeIconMoon = document.getElementById('themeIconMoon');
+  const themeIconSun = document.getElementById('themeIconSun');
+  const themeLabel = document.getElementById('themeLabel');
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    const isLight = document.body.classList.contains('light-theme');
+    themeIconMoon.style.display = isLight ? 'none' : '';
+    themeIconSun.style.display = isLight ? '' : 'none';
+    themeLabel.textContent = isLight ? 'Dark' : 'Light';
+    showToast(isLight ? 'Light theme' : 'Dark theme');
+  });
+
+  // ── DOWNLOAD / SAVE AS .yml ──
+  document.getElementById('downloadBtn').addEventListener('click', downloadYml);
+
+  function downloadYml() {
+    const text = codeInput.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    if (!text.trim()) { showToast('Nothing to save'); return; }
+    const blob = new Blob([text], { type: 'text/yaml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'playbook.yml';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('Saved as playbook.yml');
+  }
+
+  // ── LOAD / OPEN .yml FILE ──
+  const fileInput = document.getElementById('fileInput');
+  document.getElementById('loadFileBtn').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (codeInput.value.trim() && !confirm('Replace current content with ' + file.name + '?')) return;
+      pushUndo();
+      codeInput.value = ev.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      triggerUpdate();
+      showToast('Loaded ' + file.name);
+    };
+    reader.readAsText(file);
+    fileInput.value = '';
+  });
+
+  // ── FIND & REPLACE ──
+  const findBar = document.getElementById('findBar');
+  const findInput = document.getElementById('findInput');
+  const replaceInput = document.getElementById('replaceInput');
+  const findInfo = document.getElementById('findInfo');
+  let findMatches = [];
+  let findIdx = -1;
+
+  function toggleFindBar() {
+    const isOpen = findBar.classList.toggle('visible');
+    if (isOpen) {
+      const sel = codeInput.value.substring(codeInput.selectionStart, codeInput.selectionEnd);
+      if (sel) findInput.value = sel;
+      findInput.focus();
+      findInput.select();
+      runFind();
+    } else {
+      findMatches = [];
+      findIdx = -1;
+      findInfo.textContent = '';
+    }
+  }
+
+  function runFind() {
+    findMatches = [];
+    findIdx = -1;
+    const query = findInput.value;
+    if (!query) { findInfo.textContent = '0/0'; return; }
+    const text = codeInput.value;
+    let pos = 0;
+    const q = query.toLowerCase();
+    const t = text.toLowerCase();
+    while (true) {
+      const idx = t.indexOf(q, pos);
+      if (idx === -1) break;
+      findMatches.push(idx);
+      pos = idx + 1;
+    }
+    if (findMatches.length > 0) {
+      // Jump to match nearest cursor
+      const cursor = codeInput.selectionStart;
+      findIdx = 0;
+      for (let i = 0; i < findMatches.length; i++) {
+        if (findMatches[i] >= cursor) { findIdx = i; break; }
+      }
+      highlightFind();
+    }
+    findInfo.textContent = findMatches.length > 0 ? `${findIdx + 1}/${findMatches.length}` : 'No results';
+  }
+
+  function highlightFind() {
+    if (findIdx < 0 || findIdx >= findMatches.length) return;
+    const start = findMatches[findIdx];
+    const len = findInput.value.length;
+    codeInput.selectionStart = start;
+    codeInput.selectionEnd = start + len;
+    codeInput.focus();
+    // Scroll into view
+    const lines = codeInput.value.substring(0, start).split('\n');
+    const lineH = parseFloat(getComputedStyle(codeInput).lineHeight);
+    const targetScroll = (lines.length - 1) * lineH - codeWrapper.clientHeight / 2;
+    codeWrapper.scrollTop = Math.max(0, targetScroll);
+    findInfo.textContent = `${findIdx + 1}/${findMatches.length}`;
+  }
+
+  function findNext() {
+    if (findMatches.length === 0) return;
+    findIdx = (findIdx + 1) % findMatches.length;
+    highlightFind();
+  }
+
+  function findPrev() {
+    if (findMatches.length === 0) return;
+    findIdx = (findIdx - 1 + findMatches.length) % findMatches.length;
+    highlightFind();
+  }
+
+  function replaceOne() {
+    if (findMatches.length === 0 || findIdx < 0) return;
+    pushUndo();
+    const start = findMatches[findIdx];
+    const len = findInput.value.length;
+    const text = codeInput.value;
+    codeInput.value = text.substring(0, start) + replaceInput.value + text.substring(start + len);
+    triggerUpdate();
+    runFind();
+    showToast('Replaced');
+  }
+
+  function replaceAll() {
+    if (findMatches.length === 0) return;
+    pushUndo();
+    const query = findInput.value;
+    const replacement = replaceInput.value;
+    // Replace all occurrences case-insensitively preserving position
+    const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    codeInput.value = codeInput.value.replace(regex, replacement);
+    triggerUpdate();
+    runFind();
+    showToast('Replaced all');
+  }
+
+  document.getElementById('findToggleBtn').addEventListener('click', toggleFindBar);
+  document.getElementById('findNextBtn').addEventListener('click', findNext);
+  document.getElementById('findPrevBtn').addEventListener('click', findPrev);
+  document.getElementById('replaceOneBtn').addEventListener('click', replaceOne);
+  document.getElementById('replaceAllBtn').addEventListener('click', replaceAll);
+  document.getElementById('closeFindBtn').addEventListener('click', () => {
+    findBar.classList.remove('visible');
+    findMatches = [];
+    findIdx = -1;
+    findInfo.textContent = '';
+    codeInput.focus();
+  });
+
+  findInput.addEventListener('input', runFind);
+  findInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); e.shiftKey ? findPrev() : findNext(); }
+    if (e.key === 'Escape') { findBar.classList.remove('visible'); codeInput.focus(); }
+  });
+  replaceInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); replaceOne(); }
+    if (e.key === 'Escape') { findBar.classList.remove('visible'); codeInput.focus(); }
+  });
+
+  // ── GLOBAL KEYBOARD SHORTCUTS ──
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+S — Save as .yml
+    if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      downloadYml();
+    }
+    // Ctrl+F — Find
+    if (e.key === 'f' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      toggleFindBar();
+    }
   });
 
   // ── INITIAL STATE ──
