@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jupyter Notebook Primer | Networking & Cybersecurity Faculty Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ROOT VARIABLES & THEMING
+   ============================================================ */
+:root {
+  /* Required palette */
+  --color-primary: #0a2342;
+  --color-secondary: #0077b6;
+  --color-accent: #00b4d8;
+  --color-bg: #f0f8ff;
+  --color-surface: #ffffff;
+  --color-text: #0a2342;
+
+  /* Extended palette */
+  --color-success: #0a7c4f;
+  --color-error: #b91c1c;
+  --color-warning: #92400e;
+  --color-muted: #4a6580;
+  --color-border: #c8dded;
+  --color-highlight: #e0f4ff;
+  --color-correct-bg: #d1fae5;
+  --color-incorrect-bg: #fee2e2;
+
+  /* Typography */
+  --font-display: 'Space Mono', monospace;
+  --font-body: 'DM Sans', sans-serif;
+  --base-font-size: 16px;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Borders */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(10,35,66,0.12);
+  --shadow-md: 0 4px 12px rgba(10,35,66,0.15);
+  --shadow-lg: 0 8px 24px rgba(10,35,66,0.18);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-med: 250ms ease;
+  --transition-slow: 400ms ease;
+}
+
+/* ============================================================
+   HIGH CONTRAST MODE
+   ============================================================ */
+body.high-contrast {
+  --color-primary: #ffffff;
+  --color-secondary: #ffff00;
+  --color-accent: #ffff00;
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-text: #ffffff;
+  --color-muted: #ffffff;
+  --color-border: #ffffff;
+  --color-highlight: #222222;
+}
+
+body.high-contrast * {
+  background-image: none !important;
+}
+
+body.high-contrast a,
+body.high-contrast .tab-btn.active,
+body.high-contrast .quiz-option.selected {
+  color: #ffff00;
+  border-color: #ffff00;
+}
+
+body.high-contrast *:focus {
+  outline: 2px solid #ffff00 !important;
+  outline-offset: 2px;
+}
+
+body.high-contrast .progress-fill {
+  background: #ffff00 !important;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body.motion-reduced *, body.motion-reduced *::before, body.motion-reduced *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: var(--base-font-size); scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.3;
+  color: var(--color-primary);
+}
+
+a { color: var(--color-secondary); text-decoration: underline; }
+a:hover { color: var(--color-accent); }
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+  border-radius: 0 0 var(--radius-md) 0;
+}
+.skip-link:focus { left: 0; }
+
+/* ============================================================
+   ACCESSIBILITY TOOLBAR
+   ============================================================ */
+.a11y-toolbar {
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.a11y-toolbar button {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  transition: background var(--transition-fast);
+}
+
+.a11y-toolbar button:hover { background: rgba(255,255,255,0.25); }
+.a11y-toolbar button:focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.font-size-display {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.8rem;
+  font-family: var(--font-display);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-header {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0d3060 60%, var(--color-secondary) 100%);
+  color: white;
+  padding: var(--space-xl) var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.site-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0,180,216,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.header-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(0,180,216,0.3);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+
+.site-header h1 {
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  color: white;
+  margin-bottom: var(--space-sm);
+}
+
+.site-header .subtitle {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.95rem;
+  max-width: 600px;
+}
+
+.header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+  font-family: var(--font-display);
+}
+
+.header-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress-container {
+  background: var(--color-surface);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.progress-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  border-radius: 4px;
+  transition: width var(--transition-med);
+  width: 0%;
+}
+
+.progress-label {
+  font-size: 0.8rem;
+  font-family: var(--font-display);
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+.main-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md);
+}
+
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+.tab-nav {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--space-xs);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0;
+  margin-bottom: var(--space-xl);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+  margin-bottom: -2px;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  letter-spacing: 0.03em;
+}
+
+.tab-btn:hover { color: var(--color-secondary); }
+
+.tab-btn.active {
+  color: var(--color-secondary);
+  border-bottom-color: var(--color-secondary);
+  font-weight: 700;
+}
+
+.tab-btn:focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.tab-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--color-border);
+  border-radius: 50%;
+  font-size: 0.65rem;
+  margin-right: 6px;
+  transition: background var(--transition-fast);
+}
+
+.tab-btn.active .tab-number {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.tab-btn.completed .tab-number {
+  background: var(--color-success);
+  color: white;
+}
+
+/* ============================================================
+   TAB PANELS
+   ============================================================ */
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-panel.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   CONTENT COMPONENTS
+   ============================================================ */
+
+/* Section intro */
+.section-intro {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.section-intro::after {
+  content: attr(data-icon);
+  position: absolute;
+  right: var(--space-xl);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 4rem;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.section-intro h2 {
+  color: white;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  margin-bottom: var(--space-sm);
+}
+
+.section-intro p { color: rgba(255,255,255,0.85); font-size: 0.95rem; }
+
+.objectives-list {
+  margin-top: var(--space-md);
+  list-style: none;
+}
+
+.objectives-list li {
+  color: rgba(255,255,255,0.9);
+  padding: var(--space-xs) 0;
+  padding-left: 1.5rem;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.objectives-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+  font-family: var(--font-display);
+}
+
+/* Content card */
+.content-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.content-card h3 {
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.content-card p {
+  margin-bottom: var(--space-md);
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.content-card p:last-child { margin-bottom: 0; }
+
+/* Callout box */
+.callout {
+  border-left: 4px solid var(--color-accent);
+  background: var(--color-highlight);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--space-md) var(--space-lg);
+  margin: var(--space-lg) 0;
+  font-size: 0.9rem;
+}
+
+.callout.warning {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.callout.success {
+  border-left-color: var(--color-success);
+  background: #f0fdf4;
+}
+
+.callout strong { font-family: var(--font-display); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Code block */
+.code-block {
+  background: #0d1117;
+  color: #e6edf3;
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: var(--space-md) 0;
+  position: relative;
+}
+
+.code-block .comment { color: #8b949e; }
+.code-block .keyword { color: #ff7b72; }
+.code-block .string { color: #a5d6ff; }
+.code-block .function { color: #d2a8ff; }
+.code-block .number { color: #79c0ff; }
+.code-block .output { color: #56d364; }
+
+.code-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-sm);
+}
+
+/* Two-column grid */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .two-col { grid-template-columns: 1fr 1fr; }
+}
+
+/* Comparison table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  font-size: 0.88rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.comparison-table th {
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+.comparison-table td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.comparison-table tr:last-child td { border-bottom: none; }
+.comparison-table tr:nth-child(even) td { background: var(--color-highlight); }
+
+/* Feature list */
+.feature-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 480px) {
+  .feature-list { grid-template-columns: 1fr 1fr; }
+}
+
+.feature-list li {
+  background: var(--color-highlight);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.88rem;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.feature-list li .icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ============================================================
+   VIDEO EMBED
+   ============================================================ */
+.video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  margin: var(--space-lg) 0;
+  box-shadow: var(--shadow-md);
+}
+
+.video-wrap iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+.video-caption {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  text-align: center;
+  margin-top: var(--space-sm);
+  font-style: italic;
+}
+
+/* ============================================================
+   ANNOTATED DIAGRAM EXPLORER
+   ============================================================ */
+.diagram-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: var(--space-lg) 0;
+  box-shadow: var(--shadow-md);
+}
+
+.diagram-header {
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+}
+
+.diagram-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 320px;
+}
+
+@media (min-width: 640px) {
+  .diagram-body { grid-template-columns: 1fr 320px; }
+}
+
+.diagram-visual {
+  background: #0d1117;
+  padding: var(--space-lg);
+  position: relative;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Jupyter notebook mock UI */
+.notebook-mock {
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  font-size: 0.72rem;
+}
+
+.nb-titlebar {
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nb-dot { width: 10px; height: 10px; border-radius: 50%; }
+.nb-dot.red { background: #ff5f57; }
+.nb-dot.yellow { background: #febc2e; }
+.nb-dot.green { background: #28c840; }
+
+.nb-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #555;
+  font-family: var(--font-body);
+}
+
+.nb-toolbar {
+  background: #f8f8f8;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 10px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.68rem;
+  color: #333;
+}
+
+.nb-toolbar-btn {
+  padding: 2px 6px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 0.65rem;
+  cursor: default;
+}
+
+.nb-cell {
+  padding: 6px 10px;
+  border-left: 3px solid transparent;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  position: relative;
+}
+
+.nb-cell:hover { background: #f8f9ff; }
+
+.nb-cell.active {
+  border-left-color: var(--color-secondary);
+  background: #f0f8ff;
+}
+
+.nb-cell.markdown {
+  background: #fafafa;
+  border-left-color: #ccc;
+}
+
+.nb-cell.markdown.active { border-left-color: var(--color-accent); }
+
+.nb-cell-label {
+  color: #888;
+  font-size: 0.6rem;
+  margin-bottom: 2px;
+}
+
+.nb-cell-content { color: #333; white-space: pre-wrap; }
+.nb-cell-output { color: var(--color-success); margin-top: 4px; padding-top: 4px; border-top: 1px solid #eee; }
+
+.nb-hotspot {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: var(--color-secondary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  z-index: 5;
+  font-family: var(--font-display);
+}
+
+.nb-hotspot:hover, .nb-hotspot.active {
+  background: var(--color-accent);
+  transform: scale(1.2);
+}
+
+.nb-hotspot:focus { outline: 2px solid white; outline-offset: 2px; }
+
+.diagram-info {
+  padding: var(--space-lg);
+  background: var(--color-surface);
+}
+
+.diagram-info h4 {
+  font-size: 0.95rem;
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-display);
+}
+
+.annotation-panel {
+  display: none;
+  animation: fadeIn 0.2s ease;
+}
+
+.annotation-panel.active { display: block; }
+
+.annotation-text {
+  font-size: 0.88rem;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.diagram-hint {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  margin-top: var(--space-md);
+}
+
+/* ============================================================
+   SELF-PACED TUTORIAL CHECKPOINTS
+   ============================================================ */
+.checkpoint-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: var(--space-lg) 0;
+}
+
+.checkpoint-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.checkpoint-item:hover { border-color: var(--color-secondary); }
+
+.checkpoint-item.completed {
+  border-color: var(--color-success);
+  background: var(--color-correct-bg);
+}
+
+.checkpoint-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+  margin-top: 2px;
+}
+
+.checkpoint-item.completed .checkpoint-checkbox {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: white;
+}
+
+.checkpoint-content { flex: 1; }
+
+.checkpoint-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.checkpoint-desc {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.checkpoint-badge {
+  background: var(--color-success);
+  color: white;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 0.72rem;
+  font-family: var(--font-display);
+  opacity: 0;
+  transition: opacity var(--transition-med);
+}
+
+.checkpoint-item.completed .checkpoint-badge { opacity: 1; }
+
+/* Tutorial step counter */
+.step-counter {
+  background: var(--color-highlight);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
+  font-size: 0.88rem;
+}
+
+.step-counter .count {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-secondary);
+  font-weight: 700;
+  min-width: 3rem;
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.quiz-title {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+
+.quiz-score-display {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+}
+
+.question-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+}
+
+.options-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.quiz-option {
+  background: var(--color-highlight);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-body);
+  color: var(--color-text);
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--color-secondary);
+  background: #ddf0fb;
+}
+
+.quiz-option:focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.quiz-option.correct {
+  background: var(--color-correct-bg);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.quiz-option.incorrect {
+  background: var(--color-incorrect-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.quiz-option .option-letter {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+
+.quiz-option.correct .option-letter { background: var(--color-success); color: white; }
+.quiz-option.incorrect .option-letter { background: var(--color-error); color: white; }
+
+.feedback-box {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  display: none;
+}
+
+.feedback-box.show { display: block; }
+.feedback-box.correct { background: var(--color-correct-bg); border: 1px solid var(--color-success); color: #065f46; }
+.feedback-box.incorrect { background: var(--color-incorrect-bg); border: 1px solid var(--color-error); color: #7f1d1d; }
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.03em;
+}
+
+.btn:focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.btn-primary {
+  background: var(--color-secondary);
+  color: white;
+}
+.btn-primary:hover { background: var(--color-primary); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
+}
+.btn-secondary:hover { background: var(--color-highlight); }
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-primary);
+}
+.btn-accent:hover { background: #0099bb; color: white; }
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   RESULTS SCREEN
+   ============================================================ */
+.results-screen {
+  display: none;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.results-screen.show { display: block; }
+
+.results-score {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--color-secondary);
+  line-height: 1;
+  margin: var(--space-lg) 0 var(--space-sm);
+}
+
+.results-label {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-display);
+}
+
+.results-message {
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  margin: var(--space-lg) auto;
+  max-width: 400px;
+}
+
+.results-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  margin: var(--space-lg) 0;
+  flex-wrap: wrap;
+}
+
+.results-stat {
+  text-align: center;
+}
+
+.results-stat .value {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--color-secondary);
+  display: block;
+}
+
+.results-stat .label {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   NAV BETWEEN SECTIONS
+   ============================================================ */
+.section-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  background: var(--color-primary);
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: var(--space-lg) var(--space-md);
+  font-size: 0.8rem;
+  font-family: var(--font-display);
+  margin-top: var(--space-2xl);
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  @page { margin: 0.75in; size: A4 portrait; }
+
+  .a11y-toolbar,
+  .progress-container,
+  .tab-nav,
+  .section-nav,
+  .btn,
+  .quiz-nav,
+  .video-wrap,
+  .print-btn { display: none !important; }
+
+  body { background: white !important; color: black !important; font-size: 11pt; }
+  h1, h2, h3, h4 { color: black !important; page-break-after: avoid; }
+  h1 { font-size: 18pt; }
+  h2 { font-size: 16pt; }
+  h3 { font-size: 14pt; }
+
+  .tab-panel { display: block !important; page-break-before: always; }
+  .tab-panel:first-of-type { page-break-before: auto; }
+
+  .content-card, .callout, .code-block, .comparison-table {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+  }
+
+  .site-header {
+    background: white !important;
+    color: black !important;
+    border-bottom: 2px solid black;
+  }
+
+  .site-header h1, .site-header .subtitle,
+  .site-header .badge, .site-header .header-meta {
+    color: black !important;
+    border-color: black !important;
+  }
+}
+
+/* ============================================================
+   LIVE REGION
+   ============================================================ */
+.sr-live { 
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   PRINT BUTTON PLACEMENT
+   ============================================================ */
+.print-btn-wrap {
+  text-align: right;
+  margin-bottom: var(--space-md);
+}
+
+/* ============================================================
+   RESPONSIVE HELPERS
+   ============================================================ */
+@media (min-width: 640px) {
+  .main-wrapper { padding: var(--space-2xl) var(--space-xl); }
+}
+</style>
+</head>
+<body>
+
+<!-- Skip link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Screen reader live region -->
+<div aria-live="polite" aria-atomic="true" class="sr-live" id="live-region"></div>
+
+<!-- ============================================================
+   ACCESSIBILITY TOOLBAR
+   ============================================================ -->
+<div class="a11y-toolbar" role="toolbar" aria-label="Accessibility controls">
+  <button onclick="changeFontSize(-2)" aria-label="Decrease font size">A−</button>
+  <span class="font-size-display" id="font-size-label">16px</span>
+  <button onclick="changeFontSize(2)" aria-label="Increase font size">A+</button>
+  <button id="contrast-btn" onclick="toggleContrast()" aria-pressed="false">High Contrast: OFF</button>
+  <button id="motion-btn" onclick="toggleMotion()" aria-pressed="false">Reduce Motion: OFF</button>
+  <button class="print-btn" onclick="window.print()" aria-label="Print or save as PDF">🖨️ Print / Save as PDF</button>
+</div>
+
+<!-- ============================================================
+   HEADER
+   ============================================================ -->
+<header class="site-header" role="banner">
+  <div class="header-grid">
+    <div>
+      <span class="badge">Faculty Professional Development</span>
+      <h1>Jupyter Notebook: A Practical Primer</h1>
+      <p class="subtitle">Everything you need to understand, use, and teach with Jupyter Notebook — built for Networking &amp; Cybersecurity faculty who are new to the tool.</p>
+      <div class="header-meta">
+        <span>📚 6 Modules</span>
+        <span>⏱ ~60 min</span>
+        <span>🎯 Networking &amp; Cybersecurity</span>
+        <span>👩‍🏫 College Faculty</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+   STICKY PROGRESS BAR
+   ============================================================ -->
+<div class="progress-container" role="region" aria-label="Course progress">
+  <div class="progress-inner">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"
+           role="progressbar"
+           aria-valuenow="0"
+           aria-valuemax="100"
+           aria-label="Lesson progress"></div>
+    </div>
+    <span class="progress-label" id="progress-label">0% complete</span>
+  </div>
+</div>
+
+<!-- ============================================================
+   MAIN CONTENT
+   ============================================================ -->
+<main id="main-content" class="main-wrapper" role="main" aria-label="Course content">
+
+  <div class="print-btn-wrap">
+    <!-- print btn also in toolbar, this is the in-page placement -->
+  </div>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav" role="tablist" aria-label="Course modules">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-0" id="tabbtn-0" onclick="switchTab(0)">
+      <span class="tab-number" aria-hidden="true">1</span>What is Jupyter?
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-1" id="tabBtn-1" onclick="switchTab(1)">
+      <span class="tab-number" aria-hidden="true">2</span>Why Use It?
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-2" id="tabBtn-2" onclick="switchTab(2)">
+      <span class="tab-number" aria-hidden="true">3</span>Anatomy &amp; Interface
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-3" id="tabBtn-3" onclick="switchTab(3)">
+      <span class="tab-number" aria-hidden="true">4</span>Getting Started
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-4" id="tabBtn-4" onclick="switchTab(4)">
+      <span class="tab-number" aria-hidden="true">5</span>Cyber Use Cases
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-5" id="tabBtn-5" onclick="switchTab(5)">
+      <span class="tab-number" aria-hidden="true">6</span>Quiz &amp; Review
+    </button>
+  </nav>
+
+  <!-- ============================================================
+     TAB 0: WHAT IS JUPYTER?
+     ============================================================ -->
+  <section class="tab-panel active" id="tab-0" role="tabpanel" aria-labelledby="tabBtn-0">
+
+    <div class="section-intro" data-icon="📓">
+      <h2>Module 1: What is Jupyter Notebook?</h2>
+      <p>Before you teach a tool, you need to truly understand it. This module traces Jupyter from its origins to its current status as the gold standard in interactive computing.</p>
+      <ul class="objectives-list" aria-label="Module objectives">
+        <li>Define Jupyter Notebook and its purpose</li>
+        <li>Understand the origin story and the meaning behind the name</li>
+        <li>Distinguish Jupyter from a regular Python script or IDE</li>
+        <li>Recognize the file format (.ipynb) and what it contains</li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>🌱 The Origin Story</h3>
+      <p>Imagine you're a scientist in 2014, juggling Python scripts, output files, and a separate Word document where you paste your findings. Every time you change a parameter, you re-run the script, dig through the terminal output, update the Word doc, and hope you haven't lost track of which analysis corresponds to which results. This was the daily frustration that drove Fernando Pérez — a physicist at UC Berkeley — to create what would become Jupyter Notebook.</p>
+      <p>Jupyter grew out of an earlier project called <strong>IPython</strong> (Interactive Python), launched in 2001. IPython was initially just a better Python shell: it had syntax highlighting, tab completion, and a history feature. But as Pérez and his collaborators began building more sophisticated scientific workflows, they realized the command-line model was fundamentally limiting. Scientists needed a way to weave together executable code, rich documentation, mathematical equations, and visualizations — all in one document that someone else could actually read and reproduce.</p>
+      <p>The <strong>Jupyter</strong> name itself is a tribute to three core scientific programming languages: <strong>Ju</strong>lia, <strong>Pyt</strong>hon, and <strong>R</strong>. It signals from the start that Jupyter was designed to be language-agnostic. While Python remains by far the most popular language used with Jupyter, the notebook architecture supports dozens of "kernels" — the engine that runs the code — allowing instructors and researchers to work in Scala, Ruby, JavaScript, C++, and many others.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>📄 So What Exactly Is It?</h3>
+      <p>At its core, Jupyter Notebook is a <strong>web-based interactive computing environment</strong>. When you open Jupyter, you're running a local web server on your own machine. Your browser becomes the interface, but everything executes locally — no internet connection required for the code itself. This distinction matters when you're in a cybersecurity lab environment and need to analyze network traffic or run scripts on sensitive data without it leaving your network.</p>
+      <p>A Jupyter Notebook is a single document — saved with the <code>.ipynb</code> extension — that contains an ordered list of <strong>cells</strong>. Each cell can hold one of three things: executable code (like Python), formatted text written in Markdown, or raw data. When you run a code cell, the output appears directly below it in the same document. This means your analysis and its results always travel together, making notebooks exceptionally reproducible.</p>
+      <p>Under the hood, an <code>.ipynb</code> file is simply a JSON document. Open one in a text editor and you'll find metadata about the kernel, plus an array of cell objects, each with a type, source content, and stored outputs. This transparency is actually useful — it means version control systems like Git can diff notebook files, and notebooks can be exported to HTML, PDF, or Python script formats with a single command.</p>
+
+      <div class="callout">
+        <strong>💡 Faculty Tip:</strong> When you share a notebook with students, they receive both the code <em>and</em> the explanation together. There's no "lost context" because everything is embedded. This makes Jupyter ideal for lab handouts, demonstrations, and graded assignments alike.
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🔄 Jupyter vs. A Regular Script</h3>
+      <p>You might reasonably ask: "I already know Python — why not just write a .py file?" It's a fair question. The answer is about <em>workflow</em>, not capability. A Python script runs top to bottom, all at once. If you want to inspect the state of a variable halfway through, you add a print statement, re-run the whole script, and scan the output. This is fine for production software, but frustrating for exploratory analysis — especially when you're working with large packet capture files or network logs where one full run might take thirty seconds.</p>
+      <p>With Jupyter, you can run individual cells independently. You can run a cell that loads a 500MB packet capture file, confirm it loaded correctly, and then write and test your analysis code in subsequent cells without ever re-loading that file. Each cell maintains the state of the previous cells in the same session. This interactivity is Jupyter's killer feature for education: students can pause, experiment, make mistakes, fix them, and continue — all without starting over.</p>
+
+      <table class="comparison-table">
+        <caption style="text-align:left; margin-bottom:0.5rem; font-size:0.82rem; color:var(--color-muted);">Table 1: Jupyter Notebook vs. Traditional Python Script</caption>
+        <thead>
+          <tr><th>Feature</th><th>Jupyter Notebook</th><th>Python Script (.py)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Execution model</td><td>Cell-by-cell, interactive</td><td>Top-to-bottom, batch</td></tr>
+          <tr><td>Output placement</td><td>Inline, below each cell</td><td>Terminal / log file</td></tr>
+          <tr><td>Documentation</td><td>Markdown cells, rich text</td><td>Code comments only</td></tr>
+          <tr><td>Visualizations</td><td>Rendered inline</td><td>Separate window or file</td></tr>
+          <tr><td>Best for</td><td>Education, exploration, research</td><td>Production apps, automation</td></tr>
+          <tr><td>Reproducibility</td><td>Notebook = code + output + docs</td><td>Code only</td></tr>
+          <tr><td>Version control</td><td>Possible (with caveats)</td><td>Excellent (plain text)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="content-card">
+      <h3>🎬 Video: Introduction to Jupyter Notebooks</h3>
+      <p>This short video gives you a visual walkthrough of what Jupyter looks like in action — highly recommended if you haven't seen it running before.</p>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/hhh1xed4KzQ"
+          title="Introduction to Jupyter Notebooks"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="video-caption">Video 1 — Introduction to Jupyter Notebooks. Use captions/subtitles via the YouTube player controls if needed.</p>
+    </div>
+
+    <div class="section-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="switchTab(1)">Next: Why Use It? →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     TAB 1: WHY USE IT?
+     ============================================================ -->
+  <section class="tab-panel" id="tab-1" role="tabpanel" aria-labelledby="tabBtn-1">
+
+    <div class="section-intro" data-icon="🚀">
+      <h2>Module 2: Why Use Jupyter in Your Courses?</h2>
+      <p>The question isn't really "can you use Jupyter?" — it's "why would your students be better prepared having used it?" This module makes that case with concrete evidence and practical framing for networking and cybersecurity contexts.</p>
+      <ul class="objectives-list">
+        <li>Articulate 4+ pedagogical benefits of Jupyter for teaching</li>
+        <li>Connect Jupyter's features to cybersecurity lab workflows</li>
+        <li>Understand the industry adoption landscape</li>
+        <li>Address common faculty concerns about using Jupyter</li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>🏭 Industry Adoption: Why It Matters to Your Students</h3>
+      <p>Before we talk about pedagogy, let's be honest about workforce reality. Your students will graduate and seek jobs in security operations centers, network engineering teams, and threat intelligence units. They will encounter Jupyter Notebooks — possibly on their first day. Security researchers at companies like CrowdStrike, Palo Alto Networks, and Microsoft publish threat analysis notebooks on GitHub. CISA has published notebooks for analyzing indicators of compromise. Jupyter is the <em>lingua franca</em> of applied data analysis in the security space.</p>
+      <p>According to the Stack Overflow Developer Survey, Python has been among the most-used programming languages for years running, and Jupyter is Python's most popular interactive environment in academic and research contexts. The <strong>SANS Institute</strong> regularly features Jupyter-based workshops for security practitioners. If a student doesn't know how to open and run a Jupyter notebook, they're arriving at the job with a gap — and you can close that gap with a single well-designed lab assignment.</p>
+
+      <div class="callout success">
+        <strong>🎯 Real-World Signal:</strong> The Elastic Security Lab, Microsoft Threat Intelligence, and MITRE ATT&amp;CK projects all distribute Jupyter notebooks for threat hunting, log analysis, and detection engineering. These aren't niche tools — they're industry standard artifacts.
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>📚 Pedagogical Benefits for Faculty</h3>
+      <p>Even if you're not primarily a data science instructor, Jupyter offers specific advantages that translate directly to how you already teach networking and security topics.</p>
+
+      <ul class="feature-list" aria-label="Pedagogical benefits">
+        <li>
+          <span class="icon" aria-hidden="true">🔬</span>
+          <div><strong>Live Demonstrations:</strong> Show a port scan or packet analysis live, with code students can modify and re-run. No more "take my word for it."</div>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">📖</span>
+          <div><strong>Lab Handouts That Run:</strong> Instead of a PDF lab guide, give students a notebook where the instructions and the code are the same document.</div>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">🐛</span>
+          <div><strong>Visible Error Handling:</strong> Students see real error messages in context, developing debugging instincts alongside technical skills.</div>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">📊</span>
+          <div><strong>Inline Visualization:</strong> Graph a network's traffic anomalies right next to the code that generates it — no switching between apps.</div>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">♻️</span>
+          <div><strong>Reproducibility:</strong> Students can share notebooks that actually reproduce their results — building the documentation habits employers want.</div>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">🤝</span>
+          <div><strong>Scaffolding Made Easy:</strong> Pre-fill some cells, leave others blank — Jupyter supports "fill in the blank" style assignments naturally.</div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>🤔 Addressing Common Faculty Concerns</h3>
+      <p>When introducing new tools to a curriculum, legitimate concerns arise. Let's address the most common ones directly, because your hesitation is probably shared by the faculty member in the next office.</p>
+
+      <div class="callout warning">
+        <strong>Concern 1: "My students don't have Python backgrounds."</strong><br>
+        <em>Response:</em> Jupyter actually lowers the barrier to entry for Python. Because students can run one cell at a time and see immediate results, they build confidence faster than in a script-based environment. You can scaffold cells so early exercises require almost no original code — students modify, not write from scratch.
+      </div>
+
+      <div class="callout warning">
+        <strong>Concern 2: "Installation will take half a class period."</strong><br>
+        <em>Response:</em> Not necessarily. Anaconda distribution installs Jupyter in one step. JupyterHub can be deployed institution-wide so students access notebooks through a browser with no local install. Google Colab offers free Jupyter-compatible notebooks in the cloud — no installation at all.
+      </div>
+
+      <div class="callout warning">
+        <strong>Concern 3: "What about academic integrity — students can just share notebooks."</strong><br>
+        <em>Response:</em> This is true of any file-based assignment, but Jupyter actually makes individualized outputs easier to require. Ask students to run cells with their name embedded, include narrative reflection in Markdown cells, or use unique datasets. The reasoning a student writes in Markdown is much harder to copy meaningfully than code alone.
+      </div>
+
+      <div class="callout warning">
+        <strong>Concern 4: "Is this really relevant to networking, not just data science?"</strong><br>
+        <em>Response:</em> Absolutely relevant. Jupyter notebooks are used for parsing PCAP files with Scapy, analyzing firewall logs with Pandas, running Nmap scans via Python wrappers, building network traffic visualizations, and conducting forensic analysis. We cover exactly these use cases in Module 5.
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🎬 Video: Jupyter Notebook for Beginners</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/aGUiX00w4Ms"
+          title="Jupyter Notebook for Beginners Tutorial"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="video-caption">Video 2 — Jupyter Notebook for Beginners. Watch how the interactive environment responds in real time.</p>
+    </div>
+
+    <div class="section-nav">
+      <button class="btn btn-secondary" onclick="switchTab(0)">← Back</button>
+      <button class="btn btn-primary" onclick="switchTab(2)">Next: Anatomy &amp; Interface →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     TAB 2: ANATOMY & INTERFACE (ANNOTATED DIAGRAM)
+     ============================================================ -->
+  <section class="tab-panel" id="tab-2" role="tabpanel" aria-labelledby="tabBtn-2">
+
+    <div class="section-intro" data-icon="🔍">
+      <h2>Module 3: Anatomy of a Jupyter Notebook</h2>
+      <p>Click the numbered hotspots on the notebook mockup to explore each component. Understanding the interface deeply means you can guide students confidently — even when they're stuck on something as simple as "why isn't my cell running?"</p>
+      <ul class="objectives-list">
+        <li>Identify the key UI regions of Jupyter Notebook</li>
+        <li>Distinguish code cells from Markdown cells from output areas</li>
+        <li>Understand the kernel and its role</li>
+        <li>Recognize cell states: idle, running, and completed</li>
+      </ul>
+    </div>
+
+    <!-- Annotated Diagram Explorer -->
+    <div class="diagram-container" role="region" aria-label="Interactive Jupyter Notebook diagram explorer">
+      <div class="diagram-header">
+        🖱️ Interactive Diagram — Click the numbered buttons to explore each component
+      </div>
+      <div class="diagram-body">
+        <!-- Visual side: notebook mockup -->
+        <div class="diagram-visual" aria-hidden="true">
+          <div class="notebook-mock" id="notebook-mock">
+            <!-- Titlebar -->
+            <div class="nb-titlebar">
+              <div class="nb-dot red"></div>
+              <div class="nb-dot yellow"></div>
+              <div class="nb-dot green"></div>
+              <div class="nb-title">network_scan_analysis.ipynb</div>
+              <!-- Hotspot: title -->
+              <button class="nb-hotspot" style="position:absolute; top:4px; right:4px;" onclick="showAnnotation(0)" aria-label="Learn about notebook title area">1</button>
+            </div>
+            <!-- Toolbar -->
+            <div class="nb-toolbar" style="position:relative">
+              <span class="nb-toolbar-btn">+ Code</span>
+              <span class="nb-toolbar-btn">+ Markdown</span>
+              <span class="nb-toolbar-btn">▶ Run</span>
+              <span class="nb-toolbar-btn">⏹ Stop</span>
+              <span class="nb-toolbar-btn">⟳ Restart</span>
+              <span style="margin-left:auto; color:#555; font-size:0.65rem;">Kernel: Python 3 ●</span>
+              <!-- Hotspot: toolbar -->
+              <button class="nb-hotspot" style="position:absolute; bottom:-9px; left:50%; transform:translateX(-50%);" onclick="showAnnotation(1)" aria-label="Learn about the toolbar">2</button>
+            </div>
+            <!-- Markdown cell -->
+            <div class="nb-cell markdown" style="position:relative;" onclick="showAnnotation(2)">
+              <div class="nb-cell-label">MARKDOWN</div>
+              <div class="nb-cell-content" style="color:#333; font-style:italic;"># Network Scan Analysis
+Parsing Nmap output for open ports</div>
+              <button class="nb-hotspot" style="position:absolute; top:6px; right:6px;" onclick="showAnnotation(2)" aria-label="Learn about Markdown cells">3</button>
+            </div>
+            <!-- Code cell -->
+            <div class="nb-cell active" id="diag-code-cell" style="position:relative;" onclick="showAnnotation(3)">
+              <div class="nb-cell-label">IN [2]:</div>
+              <div class="nb-cell-content" style="color:#0077b6; font-family:'Space Mono', monospace; font-size:0.65rem;">import pandas as pd
+df = pd.read_csv('scan_log.csv')
+print(df.head())</div>
+              <div class="nb-cell-output">   host       port  state
+0  10.0.0.1   22     open
+1  10.0.0.1   80     open</div>
+              <button class="nb-hotspot" style="position:absolute; top:6px; right:6px;" onclick="showAnnotation(3)" aria-label="Learn about code cells and output">4</button>
+            </div>
+            <!-- Code cell 2 -->
+            <div class="nb-cell" style="position:relative;" onclick="showAnnotation(4)">
+              <div class="nb-cell-label">IN [ ]:</div>
+              <div class="nb-cell-content" style="color:#888;">▌</div>
+              <button class="nb-hotspot" style="position:absolute; top:6px; right:6px;" onclick="showAnnotation(4)" aria-label="Learn about the kernel status indicator">5</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info panel -->
+        <div class="diagram-info">
+          <h4>Component Explorer</h4>
+
+          <div id="annotation-0" class="annotation-panel">
+            <p class="annotation-text"><strong>📄 Notebook Filename (.ipynb)</strong><br><br>
+            The title bar shows the active notebook filename, always ending in <code>.ipynb</code>. This is a JSON file containing all your cells, outputs, and kernel metadata. You can rename it by clicking the title. The name is important for organization — especially when students submit assignments — so teach naming conventions from day one (e.g., <code>lastname_lab03.ipynb</code>).</p>
+          </div>
+
+          <div id="annotation-1" class="annotation-panel">
+            <p class="annotation-text"><strong>🛠️ The Toolbar</strong><br><br>
+            The toolbar provides quick access to the most common actions: adding new cells (Code or Markdown), running the current cell (▶), stopping a running cell (⏹), and restarting the kernel (⟳). The Kernel status indicator in the top-right corner tells you whether the kernel is idle (○) or busy (●). A busy kernel means code is executing — students sometimes think their notebook froze when it's actually processing a large dataset.</p>
+          </div>
+
+          <div id="annotation-2" class="annotation-panel">
+            <p class="annotation-text"><strong>📝 Markdown Cells</strong><br><br>
+            Markdown cells render rich-formatted text: headings, bold, italics, bullet lists, links, images, and even LaTeX math. In a cybersecurity context, these cells are where students document their analysis: "I ran an Nmap scan on subnet 10.0.0.0/24 at 14:32 and found 12 hosts with port 22 open." This narrative context transforms a code file into an investigative report. Teaching students to use Markdown cells builds technical writing skills alongside coding skills.</p>
+          </div>
+
+          <div id="annotation-3" class="annotation-panel">
+            <p class="annotation-text"><strong>⚙️ Code Cells + Output</strong><br><br>
+            Code cells contain executable code. The <code>In [2]:</code> label shows execution order — the number increments each time a cell runs. If you see <code>In [*]:</code>, the cell is currently running. Below the code is the <strong>output area</strong>, which displays whatever the code produces: text, tables, charts, error messages. The output is stored in the notebook file itself, so when you share a completed notebook, others see the outputs without needing to re-run anything.</p>
+          </div>
+
+          <div id="annotation-4" class="annotation-panel">
+            <p class="annotation-text"><strong>🧠 Kernel Session</strong><br><br>
+            The empty cell with a cursor (<code>In [ ]:</code>) is waiting to be run. It has no output yet because it hasn't been executed. The kernel — the Python engine running in the background — maintains all variables defined in previously-run cells. If you restart the kernel, all variables reset to zero, even if the cell outputs are still visible. This is a common source of confusion for students: they see output from a previous run but the variable is no longer in memory. Always "Restart &amp; Run All" before submitting.</p>
+          </div>
+
+          <p class="diagram-hint" id="diagram-hint">Click a numbered button on the notebook to explore that component.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🎬 Video: Jupyter Interface Deep Dive</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/0Jw8seqai18"
+          title="Jupyter Notebook Interface Tutorial"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="video-caption">Video 3 — Navigating the Jupyter interface. Pay attention to how the kernel status indicator behaves.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>⌨️ Essential Keyboard Shortcuts</h3>
+      <p>One of the best things you can teach students early is that Jupyter has two modes: <strong>Edit Mode</strong> (green border — you're typing inside a cell) and <strong>Command Mode</strong> (blue border — you're operating on cells). Most shortcuts only work in Command Mode.</p>
+
+      <table class="comparison-table">
+        <thead><tr><th>Shortcut</th><th>Mode</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>Shift + Enter</code></td><td>Either</td><td>Run current cell, move to next</td></tr>
+          <tr><td><code>Ctrl + Enter</code></td><td>Either</td><td>Run current cell, stay in cell</td></tr>
+          <tr><td><code>Esc</code></td><td>Edit → Command</td><td>Exit edit mode</td></tr>
+          <tr><td><code>Enter</code></td><td>Command → Edit</td><td>Enter edit mode</td></tr>
+          <tr><td><code>A</code></td><td>Command</td><td>Insert cell above</td></tr>
+          <tr><td><code>B</code></td><td>Command</td><td>Insert cell below</td></tr>
+          <tr><td><code>D, D</code></td><td>Command</td><td>Delete selected cell</td></tr>
+          <tr><td><code>M</code></td><td>Command</td><td>Change cell to Markdown</td></tr>
+          <tr><td><code>Y</code></td><td>Command</td><td>Change cell to Code</td></tr>
+          <tr><td><code>0, 0</code></td><td>Command</td><td>Restart kernel</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-nav">
+      <button class="btn btn-secondary" onclick="switchTab(1)">← Back</button>
+      <button class="btn btn-primary" onclick="switchTab(3)">Next: Getting Started →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     TAB 3: GETTING STARTED (SELF-PACED TUTORIAL)
+     ============================================================ -->
+  <section class="tab-panel" id="tab-3" role="tabpanel" aria-labelledby="tabBtn-3">
+
+    <div class="section-intro" data-icon="⚡">
+      <h2>Module 4: Getting Started with Jupyter</h2>
+      <p>This module is a self-paced tutorial. Work through each step, check it off, and track your progress as you go. By the end, you'll be able to install, launch, and create your first notebook from scratch.</p>
+      <ul class="objectives-list">
+        <li>Install Jupyter via Anaconda or pip</li>
+        <li>Launch Jupyter from the command line and browser</li>
+        <li>Create, save, and share a notebook file</li>
+        <li>Understand cloud alternatives (JupyterHub, Google Colab)</li>
+      </ul>
+    </div>
+
+    <!-- Step counter display -->
+    <div class="step-counter" aria-live="polite" id="step-counter-display">
+      <span class="count" id="checkpoint-count">0</span>
+      <div>
+        <strong>Steps Completed</strong><br>
+        <span style="font-size:0.82rem; color:var(--color-muted);">Check off each step as you complete it</span>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🛠️ Installation: Three Paths</h3>
+
+      <p>There are three primary ways to get Jupyter running, each suited to different classroom contexts. Choose the one that fits your environment — you don't have to commit to just one approach. Many faculty use Anaconda for their own machines and recommend Colab for student access.</p>
+
+      <p><strong>Path 1 — Anaconda Distribution (Recommended for Local Install):</strong> Anaconda is a free distribution that bundles Python, Jupyter, and over 150 data science libraries in a single installer. It's the simplest route. Download from <a href="https://www.anaconda.com/download" target="_blank" rel="noopener">anaconda.com/download</a>, run the installer, and Jupyter is ready. On Windows, you'll find "Jupyter Notebook" in the Start menu. On macOS/Linux, open a terminal and type:</p>
+
+      <div class="code-label">Terminal</div>
+      <div class="code-block" aria-label="Command to launch Jupyter Notebook">
+<span class="comment"># After installing Anaconda:</span>
+<span class="keyword">jupyter</span> notebook
+      </div>
+
+      <p><strong>Path 2 — pip (If Python Is Already Installed):</strong> If your students already have Python, pip installation is a one-liner:</p>
+
+      <div class="code-label">Terminal</div>
+      <div class="code-block">
+<span class="comment"># Install Jupyter via pip</span>
+pip install notebook
+
+<span class="comment"># Launch it</span>
+<span class="keyword">jupyter</span> notebook
+      </div>
+
+      <p><strong>Path 3 — JupyterHub (Institution-Wide, No Student Install):</strong> JupyterHub runs on a server and serves each student their own Jupyter environment in a browser. Students log in, no installation needed. This is the cleanest solution for a managed classroom, and many community colleges partner with cloud providers to offer this at minimal cost. If your institution uses Canvas, students can even authenticate through their existing school login.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>🎬 Video: Installing Jupyter Notebook</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/JGnoTN1OnWY"
+          title="How to Install and Set Up Jupyter Notebook"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="video-caption">Video 4 — Installing Jupyter Notebook with Anaconda. Follow along on your own machine.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>✅ Tutorial Checkpoint Tracker</h3>
+      <p>Work through the steps below — in your own Jupyter environment or by following along mentally. Click each item to mark it complete. These steps mirror what your students will experience in their first lab session.</p>
+
+      <ul class="checkpoint-list" id="checkpoint-list" aria-label="Tutorial steps">
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 1: Launch Jupyter Notebook</div>
+            <div class="checkpoint-desc">Open a terminal, type <code>jupyter notebook</code>, and watch the browser open to the dashboard (localhost:8888). Notice the file tree that appears — this is your working directory.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 2: Create a New Notebook</div>
+            <div class="checkpoint-desc">Click "New" → "Python 3" (or "Python 3 (ipykernel)"). A new tab opens with an untitled notebook. The kernel starts and you'll see "In [ ]:" — your first empty code cell.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 3: Rename Your Notebook</div>
+            <div class="checkpoint-desc">Click on "Untitled" at the top and rename it. Good naming habit: <code>YYYY-MM-DD_topic.ipynb</code>. The file saves automatically in the directory where you launched Jupyter.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 4: Write and Run Your First Code Cell</div>
+            <div class="checkpoint-desc">In the first cell, type <code>print("Hello, cybersecurity!")</code> and press Shift+Enter. You should see the output below. The cell counter changes from <code>[ ]</code> to <code>[1]</code>.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 5: Add a Markdown Cell</div>
+            <div class="checkpoint-desc">Press Escape (Command Mode), then press M to switch the current cell to Markdown. Type <code>## My Analysis</code> and press Shift+Enter. The heading renders beautifully.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 6: Save Your Work</div>
+            <div class="checkpoint-desc">Press Ctrl+S (or Cmd+S on Mac). The notebook auto-saves every 2 minutes by default, but don't rely on that during a demo. Teach students to save frequently and use File → Download as .ipynb for submission.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 7: Restart the Kernel and Run All</div>
+            <div class="checkpoint-desc">Go to Kernel → Restart &amp; Run All. This is the gold standard for verifying your notebook works end-to-end. All cells execute in order from a clean state — exactly what a grader (or a new colleague) would see when they open your file.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+        <li class="checkpoint-item" onclick="toggleCheckpoint(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheckpoint(this)" role="checkbox" aria-checked="false">
+          <div class="checkpoint-checkbox" aria-hidden="true"></div>
+          <div class="checkpoint-content">
+            <div class="checkpoint-title">Step 8: Export Your Notebook</div>
+            <div class="checkpoint-desc">File → Download as → HTML. Open the resulting .html file in a browser — it shows your notebook beautifully, with all outputs, and requires no Python. This is perfect for student submissions or sharing with colleagues who aren't running Jupyter.</div>
+          </div>
+          <span class="checkpoint-badge">✓ Done</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>☁️ Cloud Alternative: Google Colab</h3>
+      <p>Google Colaboratory (Colab) is a free, cloud-hosted Jupyter environment. Students sign in with a Google account, and notebooks are stored in Google Drive. There is no installation, no IT support ticket, and no "it works on my machine" debugging. Colab uses a nearly identical interface to Jupyter, with a few minor UI differences and the addition of runtime options (including free GPU access).</p>
+      <p>For security faculty, Colab has one important caveat: you should not upload sensitive data — like real packet captures from your network — to a Google-hosted environment. For those exercises, local Jupyter or a campus JupyterHub is more appropriate. But for introductory labs using public datasets (CVE databases, publicly available log samples, synthetic network data), Colab is an excellent frictionless starting point.</p>
+
+      <div class="callout">
+        <strong>💡 Faculty Workflow Tip:</strong> Create your course notebooks in Colab during curriculum development — the autosave, version history, and comment features are excellent for solo work. Then distribute them to students via JupyterHub or Canvas if your institution has those resources.
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🎬 Video: JupyterLab and the Modern Interface</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/SiTSRuSXnUM"
+          title="JupyterLab Introduction"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="video-caption">Video 5 — JupyterLab: the next-generation Jupyter interface. Covers the relationship between classic Notebook and JupyterLab.</p>
+    </div>
+
+    <div class="section-nav">
+      <button class="btn btn-secondary" onclick="switchTab(2)">← Back</button>
+      <button class="btn btn-primary" onclick="switchTab(4)">Next: Cyber Use Cases →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     TAB 4: CYBERSECURITY USE CASES
+     ============================================================ -->
+  <section class="tab-panel" id="tab-4" role="tabpanel" aria-labelledby="tabBtn-4">
+
+    <div class="section-intro" data-icon="🛡️">
+      <h2>Module 5: Jupyter in Networking &amp; Cybersecurity</h2>
+      <p>This is where theory meets your classroom. Every example here is either drawn from industry practice or directly applicable to coursework at the associate or bachelor's level.</p>
+      <ul class="objectives-list">
+        <li>Identify 5+ specific cybersecurity use cases for Jupyter</li>
+        <li>Read and understand starter code examples relevant to the field</li>
+        <li>Connect Jupyter workflows to existing course learning outcomes</li>
+        <li>Identify library ecosystem: Scapy, Pandas, Matplotlib, Shodan</li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>🕵️ Use Case 1: Network Traffic Analysis</h3>
+      <p>One of the most compelling Jupyter applications in cybersecurity is analyzing network captures — the kind students create in Wireshark labs. Instead of just reading a Wireshark GUI, students can load a PCAP file with the <strong>Scapy</strong> library and programmatically interrogate every packet. This teaches both Python and network protocol knowledge simultaneously.</p>
+      <p>Consider a typical scenario: a student captures 10 minutes of traffic on the campus network (with proper authorization). In Jupyter, they load the capture, filter for DNS requests, group by source IP, and plot the top 10 most active hosts. In thirty lines of code and five Markdown cells, they've produced a report that would take hours to generate manually in Wireshark.</p>
+
+      <div class="code-label">Python — Scapy PCAP Analysis Starter</div>
+      <div class="code-block">
+<span class="comment"># Lab 4: Analyzing network traffic with Scapy</span>
+<span class="comment"># Required: pip install scapy pandas matplotlib</span>
+
+<span class="keyword">from</span> scapy.all <span class="keyword">import</span> rdpcap, DNS, IP
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Load the packet capture</span>
+packets = <span class="function">rdpcap</span>(<span class="string">'lab_capture.pcap'</span>)
+
+<span class="comment"># Extract DNS queries</span>
+dns_queries = []
+<span class="keyword">for</span> pkt <span class="keyword">in</span> packets:
+    <span class="keyword">if</span> pkt.haslayer(DNS) <span class="keyword">and</span> pkt[DNS].qr == <span class="number">0</span>:
+        dns_queries.append({
+            <span class="string">'src_ip'</span>: pkt[IP].src,
+            <span class="string">'query'</span>: pkt[DNS].qd.qname.decode()
+        })
+
+df = pd.DataFrame(dns_queries)
+<span class="output">
+# Output: DataFrame with columns src_ip, query
+# Students can then: df['src_ip'].value_counts().plot(kind='bar')</span>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🔐 Use Case 2: Log Analysis and SIEM Simulation</h3>
+      <p>Security analysts spend a significant portion of their time sifting through logs. Jupyter is an ideal environment for teaching this skill because students can interact with real log data step by step, making decisions at each stage rather than running a black-box script. This mirrors how analysts work in tools like Splunk or Microsoft Sentinel — but with full transparency of what's happening under the hood.</p>
+      <p>A practical exercise: give students a CSV export of Apache access logs from a simulated web server. Ask them to identify all 404 error requests, group them by user agent, and flag any user agents that appear more than 50 times in an hour — a simple but effective heuristic for directory brute-forcing.</p>
+
+      <div class="code-label">Python — Web Server Log Analysis</div>
+      <div class="code-block">
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+
+<span class="comment"># Load Apache access log (pre-parsed to CSV)</span>
+logs = pd.read_csv(<span class="string">'access_log.csv'</span>,
+    parse_dates=[<span class="string">'timestamp'</span>])
+
+<span class="comment"># Filter 404 errors</span>
+errors = logs[logs[<span class="string">'status'</span>] == <span class="number">404</span>]
+
+<span class="comment"># Count requests per user_agent per hour</span>
+errors[<span class="string">'hour'</span>] = errors[<span class="string">'timestamp'</span>].dt.floor(<span class="string">'H'</span>)
+suspicious = (errors.groupby([<span class="string">'user_agent'</span>, <span class="string">'hour'</span>])
+              .size()
+              .reset_index(name=<span class="string">'count'</span>))
+
+<span class="comment"># Flag agents with more than 50 requests/hour</span>
+flagged = suspicious[suspicious[<span class="string">'count'</span>] > <span class="number">50</span>]
+<span class="output">
+# Output: DataFrame of suspicious user agents and their request volumes</span>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🗺️ Use Case 3: IP Geolocation and Threat Visualization</h3>
+      <p>Students are highly engaged when they can visualize threat data on a map. Jupyter notebooks integrate beautifully with geolocation APIs (like ip-api.com or MaxMind) and mapping libraries like Folium. A lab exercise might ask students to take a list of suspicious IP addresses from a firewall log and produce an interactive world map showing where connection attempts originated — a task that illustrates both geolocation concepts and the global nature of cybersecurity threats.</p>
+      <p>This type of exercise connects naturally to discussions of attribution, geoblocking policies, and the limitations of IP-based threat intelligence. The notebook becomes a conversation starter, not just a coding exercise.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>🔍 Use Case 4: Vulnerability Data Analysis (CVE/NVD)</h3>
+      <p>The National Vulnerability Database (NVD) provides machine-readable CVE data via a free API. Students can use Jupyter to query recent CVEs, filter by CVSS score, group by vendor, and visualize trends over time. This exercise teaches API consumption (an essential modern skill), JSON parsing, and data visualization — all in the context of a dataset students care about because it represents real-world threats to systems they'll be defending.</p>
+
+      <div class="callout success">
+        <strong>🎯 Assignment Idea:</strong> "Pull the last 30 days of Critical CVEs from the NVD API. Which vendor had the most critical vulnerabilities? Plot severity distribution over time. In your Markdown cells, explain what this means for a security operations team's patching priority queue."
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3>🎬 Video: Python for Cybersecurity with Jupyter</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/hvGeE_zB_Zg"
+          title="Python for Cybersecurity Jupyter Notebook"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="video-caption">Video 6 — Python for cybersecurity workflows in Jupyter. Real-world security analysis examples.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>📦 Essential Libraries for Security Faculty</h3>
+      <table class="comparison-table">
+        <thead><tr><th>Library</th><th>Install</th><th>Primary Use in Security</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Scapy</strong></td><td><code>pip install scapy</code></td><td>Packet crafting, PCAP analysis, protocol exploration</td></tr>
+          <tr><td><strong>Pandas</strong></td><td>Included in Anaconda</td><td>Log analysis, data manipulation, CSV/JSON ingestion</td></tr>
+          <tr><td><strong>Matplotlib</strong></td><td>Included in Anaconda</td><td>Traffic visualization, timeline plots, bar charts</td></tr>
+          <tr><td><strong>Requests</strong></td><td>Included in Anaconda</td><td>API queries (NVD, VirusTotal, Shodan)</td></tr>
+          <tr><td><strong>Folium</strong></td><td><code>pip install folium</code></td><td>Geolocation maps, threat origin visualization</td></tr>
+          <tr><td><strong>Cryptography</strong></td><td><code>pip install cryptography</code></td><td>Encryption demos, certificate parsing, hashing</td></tr>
+          <tr><td><strong>ipaddress</strong></td><td>Built-in Python</td><td>Subnet calculations, IP range validation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-nav">
+      <button class="btn btn-secondary" onclick="switchTab(3)">← Back</button>
+      <button class="btn btn-primary" onclick="switchTab(5)">Final Module: Quiz →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+     TAB 5: QUIZ
+     ============================================================ -->
+  <section class="tab-panel" id="tab-5" role="tabpanel" aria-labelledby="tabBtn-5">
+
+    <div class="section-intro" data-icon="🧠">
+      <h2>Module 6: Knowledge Check</h2>
+      <p>Ten questions covering everything from the fundamentals of what Jupyter is to practical cybersecurity applications. Questions are randomized on each load. You'll receive immediate feedback on every answer.</p>
+      <ul class="objectives-list">
+        <li>Confirm your understanding of core Jupyter concepts</li>
+        <li>Identify any areas to revisit before teaching</li>
+        <li>Receive a final score and personalized encouragement</li>
+      </ul>
+    </div>
+
+    <!-- Quiz area -->
+    <div class="quiz-container" id="quiz-container">
+      <div class="quiz-header">
+        <span class="quiz-title">📝 Knowledge Check — Jupyter Notebook Primer</span>
+        <span class="quiz-score-display" id="quiz-score-display">Question 1 of 10</span>
+      </div>
+
+      <p class="question-text" id="question-text"></p>
+
+      <ul class="options-list" id="options-list" aria-label="Answer choices"></ul>
+
+      <div class="feedback-box" id="feedback-box" aria-live="polite" aria-atomic="true"></div>
+
+      <div class="quiz-nav">
+        <span style="font-size:0.82rem; color:var(--color-muted); font-family:var(--font-display);" id="answer-tally">0 correct</span>
+        <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Results screen -->
+    <div class="results-screen" id="results-screen" role="region" aria-label="Quiz results" aria-live="polite">
+      <div class="results-label">Your Score</div>
+      <div class="results-score" id="results-score">—</div>
+      <div class="results-label">out of 10</div>
+
+      <div class="results-breakdown">
+        <div class="results-stat">
+          <span class="value" id="results-correct">—</span>
+          <span class="label">Correct</span>
+        </div>
+        <div class="results-stat">
+          <span class="value" id="results-pct">—</span>
+          <span class="label">Percentage</span>
+        </div>
+        <div class="results-stat">
+          <span class="value" id="results-incorrect">—</span>
+          <span class="label">Missed</span>
+        </div>
+      </div>
+
+      <p class="results-message" id="results-message"></p>
+
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:1.5rem;">
+        <button class="btn btn-primary" onclick="resetQuiz()">🔄 Try Again</button>
+        <button class="btn btn-secondary" onclick="switchTab(0)">📚 Review Modules</button>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ============================================================
+   FOOTER
+   ============================================================ -->
+<footer class="site-footer" role="contentinfo">
+  <p>Jupyter Notebook Primer · Networking &amp; Cybersecurity Faculty Development · School of STEAM</p>
+  <p style="margin-top:0.5rem; font-size:0.72rem; opacity:0.6;">Interactive learning module. All code examples for educational purposes only.</p>
+</footer>
+
+<script>
+/* ============================================================
+   ACCESSIBILITY: Font size control
+   ============================================================ */
+let currentFontSize = 16;
+
+function changeFontSize(delta) {
+  currentFontSize = Math.min(24, Math.max(12, currentFontSize + delta));
+  document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+  document.getElementById('font-size-label').textContent = currentFontSize + 'px';
+  announce('Font size changed to ' + currentFontSize + ' pixels');
+}
+
+/* ============================================================
+   ACCESSIBILITY: High contrast toggle
+   ============================================================ */
+function toggleContrast() {
+  const btn = document.getElementById('contrast-btn');
+  const body = document.body;
+  const on = body.classList.toggle('high-contrast');
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.textContent = 'High Contrast: ' + (on ? 'ON' : 'OFF');
+  announce('High contrast mode ' + (on ? 'enabled' : 'disabled'));
+}
+
+/* ============================================================
+   ACCESSIBILITY: Reduce motion toggle
+   ============================================================ */
+function toggleMotion() {
+  const btn = document.getElementById('motion-btn');
+  const body = document.body;
+  const on = body.classList.toggle('motion-reduced');
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.textContent = 'Reduce Motion: ' + (on ? 'ON' : 'OFF');
+  announce('Reduce motion ' + (on ? 'enabled' : 'disabled'));
+}
+
+/* ============================================================
+   SCREEN READER ANNOUNCEMENT
+   ============================================================ */
+function announce(msg) {
+  const region = document.getElementById('live-region');
+  region.textContent = '';
+  setTimeout(() => { region.textContent = msg; }, 50);
+}
+
+/* ============================================================
+   TAB SWITCHING
+   ============================================================ */
+const totalTabs = 6;
+let visitedTabs = new Set([0]);
+
+function switchTab(index) {
+  // Deactivate all tabs
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+
+  // Activate selected
+  document.getElementById('tab-' + index).classList.add('active');
+  document.querySelectorAll('.tab-btn')[index].classList.add('active');
+  document.querySelectorAll('.tab-btn')[index].setAttribute('aria-selected', 'true');
+
+  // Track visited
+  visitedTabs.add(index);
+  updateProgress();
+
+  // Scroll to top of content
+  document.getElementById('main-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Mark previous tabs as completed
+  for (let i = 0; i < index; i++) {
+    const btn = document.querySelectorAll('.tab-btn')[i];
+    if (!btn.classList.contains('active')) {
+      btn.classList.add('completed');
+    }
+  }
+
+  announce('Navigated to module ' + (index + 1));
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+function updateProgress() {
+  const pct = Math.round((visitedTabs.size / totalTabs) * 100);
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-label');
+  fill.style.width = pct + '%';
+  fill.setAttribute('aria-valuenow', pct);
+  label.textContent = pct + '% complete';
+}
+
+/* ============================================================
+   DIAGRAM ANNOTATIONS
+   ============================================================ */
+function showAnnotation(index) {
+  // Hide all panels
+  document.querySelectorAll('.annotation-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb-hotspot').forEach(h => h.classList.remove('active'));
+
+  // Show selected
+  const panel = document.getElementById('annotation-' + index);
+  if (panel) {
+    panel.classList.add('active');
+    // Mark hotspot active
+    const hotspots = document.querySelectorAll('.nb-hotspot');
+    if (hotspots[index]) hotspots[index].classList.add('active');
+    document.getElementById('diagram-hint').style.display = 'none';
+    announce('Annotation ' + (index + 1) + ' loaded');
+  }
+}
+
+/* ============================================================
+   CHECKPOINT TRACKER
+   ============================================================ */
+let completedCheckpoints = 0;
+const totalCheckpoints = 8;
+
+function toggleCheckpoint(el) {
+  const wasCompleted = el.classList.contains('completed');
+  el.classList.toggle('completed');
+  el.setAttribute('aria-checked', wasCompleted ? 'false' : 'true');
+
+  completedCheckpoints = document.querySelectorAll('.checkpoint-item.completed').length;
+  document.getElementById('checkpoint-count').textContent = completedCheckpoints;
+  announce('Step ' + (wasCompleted ? 'unchecked' : 'checked') + '. ' + completedCheckpoints + ' of ' + totalCheckpoints + ' complete.');
+}
+
+/* ============================================================
+   QUIZ ENGINE
+   ============================================================ */
+const allQuestions = [
+  {
+    q: "What does the 'Ju' in 'Jupyter' stand for?",
+    options: ["JavaScript", "Julia", "JSON", "JupyterHub"],
+    correct: 1,
+    explanation: "Jupyter is a portmanteau of Julia, Python, and R — the three core scientific computing languages it was originally designed to support."
+  },
+  {
+    q: "What file extension does a Jupyter Notebook use?",
+    options: [".py", ".nb", ".ipynb", ".jpy"],
+    correct: 2,
+    explanation: ".ipynb stands for IPython Notebook, the precursor to Jupyter. Under the hood, it's a JSON file containing cells, outputs, and metadata."
+  },
+  {
+    q: "A student sees 'In [*]:' next to a code cell. What does this mean?",
+    options: [
+      "The cell has an error and needs to be fixed",
+      "The cell is currently executing — the kernel is busy",
+      "The cell is in edit mode",
+      "The cell has not been run yet"
+    ],
+    correct: 1,
+    explanation: "An asterisk (*) in the bracket means the cell is currently being executed by the kernel. An empty bracket [ ] means not yet run, and a number like [3] means the cell was the 3rd to execute."
+  },
+  {
+    q: "Which keyboard shortcut runs the current cell AND moves focus to the next cell?",
+    options: ["Ctrl + Enter", "Shift + Enter", "Alt + Enter", "Tab + Enter"],
+    correct: 1,
+    explanation: "Shift + Enter runs the current cell and moves the cursor to the next cell. Ctrl + Enter runs and stays in the current cell. Alt + Enter runs and inserts a new cell below."
+  },
+  {
+    q: "A cybersecurity student wants to analyze a .pcap file using Python in Jupyter. Which library should they install?",
+    options: ["NumPy", "Scapy", "Flask", "SQLAlchemy"],
+    correct: 1,
+    explanation: "Scapy is the standard library for packet manipulation and PCAP analysis in Python. It can read, write, and filter packet captures at the protocol level."
+  },
+  {
+    q: "What happens to all variables in memory if you select 'Restart Kernel'?",
+    options: [
+      "Nothing — variables are preserved in cell outputs",
+      "Only imported libraries are cleared",
+      "All variables are erased; the kernel returns to a clean state",
+      "The notebook file is deleted"
+    ],
+    correct: 2,
+    explanation: "Restarting the kernel clears all variables, imported modules, and function definitions from memory. Cell outputs remain visible in the notebook, but re-running cells is required to restore the session state."
+  },
+  {
+    q: "Which of the following is the safest environment for students to analyze real PCAP files containing sensitive network traffic?",
+    options: [
+      "Google Colab",
+      "A cloud-hosted public Jupyter server",
+      "Local Jupyter or campus JupyterHub",
+      "Any environment — Jupyter is always secure"
+    ],
+    correct: 2,
+    explanation: "Sensitive network data (packet captures, log files) should stay within your network perimeter. Local Jupyter or an institution-hosted JupyterHub ensures data does not leave your control. Google Colab stores data on Google's infrastructure."
+  },
+  {
+    q: "In the classic Jupyter Notebook interface, pressing 'M' in Command Mode does what?",
+    options: [
+      "Opens the menu bar",
+      "Changes the current cell type to Markdown",
+      "Merges cells below",
+      "Runs the cell in magic mode"
+    ],
+    correct: 1,
+    explanation: "In Command Mode (blue cell border), pressing M converts the selected cell to a Markdown cell. Pressing Y converts it back to a Code cell. Command Mode is entered by pressing Escape from a cell."
+  },
+  {
+    q: "What is the PRIMARY advantage of Jupyter Notebooks over traditional .py script files for teaching purposes?",
+    options: [
+      "Notebooks run faster than scripts",
+      "Notebooks are easier to upload to GitHub",
+      "Notebooks interleave executable code with formatted documentation and inline output",
+      "Notebooks automatically detect syntax errors"
+    ],
+    correct: 2,
+    explanation: "The core pedagogical advantage of notebooks is that code, documentation (Markdown), and output all live in the same document. This makes the analysis self-explanatory and reproducible without requiring students to consult separate files."
+  },
+  {
+    q: "Which of the following Jupyter features is MOST useful for ensuring a submitted notebook works correctly before grading?",
+    options: [
+      "File → Print Preview",
+      "Kernel → Restart & Run All",
+      "Cell → Split Cell",
+      "Edit → Find and Replace"
+    ],
+    correct: 1,
+    explanation: "'Restart & Run All' restarts the kernel (clearing all variables) and re-executes every cell from top to bottom. This verifies the notebook runs cleanly in one pass — exactly what a grader or new reader will experience."
+  },
+  {
+    q: "A faculty member wants students to submit notebooks but is worried about academic dishonesty. Which Jupyter feature can help add individual accountability?",
+    options: [
+      "Cell line numbers",
+      "Markdown cells requiring personal narrative and analysis",
+      "Jupyter's built-in plagiarism detection",
+      "The kernel log file"
+    ],
+    correct: 1,
+    explanation: "Requiring students to write their own Markdown analysis cells — explaining their reasoning, interpreting outputs, and reflecting on results — makes copying much harder. Code can be copied; genuine analytical narrative written in context is much harder to replicate meaningfully."
+  },
+  {
+    q: "What library would you use to create an interactive world map showing the origins of suspicious IP addresses in a Jupyter Notebook?",
+    options: ["Scapy", "Folium", "Pandas", "Requests"],
+    correct: 1,
+    explanation: "Folium is a Python library that creates interactive Leaflet.js maps within Jupyter outputs. It's ideal for geolocation visualization — mapping threat origins, plotting network device locations, or visualizing attack patterns."
+  }
+];
+
+let quizQuestions = [];
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+// Fisher-Yates shuffle
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function initQuiz() {
+  // Pick 10 random questions (or all if fewer than 10)
+  quizQuestions = shuffle(allQuestions).slice(0, 10);
+  currentQuestion = 0;
+  score = 0;
+  answered = false;
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('results-screen').classList.remove('show');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = quizQuestions[currentQuestion];
+
+  // Shuffle options but track correct index
+  const letters = ['A', 'B', 'C', 'D'];
+  const indices = shuffle([0, 1, 2, 3]);
+  const shuffledOptions = indices.map(i => q.options[i]);
+  const newCorrectIndex = indices.indexOf(q.correct);
+
+  document.getElementById('question-text').textContent =
+    (currentQuestion + 1) + '. ' + q.q;
+
+  document.getElementById('quiz-score-display').textContent =
+    'Question ' + (currentQuestion + 1) + ' of ' + quizQuestions.length;
+
+  document.getElementById('answer-tally').textContent = score + ' correct';
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+
+  shuffledOptions.forEach((opt, i) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.setAttribute('aria-label', 'Option ' + letters[i] + ': ' + opt);
+    btn.innerHTML = '<span class="option-letter" aria-hidden="true">' + letters[i] + '</span>' + opt;
+    btn.onclick = () => selectAnswer(i, newCorrectIndex, q.explanation, btn);
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback-box';
+  fb.textContent = '';
+
+  document.getElementById('next-btn').disabled = true;
+
+  const isLast = currentQuestion === quizQuestions.length - 1;
+  document.getElementById('next-btn').textContent = isLast ? 'See Results' : 'Next →';
+}
+
+function selectAnswer(chosen, correct, explanation, btn) {
+  if (answered) return;
+  answered = true;
+
+  const allBtns = document.querySelectorAll('.quiz-option');
+
+  allBtns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === correct) b.classList.add('correct');
+  });
+
+  const fb = document.getElementById('feedback-box');
+
+  if (chosen === correct) {
+    score++;
+    btn.classList.add('correct');
+    fb.className = 'feedback-box correct show';
+    fb.innerHTML = '<strong>✓ Correct!</strong> ' + explanation;
+    announce('Correct! ' + explanation);
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback-box incorrect show';
+    fb.innerHTML = '<strong>✗ Not quite.</strong> ' + explanation;
+    announce('Incorrect. ' + explanation);
+  }
+
+  document.getElementById('answer-tally').textContent = score + ' correct';
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion >= quizQuestions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const rs = document.getElementById('results-screen');
+  rs.classList.add('show');
+
+  const pct = Math.round((score / quizQuestions.length) * 100);
+  document.getElementById('results-score').textContent = score;
+  document.getElementById('results-correct').textContent = score;
+  document.getElementById('results-pct').textContent = pct + '%';
+  document.getElementById('results-incorrect').textContent = quizQuestions.length - score;
+
+  let msg = '';
+  if (pct === 100) msg = "Perfect score! You're ready to bring Jupyter into your classroom with confidence. Your students are lucky to have a faculty member this prepared.";
+  else if (pct >= 80) msg = "Excellent work! You've got a strong grasp of Jupyter fundamentals. A quick review of the modules you found tricky and you'll be all set to teach.";
+  else if (pct >= 60) msg = "Good foundation! You've picked up the key concepts. We recommend revisiting the modules on the anatomy and cybersecurity use cases before your first lab session.";
+  else msg = "Thanks for working through this module! Jupyter has a bit of a learning curve — revisit Modules 1–4 at your own pace. You'll get there, and your students will benefit from your effort.";
+
+  document.getElementById('results-message').textContent = msg;
+  announce('Quiz complete. You scored ' + score + ' out of ' + quizQuestions.length + '. ' + msg);
+
+  // Update progress
+  visitedTabs.add(5);
+  updateProgress();
+}
+
+function resetQuiz() {
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('results-screen').classList.remove('show');
+  initQuiz();
+}
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  initQuiz();
+  updateProgress();
+});
+</script>
+</body>
+</html>
