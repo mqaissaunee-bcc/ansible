@@ -57,40 +57,6 @@
   --transition-slow: 400ms ease;
 }
 
-/* ============================================================
-   HIGH CONTRAST MODE
-   ============================================================ */
-body.high-contrast {
-  --color-primary: #ffffff;
-  --color-secondary: #ffff00;
-  --color-accent: #ffff00;
-  --color-bg: #000000;
-  --color-surface: #000000;
-  --color-text: #ffffff;
-  --color-muted: #ffffff;
-  --color-border: #ffffff;
-  --color-highlight: #222222;
-}
-
-body.high-contrast * {
-  background-image: none !important;
-}
-
-body.high-contrast a,
-body.high-contrast .tab-btn.active,
-body.high-contrast .quiz-option.selected {
-  color: #ffff00;
-  border-color: #ffff00;
-}
-
-body.high-contrast *:focus {
-  outline: 2px solid #ffff00 !important;
-  outline-offset: 2px;
-}
-
-body.high-contrast .progress-fill {
-  background: #ffff00 !important;
-}
 
 /* ============================================================
    REDUCED MOTION
@@ -1255,7 +1221,6 @@ img { max-width: 100%; height: auto; display: block; }
   <button onclick="changeFontSize(-2)" aria-label="Decrease font size">A−</button>
   <span class="font-size-display" id="font-size-label">16px</span>
   <button onclick="changeFontSize(2)" aria-label="Increase font size">A+</button>
-  <button id="contrast-btn" onclick="toggleContrast()" aria-pressed="false">High Contrast: OFF</button>
   <button id="motion-btn" onclick="toggleMotion()" aria-pressed="false">Reduce Motion: OFF</button>
   <button class="print-btn" onclick="window.print()" aria-label="Print or save as PDF">🖨️ Print / Save as PDF</button>
 </div>
@@ -2019,18 +1984,6 @@ function changeFontSize(delta) {
   document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
   document.getElementById('font-size-label').textContent = currentFontSize + 'px';
   announce('Font size changed to ' + currentFontSize + ' pixels');
-}
-
-/* ============================================================
-   ACCESSIBILITY: High contrast toggle
-   ============================================================ */
-function toggleContrast() {
-  const btn = document.getElementById('contrast-btn');
-  const body = document.body;
-  const on = body.classList.toggle('high-contrast');
-  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  btn.textContent = 'High Contrast: ' + (on ? 'ON' : 'OFF');
-  announce('High contrast mode ' + (on ? 'enabled' : 'disabled'));
 }
 
 /* ============================================================
