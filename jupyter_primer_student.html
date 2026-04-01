@@ -62,29 +62,6 @@
 }
 
 /* ============================================================
-   HIGH CONTRAST
-   ============================================================ */
-body.high-contrast {
-  --color-primary: #ffffff;
-  --color-secondary: #ffff00;
-  --color-accent: #ffff00;
-  --color-bg: #000000;
-  --color-surface: #000000;
-  --color-text: #ffffff;
-  --color-muted: #ffffff;
-  --color-border: #ffffff;
-  --color-highlight: #1a1a1a;
-  --color-xp-bg: #000000;
-  --color-tag-bg: #1a1a00;
-  --color-tag-text: #ffff00;
-}
-body.high-contrast * { background-image: none !important; }
-body.high-contrast *:focus { outline: 2px solid #ffff00 !important; outline-offset: 2px; }
-body.high-contrast .progress-fill,
-body.high-contrast .xp-fill { background: #ffff00 !important; }
-body.high-contrast .badge-earned { border-color: #ffff00; color: #ffff00; }
-
-/* ============================================================
    REDUCED MOTION
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -1283,7 +1260,6 @@ code {
   <button onclick="fontSize(-2)" aria-label="Decrease font size">A−</button>
   <span class="font-display" id="fs-label">16px</span>
   <button onclick="fontSize(2)" aria-label="Increase font size">A+</button>
-  <button id="hc-btn" onclick="toggleHC()" aria-pressed="false">High Contrast: OFF</button>
   <button id="rm-btn" onclick="toggleRM()" aria-pressed="false">Reduce Motion: OFF</button>
   <button onclick="window.print()" aria-label="Print or save as PDF">🖨️ Print / PDF</button>
 </div>
@@ -1941,13 +1917,6 @@ function fontSize(d) {
   document.documentElement.style.setProperty('--base-font-size', fs + 'px');
   document.getElementById('fs-label').textContent = fs + 'px';
   say('Font size ' + fs + ' pixels');
-}
-function toggleHC() {
-  const b = document.getElementById('hc-btn');
-  const on = document.body.classList.toggle('high-contrast');
-  b.setAttribute('aria-pressed', on);
-  b.textContent = 'High Contrast: ' + (on ? 'ON' : 'OFF');
-  say('High contrast ' + (on ? 'on' : 'off'));
 }
 function toggleRM() {
   const b = document.getElementById('rm-btn');
