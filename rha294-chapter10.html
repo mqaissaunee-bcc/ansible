@@ -312,10 +312,10 @@
                 <span class="nav-icon" aria-hidden="true">📋</span> Lab Overview & Setup
             </div>
             <div class="nav-item" data-section="lab1-tasks" tabindex="0" role="button" aria-pressed="false" onclick="navigateTo('lab1-tasks')" onkeydown="if(event.key==='Enter'||event.key===' ')navigateTo('lab1-tasks')">
-                <span class="nav-icon" aria-hidden="true">⚙️</span> Tasks 1–4: Install & Configure
+                <span class="nav-icon" aria-hidden="true">⚙️</span> Install &amp; Configure
             </div>
             <div class="nav-item" data-section="lab1-playbooks" tabindex="0" role="button" aria-pressed="false" onclick="navigateTo('lab1-playbooks')" onkeydown="if(event.key==='Enter'||event.key===' ')navigateTo('lab1-playbooks')">
-                <span class="nav-icon" aria-hidden="true">📝</span> Tasks 5–8: Playbooks & Troubleshoot
+                <span class="nav-icon" aria-hidden="true">📝</span> Playbooks &amp; Troubleshoot
             </div>
             <div class="nav-item" data-section="lab1-pause" tabindex="0" role="button" aria-pressed="false" onclick="navigateTo('lab1-pause')" onkeydown="if(event.key==='Enter'||event.key===' ')navigateTo('lab1-pause')">
                 <span class="nav-icon" aria-hidden="true">⏸️</span> ⏸ Pause Point — Lab 1
@@ -541,13 +541,13 @@
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('objectives')">← Objectives</button>
-                <button class="btn btn-primary" onclick="navigateTo('lab1-tasks')">Tasks 1–4 →</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab1-tasks')">Install &amp; Configure →</button>
             </div>
         </section>
 
         <!-- LAB 1 TASKS 1-4 -->
         <section class="section" id="section-lab1-tasks" aria-labelledby="lab1-tasks-heading">
-            <h1 id="lab1-tasks-heading">Lab 1: Tasks 1–4 — Install &amp; Configure</h1>
+            <h1 id="lab1-tasks-heading">Lab 1: Install &amp; Configure</h1>
 
             <div class="step-container">
                 <div class="step">
@@ -667,13 +667,13 @@ Running the command: podman pull utility.lab.example.com/ee-supported-rhel8:late
 
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="navigateTo('lab1-intro')">← Lab Overview</button>
-                <button class="btn btn-primary" onclick="navigateTo('lab1-playbooks')">Tasks 5–8 →</button>
+                <button class="btn btn-primary" onclick="navigateTo('lab1-playbooks')">Playbooks &amp; Troubleshoot →</button>
             </div>
         </section>
 
         <!-- LAB 1 TASKS 5-8 -->
         <section class="section" id="section-lab1-playbooks" aria-labelledby="lab1-play-heading">
-            <h1 id="lab1-play-heading">Lab 1: Tasks 5–8 — Playbooks &amp; Troubleshooting</h1>
+            <h1 id="lab1-play-heading">Lab 1: Playbooks &amp; Troubleshooting</h1>
 
             <div class="step-container">
                 <div class="step">
@@ -853,7 +853,7 @@ serverb.lab.example.com  : ok=2  changed=1  unreachable=0  failed=0</span></span
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('lab1-tasks')">← Tasks 1–4</button>
+                <button class="btn btn-secondary" onclick="navigateTo('lab1-tasks')">← Install &amp; Configure</button>
                 <button class="btn btn-primary" onclick="navigateTo('lab1-pause')">Pause Point →</button>
             </div>
         </section>
@@ -892,7 +892,7 @@ serverb.lab.example.com  : ok=2  changed=1  unreachable=0  failed=0</span></span
             </div>
 
             <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="navigateTo('lab1-playbooks')">← Tasks 5–8</button>
+                <button class="btn btn-secondary" onclick="navigateTo('lab1-playbooks')">← Playbooks &amp; Troubleshoot</button>
                 <button class="btn btn-primary" onclick="navigateTo('lab2-intro')">Start Lab 2 →</button>
             </div>
         </section>
@@ -2226,15 +2226,15 @@ PLAY RECAP ************************************************
                             <option value="get_web">get_web_content.yml — Content verification</option>
                             <option value="site2">site.yml — Full Lab 2 run</option>
                         </optgroup>
-                        <optgroup label="Lab 4 — Creating Roles">
-                            <option value="roles_site">site.yml — ansible-httpd role run</option>
-                        </optgroup>
                         <optgroup label="Lab 3 — System Roles">
                             <option value="storage">storage.yml — LVM volumes with storage role</option>
                             <option value="devusers">dev-users.yml — developer user + sudo</option>
                             <option value="network">network.yml — eth1 network configuration</option>
                             <option value="logrotat">log-rotate.yml — Midnight cron job</option>
                             <option value="site3">site.yml — Full Lab 3 run</option>
+                        </optgroup>
+                        <optgroup label="Lab 4 — Creating Roles">
+                            <option value="roles_site">site.yml — ansible-httpd role run</option>
                         </optgroup>
                     </select>
                     <button class="simulator-btn" id="sim-run-btn" onclick="runSimulation()" aria-label="Run selected playbook simulation">▶ Run Playbook</button>
